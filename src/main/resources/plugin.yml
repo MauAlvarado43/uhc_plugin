@@ -1,0 +1,86 @@
+name: uhc
+main: vch.uhc.UHC
+version: 0.0.0.1
+api-version: 1.21
+depend: [TAB, PlaceholderAPI]
+commands:
+  uhc:
+    description: UHC command
+    usage: /uhc <subcommand>
+    permission: uhc.use
+    aliases: [uhc]
+    children:
+      info:
+        description: Show UHC information
+        usage: /uhc info
+        permission: uhc.info
+      start:
+        description: Start the UHC game
+        usage: /uhc start
+        permission: uhc.start
+      cancel:
+        description: Cancel the UHC game
+        usage: /uhc cancel
+        permission: uhc.cancel
+      pause:
+        description: Pause the UHC game
+        usage: /uhc pause
+        permission: uhc.pause
+      join:
+        description: Join the UHC game
+        usage: /uhc join
+        permission: uhc.join
+      leave:
+        description: Leave the UHC game
+        usage: /uhc leave
+        permission: uhc.leave
+      players:
+        description: Player management commands
+        usage: /uhc players <list|setLives|setHealth|revive>
+        permission: uhc.players
+        children:
+          list:
+            description: List players and lives
+            usage: /uhc players list
+            permission: uhc.players.list
+          setLives:
+            description: Set lives for a player
+            usage: /uhc players setLives <player> <lives>
+            permission: uhc.players.setLives
+          setHealth:
+            description: Set max health for a player
+            usage: /uhc players setHealth <player> <health>
+            permission: uhc.players.setHealth
+          revive:
+            description: Revive a player
+            usage: /uhc players revive <player>
+            permission: uhc.players.revive
+      settings:
+        description: Change UHC settings
+        usage: /uhc settings <subcommand> <setting> <value>
+        permission: uhc.settings
+        children:
+          set:
+            description: Set a UHC setting
+            usage: /uhc settings set <setting> <value>
+            permission: uhc.settings.set
+      team:
+        description: Team management commands (implementation partial)
+        usage: /uhc team <create|add|remove|rename|leave>
+        permission: uhc.team
+        children:
+          create:
+            description: Create a team
+            permission: uhc.team.create
+          add:
+            description: Add a member to a team
+            permission: uhc.team.add
+          remove:
+            description: Remove a member from a team
+            permission: uhc.team.remove
+          rename:
+            description: Rename a team
+            permission: uhc.team.rename
+          leave:
+            description: Leave a team
+            permission: uhc.team.leave

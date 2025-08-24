@@ -1,0 +1,8 @@
+test_server/
+target/
+.vscode
+
+*.classpath
+*.project
+*.settings/
+*.class

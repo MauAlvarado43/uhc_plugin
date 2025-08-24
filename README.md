@@ -47,10 +47,10 @@ Move the produced JAR to the server `plugins` folder (script):
 .\bin\move.bat
 ```
 
-Run the test server using the provided `bin/test.bat` script (this repository uses `bin/test.bat` as the test server launcher):
+Run the test server using the provided `bin/server.bat` script (this repository uses `bin/server.bat` as the test server launcher):
 
 ```powershell
-.\bin\test.bat
+.\bin\server.bat
 ```
 
 Alternatively, build with Maven directly:

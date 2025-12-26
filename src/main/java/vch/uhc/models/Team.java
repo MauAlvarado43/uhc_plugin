@@ -45,11 +45,7 @@ public class Team {
   }
 
   public void removeMember(Player player) {
-
-    for(Player member : members)
-        if(member.getUuid().equals(player.getUuid()))
-            members.remove(member);
-
+    members.removeIf(member -> member.getUuid().equals(player.getUuid()));
   }
 
 }

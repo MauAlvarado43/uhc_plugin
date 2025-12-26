@@ -36,7 +36,7 @@ public class PlayerGoldenApple extends BaseItem {
         if (!isEnabled())
             return false;
 
-        AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
         double currentMaxHealth = attribute.getBaseValue();
 
         if (!(currentMaxHealth + 4.0D > 60.0D))

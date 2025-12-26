@@ -15,6 +15,7 @@ import vch.uhc.listeners.FoodListener;
 import vch.uhc.listeners.PlayerDeathListener;
 import vch.uhc.listeners.PlayerJoinListener;
 import vch.uhc.managers.PlayerManager;
+import vch.uhc.managers.SkinManager;
 import vch.uhc.managers.TeamManager;
 import vch.uhc.managers.UHCManager;
 import vch.uhc.misc.CommandCompleter;
@@ -29,6 +30,7 @@ public class UHC extends JavaPlugin {
     private PlayerManager playerManager;
     private TeamManager teamManager;
     private UHCManager uhcManager;
+    private SkinManager skinManager;
 
     public void onEnable() {
 
@@ -37,6 +39,7 @@ public class UHC extends JavaPlugin {
         playerManager = new PlayerManager();
         teamManager = new TeamManager();
         uhcManager = new UHCManager();
+        skinManager = new SkinManager();
 
         new ChatListener().register();
         new EntityDeathListener().register();
@@ -95,6 +98,10 @@ public class UHC extends JavaPlugin {
 
     public UHCManager getUHCManager() {
         return uhcManager;
+    }
+
+    public SkinManager getSkinManager() {
+        return skinManager;
     }
 
 }

@@ -43,7 +43,7 @@ public class PlayerCommandHandler {
                 try {
                     int health = Integer.parseInt(args[3]);
                     Player player = Bukkit.getPlayer(playerHealthName);
-                    AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+                    AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
                     attribute.setBaseValue(health);
                     sender.sendMessage(ChatColor.GREEN + "Set health for " + playerHealthName + " to " + health);
                 } catch (Exception e) {

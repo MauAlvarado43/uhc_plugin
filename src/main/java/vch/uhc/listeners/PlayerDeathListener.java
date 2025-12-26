@@ -16,9 +16,6 @@ public class PlayerDeathListener extends BaseListener {
             return;
         }
 
-        // Location loc = e.getEntity().getLocation();
-        // Block block = loc.getBlock();
-        // loc.getBlock().setType(Material.CHEST);
         
     }
 

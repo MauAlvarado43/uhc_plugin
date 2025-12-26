@@ -12,11 +12,6 @@ public class TeamCommandHandler {
             return false;
         }
 
-        // create team (if settings.team is manual)
-        // add member (if settings.team is manual)
-        // remove member (if settings.team is manual)
-        // rename team
-        // leave team (if settings.team is manual)
 
         return true;
 

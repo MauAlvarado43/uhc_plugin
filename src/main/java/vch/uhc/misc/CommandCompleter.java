@@ -29,7 +29,6 @@ public class CommandCompleter implements TabCompleter {
         AvailableCommands play = new AvailableCommands("play");
         AvailableCommands leave = new AvailableCommands("leave");
 
-        // Settings commands 
         AvailableCommands settings = new AvailableCommands("settings");
 
         AvailableCommands set = new AvailableCommands("set");
@@ -116,7 +115,6 @@ public class CommandCompleter implements TabCompleter {
 
         settings.addNextArg(set);
 
-        // User commands
         AvailableCommands player = new AvailableCommands("players");
 
         AvailableCommands playerList = new AvailableCommands("list");
@@ -146,7 +144,6 @@ public class CommandCompleter implements TabCompleter {
         player.addNextArg(setHealth);
         player.addNextArg(revive);
 
-        // Root commands
         rootCommands.add(start);
         rootCommands.add(stop);
         rootCommands.add(pause);

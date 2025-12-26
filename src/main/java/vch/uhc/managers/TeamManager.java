@@ -47,4 +47,14 @@ public class TeamManager {
         team.setName(newName);
     }
 
+    public boolean canPlayersJoinTeam(Player p1, Player p2) {
+        if (p1.getTeam() == null || p2.getTeam() == null)
+            return false;
+        
+        if (p1.getTeam() != p2.getTeam())
+            return false;
+        
+        return p1.getTeam().getMembers().size() < 5;
+    }
+
 }

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>vch.uhc</groupId>
@@ -11,50 +10,77 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 	</properties>
 
 	<repositories>
-		<!-- This adds the Spigot Maven repository to the build -->
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+			<id>papermc</id>
+			<url>https://repo.papermc.io/repository/maven-public/</url>
 		</repository>
 		<repository>
-    	<id>jitpack.io</id>
-    	<url>https://jitpack.io</url>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 		<repository>
 			<id>placeholderapi</id>
 			<url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
 		</repository>
+		<repository>
+			<id>codemc-repo</id>
+			<url>https://repo.codemc.io/repository/maven-public/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.8.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>5.8.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.24.2</version>
 			<scope>test</scope>
 		</dependency>
 		<!--This adds the Spigot API artifact to the build -->
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.21.1-R0.1-SNAPSHOT</version>
+			<groupId>io.papermc.paper</groupId>
+			<artifactId>paper-api</artifactId>
+			<version>1.21.3-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.NEZNAMY</groupId>
-    	<artifactId>TAB-API</artifactId>
-    	<version>5.0.7</version>
-    	<scope>provided</scope>
+			<artifactId>TAB-API</artifactId>
+			<version>5.0.7</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>me.clip</groupId>
 			<artifactId>placeholderapi</artifactId>
 			<version>2.11.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.skinsrestorer</groupId>
+			<artifactId>skinsrestorer-api</artifactId>
+			<version>15.9.1</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -72,11 +98,11 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.0</version>
+					<version>3.11.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.22.1</version>
+					<version>3.0.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>

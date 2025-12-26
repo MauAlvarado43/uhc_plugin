@@ -11,27 +11,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests exhaustivos para el algoritmo de distribución de spawns del UHCManager.
- * Este algoritmo es crítico porque determina la equidad del inicio del juego.
- * 
- * Algoritmo testeado:
- * - 2 spawns: esquinas opuestas (diagonal)
- * - 4 spawns: cuatro esquinas del rectángulo
- * - 5+ spawns: 4 esquinas + distribución uniforme en perímetro
- * 
- * Escenarios de prueba:
- * 1. Casos especiales (2 y 4 spawns)
- * 2. Distribución general en perímetro
- * 3. Equidad de distancias
- * 4. Casos límite y edge cases
- */
 @DisplayName("UHC Spawn Distribution Algorithm - Lógica Compleja")
 class UHCSpawnAlgorithmTest {
 
-    /**
-     * Simula la lógica de getSpawns() sin dependencias de Bukkit
-     */
     private static class SpawnPoint {
         final int x;
         final int z;
@@ -66,9 +48,6 @@ class UHCSpawnAlgorithmTest {
         }
     }
 
-    /**
-     * Implementación testeable del algoritmo de spawns
-     */
     private static List<SpawnPoint> calculateSpawns(int spawnCount, int size) {
         List<SpawnPoint> spawns = new ArrayList<>();
 

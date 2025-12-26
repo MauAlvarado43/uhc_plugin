@@ -1,529 +1,1471 @@
 package vch.uhc.misc;
-import org.bukkit.ChatColor;
-/**
- * Centralized message storage for UHC plugin
- * All user-facing messages should be defined here for easy editing
- */
+
+import vch.uhc.UHC;
+
 public class Messages {
     
-    public static String DEATH_PVP_FINAL(String victim, String killer) {
-        return ChatColor.RED + "☠ " + ChatColor.YELLOW + victim + 
-               ChatColor.GRAY + " was eliminated by " + 
-               ChatColor.GOLD + killer + 
-               ChatColor.DARK_RED + " [FINAL ELIMINATION]";
-    }
-    public static String DEATH_NATURAL_FINAL(String victim) {
-        return ChatColor.RED + "☠ " + ChatColor.YELLOW + victim + 
-               ChatColor.GRAY + " died" +
-               ChatColor.DARK_RED + " [FINAL ELIMINATION]";
-    }
-    public static String DEATH_NATURAL_WITH_CAUSE_FINAL(String victim, String cause) {
-        return ChatColor.RED + "☠ " + ChatColor.YELLOW + victim + 
-               ChatColor.GRAY + " died (" + cause + ")" +
-               ChatColor.DARK_RED + " [FINAL ELIMINATION]";
-    }
-    public static String DEATH_NATURAL_LIVES(String victim, int lives) {
-        return ChatColor.RED + "☠ " + ChatColor.YELLOW + victim + 
-               ChatColor.GRAY + " died" +
-               ChatColor.AQUA + " [" + lives + " ❤ remaining]";
-    }
-    public static String DEATH_NATURAL_WITH_CAUSE_LIVES(String victim, String cause, int lives) {
-        return ChatColor.RED + "☠ " + ChatColor.YELLOW + victim + 
-               ChatColor.GRAY + " died (" + cause + ")" +
-               ChatColor.AQUA + " [" + lives + " ❤ remaining]";
-    }
-    public static String DEATH_CHEST_COORDS(int x, int y, int z) {
-        return ChatColor.GRAY + "Chest coordinates: " + 
-               ChatColor.AQUA + "X: " + x + " Y: " + y + " Z: " + z;
-    }
-    public static String PLAYER_HEAD_NAME(String playerName) {
-        return ChatColor.GOLD + playerName + "'s Head";
+    private static LanguageManager lang() {
+        return UHC.getPlugin().getLanguageManager();
     }
     
-    public static final String ELIMINATED = ChatColor.RED + "You have been eliminated. You are now a spectator.";
-    public static final String ELIMINATED_TITLE = ChatColor.DARK_RED + "ELIMINATED";
-    public static final String SPECTATOR_MODE_SUBTITLE = ChatColor.GRAY + "Spectator mode activated";
-    public static String RESPAWN_MESSAGE(int lives) {
-        return ChatColor.GREEN + "You have respawned. Lives remaining: " + ChatColor.GOLD + lives;
+    public static String DEATH_PVP_FINAL(String victim, String killer) {
+        return lang().getMessage("death.pvp.final", victim, killer);
     }
-    public static final String RESPAWN_TITLE = ChatColor.YELLOW + "RESPAWN";
+    
+    public static String DEATH_NATURAL_FINAL(String victim) {
+        return lang().getMessage("death.natural.final", victim);
+    }
+    
+    public static String DEATH_NATURAL_WITH_CAUSE_FINAL(String victim, String cause) {
+        return lang().getMessage("death.natural.withCause.final", victim, cause);
+    }
+    
+    public static String DEATH_NATURAL_LIVES(String victim, int lives) {
+        return lang().getMessage("death.natural.lives", victim, lives);
+    }
+    
+    public static String DEATH_NATURAL_WITH_CAUSE_LIVES(String victim, String cause, int lives) {
+        return lang().getMessage("death.natural.withCause.lives", victim, cause, lives);
+    }
+    
+    public static String DEATH_CHEST_COORDS(int x, int y, int z) {
+        return lang().getMessage("death.chest.coords", x, y, z);
+    }
+    
+    public static String PLAYER_HEAD_NAME(String playerName) {
+        return lang().getMessage("death.playerHead.name", playerName);
+    }
+    
+    public static String ELIMINATED() {
+        return lang().getMessage("elimination.message");
+    }
+    
+    public static String ELIMINATED_TITLE() {
+        return lang().getMessage("elimination.title");
+    }
+    
+    public static String SPECTATOR_MODE_SUBTITLE() {
+        return lang().getMessage("elimination.subtitle");
+    }
+    
+    public static String RESPAWN_MESSAGE(int lives) {
+        return lang().getMessage("respawn.message", lives);
+    }
+    
+    public static String RESPAWN_TITLE() {
+        return lang().getMessage("respawn.title");
+    }
     
     public static String RESPAWN_SUBTITLE(int lives) {
-        return ChatColor.GRAY + "Lives: " + lives;
+        return lang().getMessage("respawn.subtitle", lives);
     }
     
-    public static final String TEAM_USAGE = ChatColor.RED + "Usage: /uhc team <create|add|remove|rename|leave|list|info>";
-    public static final String TEAM_UNKNOWN_SUBCOMMAND = ChatColor.RED + "Unknown subcommand. Use: create, add, remove, rename, leave, list, info";
+    public static String TEAM_USAGE() {
+        return lang().getMessage("team.usage");
+    }
     
-    public static final String TEAM_MANUAL_ONLY = ChatColor.RED + "Teams can only be managed manually in MANUAL mode.";
+    public static String TEAM_UNKNOWN_SUBCOMMAND() {
+        return lang().getMessage("team.unknown");
+    }
+    
+    public static String TEAM_MANUAL_ONLY() {
+        return lang().getMessage("team.manualOnly");
+    }
+    
     public static String TEAM_CURRENT_MODE(Settings.TeamMode mode) {
-        return ChatColor.YELLOW + "Current mode: " + mode;
+        return lang().getMessage("team.currentMode", mode.toString());
     }
     
-    public static final String TEAM_PLAYERS_ONLY = ChatColor.RED + "Only players can create teams.";
-    public static final String TEAM_CREATE_USAGE = ChatColor.RED + "Usage: /uhc team create <name>";
-    public static final String TEAM_ALREADY_IN_TEAM = ChatColor.RED + "You are already in a team. Use /uhc team leave first.";
-    public static final String TEAM_NAME_TAKEN = ChatColor.RED + "A team with that name already exists.";
+    public static String TEAM_PLAYERS_ONLY() {
+        return lang().getMessage("team.playersOnly");
+    }
+    
+    public static String TEAM_CREATE_USAGE() {
+        return lang().getMessage("team.create.usage");
+    }
+    
+    public static String TEAM_ALREADY_IN_TEAM() {
+        return lang().getMessage("team.alreadyInTeam");
+    }
+    
+    public static String TEAM_NAME_TAKEN() {
+        return lang().getMessage("team.nameTaken");
+    }
     
     public static String TEAM_CREATED(String teamName) {
-        return ChatColor.GREEN + "Team '" + teamName + "' created successfully.";
+        return lang().getMessage("team.created", teamName);
     }
     
-    public static final String TEAM_YOU_ARE_LEADER = ChatColor.YELLOW + "You are the team leader.";
-    public static final String TEAM_ADD_USAGE = ChatColor.RED + "Usage: /uhc team add <player> <team>";
-    public static final String TEAM_PLAYER_NOT_FOUND = ChatColor.RED + "Player not found or offline.";
+    public static String TEAM_YOU_ARE_LEADER() {
+        return lang().getMessage("team.youAreLeader");
+    }
+    
+    public static String TEAM_ADD_USAGE() {
+        return lang().getMessage("team.add.usage");
+    }
+    
+    public static String TEAM_PLAYER_NOT_FOUND() {
+        return lang().getMessage("team.playerNotFound");
+    }
     
     public static String TEAM_PLAYER_HAS_TEAM(String playerName) {
-        return ChatColor.RED + playerName + " is already in a team.";
+        return lang().getMessage("team.playerHasTeam", playerName);
     }
     
     public static String TEAM_NOT_FOUND(String teamName) {
-        return ChatColor.RED + "Team '" + teamName + "' not found.";
+        return lang().getMessage("team.notFound", teamName);
     }
     
     public static String TEAM_FULL(int maxSize) {
-        return ChatColor.RED + "Team is full. Maximum size: " + maxSize;
+        return lang().getMessage("team.full", maxSize);
     }
     
     public static String TEAM_PLAYER_ADDED(String playerName, String teamName) {
-        return ChatColor.GREEN + playerName + " added to team '" + teamName + "'.";
+        return lang().getMessage("team.playerAdded", playerName, teamName);
     }
     
     public static String TEAM_YOU_WERE_ADDED(String teamName) {
-        return ChatColor.GREEN + "You have been added to team '" + teamName + "'.";
+        return lang().getMessage("team.youWereAdded", teamName);
     }
     
-    public static final String TEAM_REMOVE_USAGE = ChatColor.RED + "Usage: /uhc team remove <player>";
+    public static String TEAM_REMOVE_USAGE() {
+        return lang().getMessage("team.remove.usage");
+    }
     
     public static String TEAM_PLAYER_NO_TEAM(String playerName) {
-        return ChatColor.RED + playerName + " is not in any team.";
+        return lang().getMessage("team.playerNoTeam", playerName);
     }
     
     public static String TEAM_PLAYER_REMOVED(String playerName, String teamName) {
-        return ChatColor.GREEN + playerName + " removed from team '" + teamName + "'.";
+        return lang().getMessage("team.playerRemoved", playerName, teamName);
     }
     
     public static String TEAM_YOU_WERE_REMOVED(String teamName) {
-        return ChatColor.YELLOW + "You have been removed from team '" + teamName + "'.";
+        return lang().getMessage("team.youWereRemoved", teamName);
     }
     
-    public static final String TEAM_RENAME_USAGE = ChatColor.RED + "Usage: /uhc team rename <currentTeam> <newName>";
+    public static String TEAM_RENAME_USAGE() {
+        return lang().getMessage("team.rename.usage");
+    }
     
     public static String TEAM_RENAMED(String oldName, String newName) {
-        return ChatColor.GREEN + "Team renamed from '" + oldName + "' to '" + newName + "'.";
+        return lang().getMessage("team.renamed", oldName, newName);
     }
     
     public static String TEAM_YOU_WERE_RENAMED(String newName) {
-        return ChatColor.YELLOW + "Your team has been renamed to '" + newName + "'.";
+        return lang().getMessage("team.youWereRenamed", newName);
     }
     
-    public static final String TEAM_NOT_IN_TEAM = ChatColor.RED + "You are not in any team.";
-    public static final String TEAM_LEADER_ONLY = ChatColor.RED + "Only the team leader can rename the team.";
-    public static final String PLAYER_NOT_FOUND = ChatColor.RED + "Player not found.";
+    public static String TEAM_NOT_IN_TEAM() {
+        return lang().getMessage("team.notInTeam");
+    }
+    
+    public static String TEAM_LEADER_ONLY() {
+        return lang().getMessage("team.leaderOnly");
+    }
+    
+    public static String PLAYER_NOT_FOUND() {
+        return lang().getMessage("team.playerNotFound");
+    }
     
     public static String TEAM_YOU_LEFT(String teamName) {
-        return ChatColor.YELLOW + "You left team '" + teamName + "'.";
+        return lang().getMessage("team.youLeft", teamName);
     }
     
     public static String TEAM_PLAYER_LEFT(String playerName) {
-        return ChatColor.GRAY + playerName + " has left the team.";
+        return lang().getMessage("team.playerLeft", playerName);
     }
     
-    public static final String TEAM_NONE_CREATED = ChatColor.YELLOW + "No teams have been created yet.";
-    public static final String TEAM_LIST_HEADER = ChatColor.GOLD + "========== UHC Teams ==========";
-    public static final String TEAM_LIST_FOOTER = ChatColor.GOLD + "================================";
+    public static String TEAM_NONE_CREATED() {
+        return lang().getMessage("team.noneCreated");
+    }
+    
+    public static String TEAM_LIST_HEADER() {
+        return lang().getMessage("team.list.header");
+    }
+    
+    public static String TEAM_LIST_FOOTER() {
+        return lang().getMessage("team.list.footer");
+    }
     
     public static String TEAM_LIST_ENTRY(String teamName, int memberCount) {
-        return ChatColor.AQUA + "▸ " + ChatColor.WHITE + teamName + 
-               ChatColor.GRAY + " (" + memberCount + " members)";
+        return lang().getMessage("team.list.entry", teamName, memberCount);
     }
     
     public static String TEAM_LEADER(String leaderName) {
-        return ChatColor.YELLOW + "  Leader: " + ChatColor.WHITE + leaderName;
+        return lang().getMessage("team.leader", leaderName);
     }
     
-    public static final String TEAM_MEMBERS_PREFIX = ChatColor.GRAY + "  Members: ";
-    public static final String TEAM_INFO_USAGE = ChatColor.RED + "Usage: /uhc team info <team>";
+    public static String TEAM_MEMBERS_PREFIX() {
+        return lang().getMessage("team.membersPrefix");
+    }
+    
+    public static String TEAM_INFO_USAGE() {
+        return lang().getMessage("team.info.usage");
+    }
     
     public static String TEAM_INFO_HEADER(String teamName) {
-        return ChatColor.GOLD + "======== Info: " + teamName + " ========";
+        return lang().getMessage("team.info.header", teamName);
     }
     
     public static String TEAM_TOTAL_MEMBERS(int count) {
-        return ChatColor.YELLOW + "Total members: " + ChatColor.WHITE + count;
+        return lang().getMessage("team.totalMembers", count);
     }
     
-    public static final String TEAM_MEMBER_LIST = ChatColor.AQUA + "Member list:";
+    public static String TEAM_MEMBER_LIST() {
+        return lang().getMessage("team.memberList");
+    }
     
-    public static final String PVP_DISABLED_AGREEMENT = ChatColor.RED + "PvP is disabled during the agreement period!";
+    public static String PVP_DISABLED_AGREEMENT() {
+        return lang().getMessage("pvp.disabled");
+    }
     
     public static String PVP_TIME_REMAINING(int minutes, int seconds) {
-        return ChatColor.YELLOW + "Time remaining: " + minutes + ":" + String.format("%02d", seconds);
+        return lang().getMessage("pvp.timeRemaining", minutes, String.format("%02d", seconds));
     }
     
     public static String AGREEMENT_WARNING_MINUTES(int minutes) {
-        return ChatColor.YELLOW + "⚠ PvP disabled. Time remaining: " + 
-               ChatColor.GOLD + minutes + " minutes";
+        return lang().getMessage("pvp.agreementWarning.minutes", minutes);
     }
     
     public static String AGREEMENT_WARNING_SECONDS(int seconds) {
-        return ChatColor.RED + "⚠ PvP will activate in " + seconds + " seconds!";
+        return lang().getMessage("pvp.agreementWarning.seconds", seconds);
     }
     
-    public static final String PVP_ACTIVATED_LINE1 = "";
-    public static final String PVP_ACTIVATED_LINE2 = ChatColor.DARK_RED + "════════════════════════════════";
-    public static final String PVP_ACTIVATED_LINE3 = ChatColor.RED + "⚔ " + ChatColor.BOLD + "PVP ACTIVATED" + ChatColor.RED + " ⚔";
-    public static final String PVP_ACTIVATED_LINE4 = ChatColor.DARK_RED + "════════════════════════════════";
-    public static final String PVP_ACTIVATED_LINE5 = "";
+    public static String PVP_ACTIVATED_LINE1() {
+        return lang().getMessage("pvp.activated.line1");
+    }
     
-    public static final String PVP_ACTIVATED_TITLE = ChatColor.DARK_RED + "⚔ PVP ACTIVATED ⚔";
-    public static final String PVP_ACTIVATED_SUBTITLE = ChatColor.YELLOW + "The agreement has ended!";
+    public static String PVP_ACTIVATED_LINE2() {
+        return lang().getMessage("pvp.activated.line2");
+    }
     
-    public static final String SCOREBOARD_TITLE = ChatColor.GOLD + "" + ChatColor.BOLD + "UHC";
+    public static String PVP_ACTIVATED_LINE3() {
+        return lang().getMessage("pvp.activated.line3");
+    }
+    
+    public static String PVP_ACTIVATED_LINE4() {
+        return lang().getMessage("pvp.activated.line4");
+    }
+    
+    public static String PVP_ACTIVATED_LINE5() {
+        return lang().getMessage("pvp.activated.line5");
+    }
+    
+    public static String PVP_ACTIVATED_TITLE() {
+        return lang().getMessage("pvp.activated.title");
+    }
+    
+    public static String PVP_ACTIVATED_SUBTITLE() {
+        return lang().getMessage("pvp.activated.subtitle");
+    }
+    
+    public static String SCOREBOARD_TITLE() {
+        return lang().getMessage("scoreboard.title");
+    }
     
     public static String SCOREBOARD_TIME(int hours, int minutes, int seconds) {
-        return ChatColor.YELLOW + "Time: " + ChatColor.WHITE + 
-               String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return lang().getMessage("scoreboard.time", String.format("%02d", hours), String.format("%02d", minutes), String.format("%02d", seconds));
     }
     
-    public static final String SCOREBOARD_PVP = ChatColor.YELLOW + "PvP: ";
-    public static final String SCOREBOARD_PVP_DISABLED = ChatColor.RED + "✖ Disabled";
-    public static final String SCOREBOARD_PVP_ENABLED = ChatColor.GREEN + "✔ Enabled";
+    public static String SCOREBOARD_PVP() {
+        return lang().getMessage("scoreboard.pvp");
+    }
+    
+    public static String SCOREBOARD_PVP_DISABLED() {
+        return lang().getMessage("scoreboard.pvp.disabled");
+    }
+    
+    public static String SCOREBOARD_PVP_ENABLED() {
+        return lang().getMessage("scoreboard.pvp.enabled");
+    }
     
     public static String SCOREBOARD_ALIVE_PLAYERS(long alive, long total) {
-        return ChatColor.AQUA + "Alive: " + ChatColor.WHITE + alive + "/" + total;
+        return lang().getMessage("scoreboard.alivePlayers", alive, total);
     }
     
     public static String SCOREBOARD_TEAMS(long aliveTeams) {
-        return ChatColor.GREEN + "Teams: " + ChatColor.WHITE + aliveTeams;
+        return lang().getMessage("scoreboard.teams", aliveTeams);
     }
     
     public static String SCOREBOARD_BORDER(int borderSize) {
-        return ChatColor.LIGHT_PURPLE + "Border: " + ChatColor.WHITE + "±" + borderSize;
+        return lang().getMessage("scoreboard.border", borderSize);
     }
     
     public static String SCOREBOARD_YOUR_KILLS(int kills) {
-        return ChatColor.GOLD + "Your Kills: " + ChatColor.WHITE + kills;
+        return lang().getMessage("scoreboard.yourKills", kills);
     }
     
     public static String SCOREBOARD_YOUR_LIVES(int lives) {
-        return ChatColor.RED + "Your Lives: " + ChatColor.WHITE + lives;
+        return lang().getMessage("scoreboard.yourLives", lives);
     }
     
-    public static final String VICTORY_HEADER = ChatColor.GOLD + "════════════════════════════════";
-    public static final String VICTORY_TITLE_LINE = ChatColor.YELLOW + "       🏆 " + ChatColor.BOLD + "VICTORY!" + ChatColor.YELLOW + " 🏆";
-    public static final String VICTORY_FOOTER = ChatColor.GOLD + "════════════════════════════════";
+    public static String VICTORY_HEADER() {
+        return lang().getMessage("victory.header");
+    }
+    
+    public static String VICTORY_TITLE_LINE() {
+        return lang().getMessage("victory.titleLine");
+    }
+    
+    public static String VICTORY_FOOTER() {
+        return lang().getMessage("victory.footer");
+    }
     
     public static String VICTORY_WINNER(String winnerName) {
-        return ChatColor.GREEN + "Winner: " + ChatColor.GOLD + ChatColor.BOLD + winnerName;
+        return lang().getMessage("victory.winner", winnerName);
     }
     
     public static String VICTORY_DURATION(String duration) {
-        return ChatColor.AQUA + "Game duration: " + ChatColor.WHITE + duration;
+        return lang().getMessage("victory.duration", duration);
     }
     
     public static String VICTORY_KILLS(int kills) {
-        return ChatColor.AQUA + "Winner's kills: " + ChatColor.WHITE + kills;
+        return lang().getMessage("victory.kills", kills);
     }
     
     public static String VICTORY_PLAYER_TITLE(String winnerName) {
-        return ChatColor.GOLD + "🏆 " + winnerName + " 🏆";
+        return lang().getMessage("victory.player.title", winnerName);
     }
     
-    public static final String VICTORY_PLAYER_SUBTITLE = ChatColor.YELLOW + "Has won the UHC!";
+    public static String VICTORY_PLAYER_SUBTITLE() {
+        return lang().getMessage("victory.player.subtitle");
+    }
     
     public static String VICTORY_TEAM_WINNER(String teamName) {
-        return ChatColor.GREEN + "Winning team: " + ChatColor.GOLD + ChatColor.BOLD + teamName;
+        return lang().getMessage("victory.team.winner", teamName);
     }
     
-    public static final String VICTORY_TEAM_MEMBERS = ChatColor.AQUA + "Team members:";
+    public static String VICTORY_TEAM_MEMBERS() {
+        return lang().getMessage("victory.team.members");
+    }
     
     public static String VICTORY_TEAM_TOTAL_KILLS(int kills) {
-        return ChatColor.AQUA + "Team total kills: " + ChatColor.WHITE + kills;
+        return lang().getMessage("victory.team.totalKills", kills);
     }
     
     public static String VICTORY_TEAM_TITLE(String teamName) {
-        return ChatColor.GOLD + "🏆 " + teamName + " 🏆";
+        return lang().getMessage("victory.team.title", teamName);
     }
     
-    public static final String DRAW_HEADER = ChatColor.GRAY + "════════════════════════════════";
-    public static final String DRAW_TITLE_LINE = ChatColor.YELLOW + "         ⚔ " + ChatColor.BOLD + "DRAW" + ChatColor.YELLOW + " ⚔";
-    public static final String DRAW_MESSAGE = ChatColor.RED + "All players have been eliminated!";
-    public static final String DRAW_FOOTER = ChatColor.GRAY + "════════════════════════════════";
-    public static final String DRAW_TITLE = ChatColor.GRAY + "⚔ DRAW ⚔";
-    public static final String DRAW_SUBTITLE = ChatColor.RED + "No winner";
+    public static String DRAW_HEADER() {
+        return lang().getMessage("draw.header");
+    }
+    
+    public static String DRAW_TITLE_LINE() {
+        return lang().getMessage("draw.titleLine");
+    }
+    
+    public static String DRAW_MESSAGE() {
+        return lang().getMessage("draw.message");
+    }
+    
+    public static String DRAW_FOOTER() {
+        return lang().getMessage("draw.footer");
+    }
+    
+    public static String DRAW_TITLE() {
+        return lang().getMessage("draw.title");
+    }
+    
+    public static String DRAW_SUBTITLE() {
+        return lang().getMessage("draw.subtitle");
+    }
+    
+    public static String UHC_TEAM_FORMED(String playerName) {
+        return lang().getMessage("uhc.teamFormed", playerName);
+    }
+    
+    public static String UHC_YOU_JOINED(String teamName) {
+        return lang().getMessage("uhc.youJoined", teamName);
+    }
+    
+    public static String UHC_PLAYER_JOINED_TEAM(String playerName) {
+        return lang().getMessage("uhc.playerJoinedTeam", playerName);
+    }
+    
+    public static String UHC_TEAMS_MERGED(String teamName) {
+        return lang().getMessage("uhc.teamsMerged", teamName);
+    }
+    
+    public static String PVP_WARNING_SECONDS(int seconds) {
+        return lang().getMessage("pvp.warningSeconds", seconds);
+    }
+    
+    public static String PVP_ACTIVATED() {
+        return lang().getMessage("pvp.activated");
+    }
+    
+    public static String PVP_ACTIVATED_LINE() {
+        return lang().getMessage("pvp.activatedLine");
+    }
+    
+    public static String VICTORY_WINNER_SOLO(String winnerName) {
+        return lang().getMessage("victory.winnerSolo", winnerName);
+    }
+    
+    public static String VICTORY_GAME_DURATION(String duration) {
+        return lang().getMessage("victory.gameDuration", duration);
+    }
+    
+    public static String VICTORY_WINNING_TEAM(String teamName) {
+        return lang().getMessage("victory.winningTeam", teamName);
+    }
+    
+    public static String VICTORY_MEMBER_ALIVE() {
+        return lang().getMessage("victory.memberAlive");
+    }
+    
+    public static String VICTORY_MEMBER_DEAD() {
+        return lang().getMessage("victory.memberDead");
+    }
+    
+    public static String VICTORY_MEMBER_STATUS(String status, String name) {
+        return lang().getMessage("victory.memberStatus", status, name);
+    }
+    
+    public static String VICTORY_TITLE_WON() {
+        return lang().getMessage("victory.titleWon");
+    }
+    
+    public static String VICTORY_TEAM_PREFIX() {
+        return lang().getMessage("victory.teamPrefix");
+    }
+    
+    public static String DRAW_ALL_ELIMINATED() {
+        return lang().getMessage("draw.allEliminated");
+    }
+    
+    public static String DRAW_DURATION(String duration) {
+        return lang().getMessage("draw.duration", duration);
+    }
+    
+    public static String DRAW_TITLE_SCREEN() {
+        return lang().getMessage("draw.titleScreen");
+    }
+    
+    public static String DRAW_NO_WINNER() {
+        return lang().getMessage("draw.noWinner");
+    }
+    
+    public static String DRAW_WINNER_TEXT() {
+        return lang().getMessage("draw.winnerText");
+    }
+    
+    public static String MENU_CLICK_TO_CONFIGURE() {
+        return lang().getMessage("menu.clickToConfigure");
+    }
+    
+    public static String MENU_END_PORTAL_TIME() {
+        return lang().getMessage("menu.endPortalTime");
+    }
+    
+    public static String MENU_CURRENT(int hours, int minutes, int seconds) {
+        return lang().getMessage("menu.current", hours, minutes, seconds);
+    }
+    
+    public static String MENU_CURRENT_SIMPLE() {
+        return lang().getMessage("menu.currentSimple");
+    }
+    
+    public static String MENU_STATUS(String status) {
+        return lang().getMessage("menu.status", status);
+    }
+    
+    public static String MENU_ENABLED() {
+        return lang().getMessage("menu.enabled");
+    }
+    
+    public static String MENU_DISABLED() {
+        return lang().getMessage("menu.disabled");
+    }
+    
+    public static String MENU_LOCATOR_BAR_TIME() {
+        return lang().getMessage("menu.locatorBarTime");
+    }
+    
+    public static String MENU_LOCATOR_BAR_DESC() {
+        return lang().getMessage("menu.locatorBarDesc");
+    }
+    
+    public static String MENU_SHULKER_SPAWN() {
+        return lang().getMessage("menu.shulkerSpawn");
+    }
+    
+    public static String MENU_TIME(int hours, int minutes, int seconds) {
+        return lang().getMessage("menu.time", hours, minutes, seconds);
+    }
+    
+    public static String MENU_TIME_SIMPLE() {
+        return lang().getMessage("menu.timeSimple");
+    }
+    
+    public static String MENU_CUSTOM_RECIPES() {
+        return lang().getMessage("menu.customRecipes");
+    }
+    
+    public static String MENU_CLICK_TO_VIEW() {
+        return lang().getMessage("menu.clickToView");
+    }
+    
+    public static String MENU_CUSTOM_RECIPES_DESC() {
+        return lang().getMessage("menu.customRecipesDesc");
+    }
+    
+    public static String MENU_VIEW_STATS() {
+        return lang().getMessage("menu.viewStats");
+    }
+    
+    public static String MENU_VIEW_STATS_DESC() {
+        return lang().getMessage("menu.viewStatsDesc");
+    }
+    
+    public static String MENU_CURRENT_GAME_STATS() {
+        return lang().getMessage("menu.currentGameStats");
+    }
+    
+    public static String MENU_SAVE_CONFIG() {
+        return lang().getMessage("menu.saveConfig");
+    }
+    
+    public static String MENU_SAVE_ALL_CHANGES() {
+        return lang().getMessage("menu.saveAllChanges");
+    }
+    
+    public static String MENU_CLOSE_MENU() {
+        return lang().getMessage("menu.closeMenu");
+    }
+    
+    public static String MENU_HOURS(int hours) {
+        return lang().getMessage("menu.hours", hours);
+    }
+    
+    public static String MENU_MINUTES(int minutes) {
+        return lang().getMessage("menu.minutes", minutes);
+    }
+    
+    public static String MENU_SECONDS(int seconds) {
+        return lang().getMessage("menu.seconds", seconds);
+    }
+    
+    public static String MENU_LEFT_CLICK_PLUS() {
+        return lang().getMessage("menu.leftClickPlus");
+    }
+    
+    public static String MENU_RIGHT_CLICK_MINUS() {
+        return lang().getMessage("menu.rightClickMinus");
+    }
+    
+    public static String MENU_CLICK_TO_TOGGLE(String action) {
+        return lang().getMessage("menu.clickToToggle", action);
+    }
+    
+    public static String MENU_ENABLE() {
+        return lang().getMessage("menu.enable");
+    }
+    
+    public static String MENU_DISABLE() {
+        return lang().getMessage("menu.disable");
+    }
+    
+    public static String MENU_BACK_TO_MAIN() {
+        return lang().getMessage("menu.backToMain");
+    }
+    
+    public static String MENU_CONFIG_SAVED() {
+        return lang().getMessage("menu.configSaved");
+    }
+    
+    public static String GAMEMODE_ENDER_DRAGON() {
+        return lang().getMessage("gamemode.enderDragon");
+    }
+    
+    public static String ITEM_SUPER_GOLDEN_APPLE() {
+        return lang().getMessage("item.superGoldenApple");
+    }
+    
+    public static String ITEM_HEAD_APPLE() {
+        return lang().getMessage("item.headApple");
+    }
+    
+    public static String ITEM_HYPER_GOLDEN_APPLE() {
+        return lang().getMessage("item.hyperGoldenApple");
+    }
+    
+    public static String ITEM_GLISTERING_MELON_SLICE() {
+        return lang().getMessage("item.glisteringMelonSlice");
+    }
+    
+    public static String ITEM_DRAGON_BREATH() {
+        return lang().getMessage("item.dragonBreath");
+    }
     
     public static String PROXIMITY_NEARBY_PLAYER(String playerName) {
-        return "You are close to " + playerName;
+        return lang().getMessage("proximity.nearbyPlayer", playerName);
     }
     
-    public static final String COMMAND_SPECIFY_SUBCOMMAND = ChatColor.RED + "Please specify a subcommand.";
-    public static final String COMMAND_UNKNOWN_SUBCOMMAND = ChatColor.RED + "Unknown subcommand.";
+    public static String COMMAND_SPECIFY_SUBCOMMAND() {
+        return lang().getMessage("command.specifySubcommand");
+    }
     
-    public static final String MAIN_PLAYERS_ONLY_JOIN = ChatColor.RED + "Only players can join the UHC.";
-    public static final String MAIN_PLAYERS_ONLY_LEAVE = ChatColor.RED + "Only players can leave the UHC.";
-    public static final String MAIN_JOINED_UHC = ChatColor.GREEN + "You have joined the UHC.";
-    public static final String MAIN_LEFT_UHC = ChatColor.RED + "You have left the UHC.";
+    public static String COMMAND_UNKNOWN_SUBCOMMAND() {
+        return lang().getMessage("command.unknownSubcommand");
+    }
     
-    public static final String GAME_STARTED = ChatColor.GREEN + "UHC started.";
-    public static final String GAME_CANCELLED = ChatColor.RED + "UHC cancelled.";
+    public static String MAIN_PLAYERS_ONLY_JOIN() {
+        return lang().getMessage("main.playersOnly.join");
+    }
     
-    public static final String SETTINGS_SAVED = ChatColor.GREEN + "✓ Configuration saved successfully!";
-    public static final String SETTINGS_LOADED = ChatColor.GREEN + "✓ Configuration loaded successfully!";
+    public static String MAIN_PLAYERS_ONLY_LEAVE() {
+        return lang().getMessage("main.playersOnly.leave");
+    }
     
-    public static final String INFO_HEADER = ChatColor.YELLOW + "UHC Information:";
+    public static String MAIN_JOINED_UHC() {
+        return lang().getMessage("main.joined");
+    }
+    
+    public static String MAIN_LEFT_UHC() {
+        return lang().getMessage("main.left");
+    }
+    
+    public static String GAME_STARTED() {
+        return lang().getMessage("game.started");
+    }
+    
+    public static String GAME_CANCELLED() {
+        return lang().getMessage("game.cancelled");
+    }
+    
+    public static String SETTINGS_SAVED() {
+        return lang().getMessage("settings.saved");
+    }
+    
+    public static String SETTINGS_LOADED() {
+        return lang().getMessage("settings.loaded");
+    }
+    
+    public static String INFO_HEADER() {
+        return lang().getMessage("info.header");
+    }
     
     public static String INFO_GAME_STATUS(Settings.GameStatus status) {
-        return ChatColor.GOLD + "\n- Game Status: " + status;
+        return lang().getMessage("info.gameStatus", status.toString());
     }
     
     public static String INFO_TEAM_MODE(Settings.TeamMode mode) {
-        return ChatColor.GOLD + "\n- Team mode: " + mode;
+        return lang().getMessage("info.teamMode", mode.toString());
     }
     
     public static String INFO_TEAM_SIZE(int size) {
-        return ChatColor.GOLD + "\n- Team size: " + size;
+        return lang().getMessage("info.teamSize", size);
     }
     
     public static String INFO_PLAYER_LIVES(int lives) {
-        return ChatColor.GOLD + "\n- Player lives: " + lives;
+        return lang().getMessage("info.playerLives", lives);
     }
     
     public static String INFO_MAX_WORLD_SIZE(int size) {
-        return ChatColor.GOLD + "\n- Max World Size: " + size;
+        return lang().getMessage("info.maxWorldSize", size);
     }
     
     public static String INFO_MIN_WORLD_SIZE(int size) {
-        return ChatColor.GOLD + "\n- Min World Size: " + size;
+        return lang().getMessage("info.minWorldSize", size);
     }
     
     public static String INFO_GAME_TIME(int h, int m, int s) {
-        return ChatColor.GOLD + "  Game Time: " + ChatColor.WHITE + String.format("%02d:%02d:%02d", h, m, s);
+        return lang().getMessage("info.gameTime", String.format("%02d", h), String.format("%02d", m), String.format("%02d", s));
     }
     
     public static String INFO_AGREEMENT_TIME(int h, int m, int s) {
-        return ChatColor.GOLD + "  Agreement Time: " + ChatColor.WHITE + String.format("%02d:%02d:%02d", h, m, s);
+        return lang().getMessage("info.agreementTime", String.format("%02d", h), String.format("%02d", m), String.format("%02d", s));
     }
     
     public static String INFO_MIN_BORDER_TIME(int h, int m, int s) {
-        return ChatColor.GOLD + "  Min Border Time: " + ChatColor.WHITE + String.format("%02d:%02d:%02d", h, m, s);
+        return lang().getMessage("info.minBorderTime", String.format("%02d", h), String.format("%02d", m), String.format("%02d", s));
     }
     
     public static String INFO_MAX_INGAME_TEAMS_TIME(int h, int m, int s) {
-        return ChatColor.GOLD + "  Max In-Game Teams Time: " + ChatColor.WHITE + String.format("%02d:%02d:%02d", h, m, s);
+        return lang().getMessage("info.maxTeamTime", String.format("%02d", h), String.format("%02d", m), String.format("%02d", s));
     }
     
     public static String INFO_TEAMS_COUNT(int count) {
-        return ChatColor.GOLD + "  Teams: " + ChatColor.WHITE + count;
+        return lang().getMessage("info.teamsCount", count);
     }
     
     public static String INFO_PLAYERS_COUNT(int count) {
-        return ChatColor.GOLD + "  Players: " + ChatColor.WHITE + count;
+        return lang().getMessage("info.playersCount", count);
     }
     
-    public static final String INFO_RECIPES_HEADER = ChatColor.GOLD + "  Recipes:";
+    public static String INFO_RECIPES_HEADER() {
+        return lang().getMessage("info.recipesHeader");
+    }
     
-    public static final String INFO_SEPARATOR = ChatColor.GOLD + "" + ChatColor.STRIKETHROUGH + "======================";
-    public static final String INFO_BORDER = ChatColor.YELLOW + "⬛" + ChatColor.GOLD + ChatColor.STRIKETHROUGH + "====================" + ChatColor.YELLOW + "⬛";
+    public static String INFO_SEPARATOR() {
+        return lang().getMessage("info.separator");
+    }
     
-    public static final String PLAYER_JOINED_UHC = ChatColor.GREEN + "You have joined the UHC.";
+    public static String INFO_BORDER() {
+        return lang().getMessage("info.border");
+    }
     
-    public static final String JOINED_UHC = ChatColor.GREEN + "You have joined the UHC.";
-    public static final String LEFT_UHC = ChatColor.RED + "You have left the UHC.";
-    public static final String ONLY_PLAYERS_JOIN = ChatColor.RED + "Only players can join the UHC.";
-    public static final String ONLY_PLAYERS_LEAVE = ChatColor.RED + "Only players can leave the UHC.";
+    public static String PLAYER_JOINED_UHC() {
+        return MAIN_JOINED_UHC();
+    }
     
-    public static final String SETTINGS_SPECIFY_SUBCOMMAND = ChatColor.RED + "Please specify a settings subcommand.";
-    public static final String SETTINGS_SPECIFY_VALUE = ChatColor.RED + "Please specify a setting and value.";
-    public static final String SETTINGS_UNKNOWN_SUBCOMMAND = ChatColor.RED + "Unknown subcommand.";
-    public static final String SETTINGS_UNKNOWN = ChatColor.RED + "Unknown setting.";
+    public static String JOINED_UHC() {
+        return MAIN_JOINED_UHC();
+    }
     
-    public static final String SETTINGS_TEAM_MODE_UNKNOWN = ChatColor.RED + "Unknown team mode.";
+    public static String LEFT_UHC() {
+        return MAIN_LEFT_UHC();
+    }
+    
+    public static String ONLY_PLAYERS_JOIN() {
+        return MAIN_PLAYERS_ONLY_JOIN();
+    }
+    
+    public static String ONLY_PLAYERS_LEAVE() {
+        return MAIN_PLAYERS_ONLY_LEAVE();
+    }
+    
+    public static String SETTINGS_SPECIFY_SUBCOMMAND() {
+        return lang().getMessage("settings.specifySubcommand");
+    }
+    
+    public static String SETTINGS_SPECIFY_VALUE() {
+        return lang().getMessage("settings.specifyValue");
+    }
+    
+    public static String SETTINGS_UNKNOWN_SUBCOMMAND() {
+        return lang().getMessage("settings.unknownSubcommand");
+    }
+    
+    public static String SETTINGS_UNKNOWN() {
+        return lang().getMessage("settings.unknown");
+    }
+    
+    public static String SETTINGS_TEAM_MODE_UNKNOWN() {
+        return lang().getMessage("settings.teamMode.unknown");
+    }
+    
     public static String SETTINGS_TEAM_MODE_SET(String mode) {
-        return ChatColor.GREEN + "Team mode set to " + mode + ".";
+        return lang().getMessage("settings.teamMode.set", mode);
     }
     
     public static String SETTINGS_TEAM_SIZE_SET(int size) {
-        return ChatColor.GREEN + "Team size set to " + size + ".";
+        return lang().getMessage("settings.teamSize.set", size);
     }
-    public static final String SETTINGS_TEAM_SIZE_INVALID = ChatColor.RED + "Invalid team size.";
+    
+    public static String SETTINGS_TEAM_SIZE_INVALID() {
+        return lang().getMessage("settings.teamSize.invalid");
+    }
     
     public static String SETTINGS_PLAYER_LIVES_SET(int lives) {
-        return ChatColor.GREEN + "Player lives set to " + lives + ".";
+        return lang().getMessage("settings.playerLives.set", lives);
     }
-    public static final String SETTINGS_PLAYER_LIVES_INVALID = ChatColor.RED + "Invalid player lives.";
+    
+    public static String SETTINGS_PLAYER_LIVES_INVALID() {
+        return lang().getMessage("settings.playerLives.invalid");
+    }
     
     public static String SETTINGS_MAX_WORLD_SIZE_SET(int size) {
-        return ChatColor.GREEN + "Max world size set to " + size + ".";
+        return lang().getMessage("settings.maxWorldSize.set", size);
     }
-    public static final String SETTINGS_MAX_WORLD_SIZE_INVALID = ChatColor.RED + "Invalid max world size.";
+    
+    public static String SETTINGS_MAX_WORLD_SIZE_INVALID() {
+        return lang().getMessage("settings.maxWorldSize.invalid");
+    }
     
     public static String SETTINGS_MIN_WORLD_SIZE_SET(int size) {
-        return ChatColor.GREEN + "Min world size set to " + size + ".";
+        return lang().getMessage("settings.minWorldSize.set", size);
     }
-    public static final String SETTINGS_MIN_WORLD_SIZE_INVALID = ChatColor.RED + "Invalid min world size.";
+    
+    public static String SETTINGS_MIN_WORLD_SIZE_INVALID() {
+        return lang().getMessage("settings.minWorldSize.invalid");
+    }
     
     public static String SETTINGS_HOURS_SET(int hours) {
-        return ChatColor.GREEN + "Hours set to " + hours + ".";
+        return lang().getMessage("settings.hours.set", hours);
     }
-    public static final String SETTINGS_HOURS_INVALID = ChatColor.RED + "Invalid hours.";
+    
+    public static String SETTINGS_HOURS_INVALID() {
+        return lang().getMessage("settings.hours.invalid");
+    }
     
     public static String SETTINGS_MINUTES_SET(int minutes) {
-        return ChatColor.GREEN + "Minutes set to " + minutes + ".";
+        return lang().getMessage("settings.minutes.set", minutes);
     }
-    public static final String SETTINGS_MINUTES_INVALID = ChatColor.RED + "Invalid minutes.";
+    
+    public static String SETTINGS_MINUTES_INVALID() {
+        return lang().getMessage("settings.minutes.invalid");
+    }
     
     public static String SETTINGS_SECONDS_SET(int seconds) {
-        return ChatColor.GREEN + "Seconds set to " + seconds + ".";
+        return lang().getMessage("settings.seconds.set", seconds);
     }
-    public static final String SETTINGS_SECONDS_INVALID = ChatColor.RED + "Invalid seconds.";
+    
+    public static String SETTINGS_SECONDS_INVALID() {
+        return lang().getMessage("settings.seconds.invalid");
+    }
     
     public static String SETTINGS_AGREEMENT_HOURS_SET(int hours) {
-        return ChatColor.GREEN + "Agreement hours set to " + hours + ".";
+        return lang().getMessage("settings.hours.set", hours);
     }
-    public static final String SETTINGS_AGREEMENT_HOURS_INVALID = ChatColor.RED + "Invalid agreement hours.";
+    
+    public static String SETTINGS_AGREEMENT_HOURS_INVALID() {
+        return lang().getMessage("settings.hours.invalid");
+    }
     
     public static String SETTINGS_AGREEMENT_MINUTES_SET(int minutes) {
-        return ChatColor.GREEN + "Agreement minutes set to " + minutes + ".";
+        return lang().getMessage("settings.minutes.set", minutes);
     }
-    public static final String SETTINGS_AGREEMENT_MINUTES_INVALID = ChatColor.RED + "Invalid agreement minutes.";
+    
+    public static String SETTINGS_AGREEMENT_MINUTES_INVALID() {
+        return lang().getMessage("settings.minutes.invalid");
+    }
     
     public static String SETTINGS_AGREEMENT_SECONDS_SET(int seconds) {
-        return ChatColor.GREEN + "Agreement seconds set to " + seconds + ".";
+        return lang().getMessage("settings.seconds.set", seconds);
     }
-    public static final String SETTINGS_AGREEMENT_SECONDS_INVALID = ChatColor.RED + "Invalid agreement seconds.";
+    
+    public static String SETTINGS_AGREEMENT_SECONDS_INVALID() {
+        return lang().getMessage("settings.seconds.invalid");
+    }
     
     public static String SETTINGS_MIN_BORDER_HOURS_SET(int hours) {
-        return ChatColor.GREEN + "Min world border hours set to " + hours + ".";
+        return lang().getMessage("settings.hours.set", hours);
     }
-    public static final String SETTINGS_MIN_BORDER_HOURS_INVALID = ChatColor.RED + "Invalid min world border hours.";
+    
+    public static String SETTINGS_MIN_BORDER_HOURS_INVALID() {
+        return lang().getMessage("settings.hours.invalid");
+    }
     
     public static String SETTINGS_MIN_BORDER_MINUTES_SET(int minutes) {
-        return ChatColor.GREEN + "Min world border minutes set to " + minutes + ".";
+        return lang().getMessage("settings.minutes.set", minutes);
     }
-    public static final String SETTINGS_MIN_BORDER_MINUTES_INVALID = ChatColor.RED + "Invalid min world border minutes.";
+    
+    public static String SETTINGS_MIN_BORDER_MINUTES_INVALID() {
+        return lang().getMessage("settings.minutes.invalid");
+    }
     
     public static String SETTINGS_MIN_BORDER_SECONDS_SET(int seconds) {
-        return ChatColor.GREEN + "Min world border seconds set to " + seconds + ".";
+        return lang().getMessage("settings.seconds.set", seconds);
     }
-    public static final String SETTINGS_MIN_BORDER_SECONDS_INVALID = ChatColor.RED + "Invalid min world border seconds.";
+    
+    public static String SETTINGS_MIN_BORDER_SECONDS_INVALID() {
+        return lang().getMessage("settings.seconds.invalid");
+    }
     
     public static String SETTINGS_MAX_TEAM_HOURS_SET(int hours) {
-        return ChatColor.GREEN + "Max team in game hours set to " + hours + ".";
+        return lang().getMessage("settings.hours.set", hours);
     }
-    public static final String SETTINGS_MAX_TEAM_HOURS_INVALID = ChatColor.RED + "Invalid max team in game hours.";
+    
+    public static String SETTINGS_MAX_TEAM_HOURS_INVALID() {
+        return lang().getMessage("settings.hours.invalid");
+    }
     
     public static String SETTINGS_MAX_TEAM_MINUTES_SET(int minutes) {
-        return ChatColor.GREEN + "Max team in game minutes set to " + minutes + ".";
+        return lang().getMessage("settings.minutes.set", minutes);
     }
-    public static final String SETTINGS_MAX_TEAM_MINUTES_INVALID = ChatColor.RED + "Invalid max team in game minutes.";
+    
+    public static String SETTINGS_MAX_TEAM_MINUTES_INVALID() {
+        return lang().getMessage("settings.minutes.invalid");
+    }
     
     public static String SETTINGS_MAX_TEAM_SECONDS_SET(int seconds) {
-        return ChatColor.GREEN + "Max team in game seconds set to " + seconds + ".";
+        return lang().getMessage("settings.seconds.set", seconds);
     }
-    public static final String SETTINGS_MAX_TEAM_SECONDS_INVALID = ChatColor.RED + "Invalid max team in game seconds.";
     
-    public static final String SETTINGS_RECIPE_SPECIFY = ChatColor.RED + "Please specify a recipe name and value.";
-    public static final String SETTINGS_RECIPE_INVALID_VALUE = ChatColor.RED + "Invalid recipe value. Use 'enabled' or 'disabled'.";
-    public static final String SETTINGS_RECIPE_UNKNOWN = ChatColor.RED + "Unknown recipe name.";
+    public static String SETTINGS_MAX_TEAM_SECONDS_INVALID() {
+        return lang().getMessage("settings.seconds.invalid");
+    }
+    
+    public static String SETTINGS_RECIPE_SPECIFY() {
+        return lang().getMessage("settings.recipe.specify");
+    }
+    
+    public static String SETTINGS_RECIPE_INVALID_VALUE() {
+        return lang().getMessage("settings.recipe.invalidValue");
+    }
+    
+    public static String SETTINGS_RECIPE_UNKNOWN() {
+        return lang().getMessage("settings.recipe.unknown");
+    }
+    
     public static String SETTINGS_RECIPE_SET(String name, boolean enabled) {
-        return ChatColor.GREEN + "Recipe " + name + " set to " + (enabled ? "enabled" : "disabled") + ".";
+        return lang().getMessage("settings.recipe.set", name, enabled ? "enabled" : "disabled");
     }
     
-    public static final String SETTINGS_TIME_FORMAT_INVALID = ChatColor.RED + "Invalid time format. Use HH:MM:SS (e.g., 01:30:00)";
+    public static String SETTINGS_TIME_FORMAT_INVALID() {
+        return lang().getMessage("settings.timeFormat.invalid");
+    }
+    
     public static String SETTINGS_GAME_TIME_SET(String time) {
-        return ChatColor.GREEN + "Game time set to " + time;
-    }
-    public static String SETTINGS_AGREEMENT_TIME_SET(String time) {
-        return ChatColor.GREEN + "Agreement time set to " + time;
-    }
-    public static String SETTINGS_MIN_BORDER_TIME_SET(String time) {
-        return ChatColor.GREEN + "Min world border time set to " + time;
-    }
-    public static String SETTINGS_MAX_TEAM_TIME_SET(String time) {
-        return ChatColor.GREEN + "Max team in-game time set to " + time;
+        return lang().getMessage("settings.gameTime.set", time);
     }
     
-    public static final String PLAYER_SPECIFY_SUBCOMMAND = ChatColor.RED + "Please specify a player subcommand.";
-    public static final String PLAYER_UNKNOWN_SUBCOMMAND = ChatColor.RED + "Unknown subcommand.";
-    public static final String PLAYER_LIST_HEADER = ChatColor.YELLOW + "UHC Players:";
+    public static String SETTINGS_AGREEMENT_TIME_SET(String time) {
+        return lang().getMessage("settings.agreementTime.set", time);
+    }
+    
+    public static String SETTINGS_MIN_BORDER_TIME_SET(String time) {
+        return lang().getMessage("settings.minBorderTime.set", time);
+    }
+    
+    public static String SETTINGS_MAX_TEAM_TIME_SET(String time) {
+        return lang().getMessage("settings.maxTeamTime.set", time);
+    }
+    
+    public static String PLAYER_SPECIFY_SUBCOMMAND() {
+        return lang().getMessage("player.specifySubcommand");
+    }
+    
+    public static String PLAYER_UNKNOWN_SUBCOMMAND() {
+        return lang().getMessage("player.unknownSubcommand");
+    }
+    
+    public static String PLAYER_LIST_HEADER() {
+        return lang().getMessage("player.list.header");
+    }
     
     public static String PLAYER_LIST_ITEM(String name, int lives) {
-        return ChatColor.AQUA + "- " + ChatColor.GOLD + name + ChatColor.AQUA + " (" + lives + " lives)";
+        return lang().getMessage("player.list.item", name, lives);
     }
-    public static final String PLAYER_LIST_NONE = ChatColor.AQUA + "None";
+    
+    public static String PLAYER_LIST_NONE() {
+        return lang().getMessage("player.list.none");
+    }
     
     public static String PLAYER_LIVES_SET(String playerName, int lives) {
-        return ChatColor.GREEN + "Set lives for " + playerName + " to " + lives;
+        return lang().getMessage("player.lives.set", playerName, lives);
     }
+    
     public static String PLAYER_LIVES_ERROR(String playerName) {
-        return ChatColor.RED + "Error setting lives for " + playerName;
+        return lang().getMessage("player.lives.error", playerName);
     }
     
     public static String PLAYER_HEALTH_SET(String playerName, double health) {
-        return ChatColor.GREEN + "Set health for " + playerName + " to " + health;
+        return lang().getMessage("player.health.set", playerName, health);
     }
+    
     public static String PLAYER_HEALTH_ERROR(String playerName) {
-        return ChatColor.RED + "Error setting health for " + playerName;
+        return lang().getMessage("player.health.error", playerName);
     }
     
     public static String PLAYER_REVIVED(String playerName) {
-        return ChatColor.GREEN + "Revived " + playerName;
+        return lang().getMessage("player.revived", playerName);
     }
+    
     public static String PLAYER_REVIVE_ERROR(String playerName) {
-        return ChatColor.RED + "Error reviving " + playerName;
+        return lang().getMessage("player.revive.error", playerName);
     }
     
     public static String CHAT_GLOBAL_PREFIX(String randomName, String message) {
-        return ChatColor.AQUA + "[GLOBAL] " + randomName + ": " + ChatColor.WHITE + message;
+        return lang().getMessage("chat.global.prefix", randomName, message);
     }
     
     public static String CHAT_TEAM_PREFIX(String playerName, String message) {
-        return ChatColor.GREEN + "[TEAM] " + playerName + ": " + ChatColor.WHITE + message;
+        return lang().getMessage("chat.team.prefix", playerName, message);
     }
     
     public static String ADVANCEMENT_MADE(String randomName, String advancementTitle) {
-        return ChatColor.YELLOW + randomName + ChatColor.WHITE + " has made the advancement " + 
-               ChatColor.GREEN + "[" + advancementTitle + "]";
+        return lang().getMessage("chat.advancement", randomName, advancementTitle);
     }
     
-    public static final String SKIN_SHUFFLE_BORDER = ChatColor.GOLD + "═══════════════════════════════════════";
-    public static final String SKIN_SHUFFLE_TITLE = ChatColor.YELLOW + "🎭 " + ChatColor.BOLD + "SKINS SHUFFLED" + ChatColor.RESET;
-    public static final String SKIN_SHUFFLE_DESCRIPTION = ChatColor.GRAY + "Identities have been mixed!";
-    public static final String SKIN_SHUFFLE_HINT = ChatColor.GRAY + "Hit a player to reveal their identity";
+    public static String SKIN_SHUFFLE_BORDER() {
+        return lang().getMessage("skin.shuffle.border");
+    }
     
-    public static final String SKIN_REVEAL_BORDER = ChatColor.GOLD + "═════════════════════════════════════";
-    public static final String SKIN_REVEAL_TITLE = ChatColor.YELLOW + "🎭 " + ChatColor.BOLD + "IDENTITY REVEALED!";
+    public static String SKIN_SHUFFLE_TITLE() {
+        return lang().getMessage("skin.shuffle.title");
+    }
+    
+    public static String SKIN_SHUFFLE_DESCRIPTION() {
+        return lang().getMessage("skin.shuffle.description");
+    }
+    
+    public static String SKIN_SHUFFLE_HINT() {
+        return lang().getMessage("skin.shuffle.hint");
+    }
+    
+    public static String SKIN_REVEAL_BORDER() {
+        return lang().getMessage("skin.reveal.border");
+    }
+    
+    public static String SKIN_REVEAL_TITLE() {
+        return lang().getMessage("skin.reveal.title");
+    }
     
     public static String SKIN_REVEAL_SKIN(String skinName) {
-        return ChatColor.WHITE + "  Skin: " + ChatColor.AQUA + skinName;
+        return lang().getMessage("skin.reveal.skin", skinName);
     }
     
     public static String SKIN_REVEAL_REAL(String realName) {
-        return ChatColor.WHITE + "  Real: " + ChatColor.GREEN + ChatColor.BOLD + realName;
+        return lang().getMessage("skin.reveal.real", realName);
     }
     
     public static String SKIN_REVEAL_BROADCAST(String attackerName, String revealedName) {
-        return ChatColor.YELLOW + "⚠ " + 
-               ChatColor.WHITE + attackerName + 
-               ChatColor.GRAY + " revealed the identity of " +
-               ChatColor.GREEN + revealedName + 
-               ChatColor.GRAY + "!";
+        return lang().getMessage("skin.reveal.broadcast", attackerName, revealedName);
     }
     
-    public static final String SKIN_RESTORE_SUCCESS = ChatColor.GREEN + "✓ All skins have been restored";
+    public static String SKIN_RESTORE_SUCCESS() {
+        return lang().getMessage("skin.restore.success");
+    }
     
-    public static final String SKINS_USAGE = ChatColor.RED + "Usage: /uhc skins <shuffle|restore|info>";
-    public static final String SKINS_SHUFFLED = ChatColor.GREEN + "✓ Skins shuffled successfully";
-    public static final String SKINS_RESTORED = ChatColor.GREEN + "✓ Skins restored to original values";
-    public static final String SKINS_STATUS_SHUFFLED = ChatColor.YELLOW + "Status: " + ChatColor.GREEN + "Skins shuffled";
-    public static final String SKINS_STATUS_NORMAL = ChatColor.YELLOW + "Status: " + ChatColor.GRAY + "Normal skins";
-    public static final String SKINS_UNKNOWN_SUBCOMMAND = ChatColor.RED + "Unknown subcommand. Use: shuffle, restore, info";
+    public static String SKINS_USAGE() {
+        return lang().getMessage("skins.usage");
+    }
+    
+    public static String SKINS_SHUFFLED() {
+        return lang().getMessage("skins.shuffled");
+    }
+    
+    public static String SKINS_RESTORED() {
+        return lang().getMessage("skins.restored");
+    }
+    
+    public static String SKINS_STATUS_SHUFFLED() {
+        return lang().getMessage("skins.status.shuffled");
+    }
+    
+    public static String SKINS_STATUS_NORMAL() {
+        return lang().getMessage("skins.status.normal");
+    }
+    
+    public static String SKINS_UNKNOWN_SUBCOMMAND() {
+        return lang().getMessage("skins.unknown");
+    }
     
     public static String SKIN_STATS(int revealed, int hidden) {
-        return ChatColor.YELLOW + "Skins: " + 
-               ChatColor.GREEN + revealed + " revealed" + 
-               ChatColor.GRAY + " | " +
-               ChatColor.RED + hidden + " hidden";
+        return lang().getMessage("skin.stats", revealed, hidden);
+    }
+    
+    public static String SHULKER_BORDER() {
+        return lang().getMessage("shulker.border");
+    }
+    
+    public static String SHULKER_SPAWNED_TITLE() {
+        return lang().getMessage("shulker.spawned.title");
+    }
+    
+    public static String SHULKER_HUNT_INFO() {
+        return lang().getMessage("shulker.hunt.info");
+    }
+    
+    public static String SHULKER_LOCATION(int y) {
+        return lang().getMessage("shulker.location", y);
+    }
+    
+    public static String SHULKER_WILL_SPAWN(int minutes) {
+        return lang().getMessage("shulker.willSpawn", minutes);
+    }
+    
+    public static String LOCATOR_BAR_BORDER() {
+        return lang().getMessage("locatorBar.border");
+    }
+    
+    public static String LOCATOR_BAR_ACTIVATED_TITLE() {
+        return lang().getMessage("locatorBar.activated.title");
+    }
+    
+    public static String LOCATOR_BAR_ACTIVATED_DESC() {
+        return lang().getMessage("locatorBar.activated.desc");
+    }
+    
+    public static String LOCATOR_BAR_HIDDEN_INFO() {
+        return lang().getMessage("locatorBar.hidden.info");
+    }
+    
+    public static String LOCATOR_BAR_WILL_ACTIVATE(int minutes) {
+        return lang().getMessage("locatorBar.willActivate", minutes);
+    }
+    
+    public static String GAMEMODE_PVD_HEADER() {
+        return lang().getMessage("gameMode.pvd.header");
+    }
+    
+    public static String GAMEMODE_PVD_OBJECTIVE() {
+        return lang().getMessage("gameMode.pvd.objective");
+    }
+    
+    public static String GAMEMODE_PVD_PVP_ENABLED() {
+        return lang().getMessage("gameMode.pvd.pvpEnabled");
+    }
+    
+    public static String GAMEMODE_PVD_END_PORTAL(int minutes) {
+        return lang().getMessage("gameMode.pvd.endPortal", minutes);
+    }
+    
+    public static String GAMEMODE_PVP_HEADER() {
+        return lang().getMessage("gameMode.pvp.header");
+    }
+    
+    public static String GAMEMODE_PVP_OBJECTIVE() {
+        return lang().getMessage("gameMode.pvp.objective");
+    }
+    
+    public static String GAMEMODE_PVP_PREPARE() {
+        return lang().getMessage("gameMode.pvp.prepare");
+    }
+    
+    public static String GAMEMODE_RESOURCE_RUSH_HEADER() {
+        return lang().getMessage("gameMode.resourceRush.header");
+    }
+    
+    public static String GAMEMODE_RESOURCE_RUSH_OBJECTIVE() {
+        return lang().getMessage("gameMode.resourceRush.objective");
+    }
+    
+    public static String GAMEMODE_RESOURCE_RUSH_ITEMS_LIST() {
+        return lang().getMessage("gameMode.resourceRush.itemsList");
+    }
+    
+    public static String GAMEMODE_RESOURCE_RUSH_ITEM(String itemName) {
+        return lang().getMessage("gameMode.resourceRush.item", itemName);
+    }
+    
+    public static String GAMEMODE_GAME_ENDED() {
+        return lang().getMessage("gameMode.gameEnded");
+    }
+    
+    public static String GAMEMODE_GAME_ENDED_TITLE() {
+        return lang().getMessage("gameMode.gameEndedTitle");
+    }
+    
+    public static String GAMEMODE_WINNING_TEAM(String teamName) {
+        return lang().getMessage("gameMode.winningTeam", teamName);
+    }
+    
+    public static String GAMEMODE_MODE_USED(String mode) {
+        return lang().getMessage("gameMode.modeUsed", mode);
+    }
+    
+    public static String GAMEMODE_END_PORTAL_ACTIVATED() {
+        return GAMEMODE_PVD_END_PORTAL(0);
+    }
+    
+    public static String GAMEMODE_END_PORTAL_LOCATION(int y) {
+        return SHULKER_LOCATION(y);
+    }
+    
+    public static String GAMEMODE_END_PORTAL_GO() {
+        return GAMEMODE_PVD_OBJECTIVE();
+    }
+    
+    public static String MENU_MAIN_TITLE() {
+        return lang().getMessage("menu.main.title");
+    }
+    
+    public static String MENU_TIME_TITLE() {
+        return lang().getMessage("menu.time.title");
+    }
+    
+    public static String MENU_RECIPES_TITLE() {
+        return lang().getMessage("menu.recipes.title");
+    }
+    
+    public static String MENU_GAME_MODE() {
+        return lang().getMessage("menu.gameMode");
+    }
+    
+    public static String MENU_GAME_MODE_CURRENT(String mode) {
+        return lang().getMessage("menu.gameMode.current", mode);
+    }
+    
+    public static String MENU_GAME_MODE_CLICK() {
+        return lang().getMessage("menu.gameMode.clickToChange");
+    }
+    
+    public static String MENU_GAME_MODE_PVD() {
+        return lang().getMessage("menu.gameMode.pvd");
+    }
+    
+    public static String MENU_GAME_MODE_PVP() {
+        return lang().getMessage("menu.gameMode.pvp");
+    }
+    
+    public static String MENU_GAME_MODE_RESOURCE_RUSH() {
+        return lang().getMessage("menu.gameMode.resourceRush");
+    }
+    
+    public static String MENU_TEAM_MODE() {
+        return lang().getMessage("menu.teamMode");
+    }
+    
+    public static String MENU_TEAM_MODE_CURRENT(String mode) {
+        return lang().getMessage("menu.teamMode.current", mode);
+    }
+    
+    public static String MENU_TEAM_MODE_CLICK() {
+        return lang().getMessage("menu.teamMode.clickToChange");
+    }
+    
+    public static String MENU_TEAM_MODE_AUTO() {
+        return lang().getMessage("menu.teamMode.auto");
+    }
+    
+    public static String MENU_TEAM_MODE_MANUAL() {
+        return lang().getMessage("menu.teamMode.manual");
+    }
+    
+    public static String MENU_TEAM_MODE_IN_GAME() {
+        return lang().getMessage("menu.teamMode.inGame");
+    }
+    
+    public static String MENU_TEAM_SIZE() {
+        return lang().getMessage("menu.teamSize");
+    }
+    
+    public static String MENU_TEAM_SIZE_CURRENT(int size) {
+        return lang().getMessage("menu.teamSize.current", size);
+    }
+    
+    public static String MENU_TEAM_SIZE_LEFT() {
+        return lang().getMessage("menu.teamSize.leftClick");
+    }
+    
+    public static String MENU_TEAM_SIZE_RIGHT() {
+        return lang().getMessage("menu.teamSize.rightClick");
+    }
+    
+    public static String MENU_PLAYER_LIVES() {
+        return lang().getMessage("menu.playerLives");
+    }
+    
+    public static String MENU_PLAYER_LIVES_CURRENT(int lives) {
+        return lang().getMessage("menu.playerLives.current", lives);
+    }
+    
+    public static String MENU_PLAYER_LIVES_LEFT() {
+        return lang().getMessage("menu.playerLives.leftClick");
+    }
+    
+    public static String MENU_PLAYER_LIVES_RIGHT() {
+        return lang().getMessage("menu.playerLives.rightClick");
+    }
+    
+    public static String MENU_MAX_WORLD_SIZE() {
+        return lang().getMessage("menu.maxWorldSize");
+    }
+    
+    public static String MENU_MAX_WORLD_SIZE_CURRENT(int size) {
+        return lang().getMessage("menu.maxWorldSize.current", size);
+    }
+    
+    public static String MENU_MAX_WORLD_SIZE_LEFT() {
+        return lang().getMessage("menu.maxWorldSize.leftClick");
+    }
+    
+    public static String MENU_MAX_WORLD_SIZE_RIGHT() {
+        return lang().getMessage("menu.maxWorldSize.rightClick");
+    }
+    
+    public static String MENU_MIN_WORLD_SIZE() {
+        return lang().getMessage("menu.minWorldSize");
+    }
+    
+    public static String MENU_MIN_WORLD_SIZE_CURRENT(int size) {
+        return lang().getMessage("menu.minWorldSize.current", size);
+    }
+    
+    public static String MENU_MIN_WORLD_SIZE_LEFT() {
+        return lang().getMessage("menu.minWorldSize.leftClick");
+    }
+    
+    public static String MENU_MIN_WORLD_SIZE_RIGHT() {
+        return lang().getMessage("menu.minWorldSize.rightClick");
+    }
+    
+    public static String MENU_GAME_TIME() {
+        return lang().getMessage("menu.gameTime");
+    }
+    
+    public static String MENU_GAME_TIME_CURRENT(int h, int m, int s) {
+        return lang().getMessage("menu.gameTime.current", h, m, s);
+    }
+    
+    public static String MENU_GAME_TIME_CLICK() {
+        return lang().getMessage("menu.gameTime.clickToConfigure");
+    }
+    
+    public static String MENU_AGREEMENT_TIME() {
+        return lang().getMessage("menu.agreementTime");
+    }
+    
+    public static String MENU_AGREEMENT_TIME_CURRENT(int h, int m, int s) {
+        return lang().getMessage("menu.agreementTime.current", h, m, s);
+    }
+    
+    public static String MENU_AGREEMENT_TIME_CLICK() {
+        return lang().getMessage("menu.agreementTime.clickToConfigure");
+    }
+    
+    public static String MENU_MIN_BORDER_TIME() {
+        return lang().getMessage("menu.minBorderTime");
+    }
+    
+    public static String MENU_MIN_BORDER_TIME_CURRENT(int h, int m, int s) {
+        return lang().getMessage("menu.minBorderTime.current", h, m, s);
+    }
+    
+    public static String MENU_MIN_BORDER_TIME_CLICK() {
+        return lang().getMessage("menu.minBorderTime.clickToConfigure");
+    }
+    
+    public static String MENU_MAX_TEAM_TIME() {
+        return lang().getMessage("menu.maxTeamTime");
+    }
+    
+    public static String MENU_MAX_TEAM_TIME_CURRENT(int h, int m, int s) {
+        return lang().getMessage("menu.maxTeamTime.current", h, m, s);
+    }
+    
+    public static String MENU_MAX_TEAM_TIME_CLICK() {
+        return lang().getMessage("menu.maxTeamTime.clickToConfigure");
+    }
+    
+    public static String MENU_RECIPES() {
+        return lang().getMessage("menu.recipes");
+    }
+    
+    public static String MENU_RECIPES_CLICK() {
+        return lang().getMessage("menu.recipes.clickToConfigure");
+    }
+    
+    public static String MENU_BACK() {
+        return lang().getMessage("menu.back");
+    }
+    
+    public static String MENU_CLOSE() {
+        return lang().getMessage("menu.close");
+    }
+    
+    public static String MENU_TIME_HOURS(int hours) {
+        return lang().getMessage("menu.time.hours", hours);
+    }
+    
+    public static String MENU_TIME_MINUTES(int minutes) {
+        return lang().getMessage("menu.time.minutes", minutes);
+    }
+    
+    public static String MENU_TIME_SECONDS(int seconds) {
+        return lang().getMessage("menu.time.seconds", seconds);
+    }
+    
+    public static String MENU_TIME_INCREASE_HOUR() {
+        return lang().getMessage("menu.time.increaseHour");
+    }
+    
+    public static String MENU_TIME_DECREASE_HOUR() {
+        return lang().getMessage("menu.time.decreaseHour");
+    }
+    
+    public static String MENU_TIME_INCREASE_MINUTE() {
+        return lang().getMessage("menu.time.increaseMinute");
+    }
+    
+    public static String MENU_TIME_DECREASE_MINUTE() {
+        return lang().getMessage("menu.time.decreaseMinute");
+    }
+    
+    public static String MENU_TIME_INCREASE_SECOND() {
+        return lang().getMessage("menu.time.increaseSecond");
+    }
+    
+    public static String MENU_TIME_DECREASE_SECOND() {
+        return lang().getMessage("menu.time.decreaseSecond");
+    }
+    
+    public static String STATS_HEADER() {
+        return lang().getMessage("stats.header");
+    }
+    
+    public static String STATS_TOP_KILLER(String name, int kills) {
+        return lang().getMessage("stats.topKiller", name, kills);
+    }
+    
+    public static String STATS_IRONMAN(int count) {
+        return lang().getMessage("stats.ironman", count);
+    }
+    
+    public static String STATS_IRONMAN_ENTRY(String name, boolean alive) {
+        return lang().getMessage("stats.ironman.entry", name, 
+            alive ? lang().getMessage("stats.ironman.alive") : lang().getMessage("stats.ironman.dead"));
+    }
+    
+    public static String STATS_TOP_KILLERS_HEADER() {
+        return lang().getMessage("stats.topKillersHeader");
+    }
+    
+    public static String STATS_TOP_KILLERS_ENTRY(int position, String name, int kills) {
+        return lang().getMessage("stats.topKillers.entry", position, name, kills);
+    }
+    
+    public static String UHC_SCOREBOARD_TITLE() {
+        return lang().getMessage("scoreboard.title");
+    }
+    
+    public static String UHC_SCOREBOARD_TIME(int h, int m, int s) {
+        return lang().getMessage("scoreboard.time", String.format("%02d", h), String.format("%02d", m), String.format("%02d", s));
+    }
+    
+    public static String UHC_SCOREBOARD_PVP() {
+        return lang().getMessage("scoreboard.pvp");
+    }
+    
+    public static String UHC_SCOREBOARD_PVP_DISABLED() {
+        return lang().getMessage("scoreboard.pvp.disabled");
+    }
+    
+    public static String UHC_SCOREBOARD_PVP_ENABLED() {
+        return lang().getMessage("scoreboard.pvp.enabled");
+    }
+    
+    public static String UHC_SCOREBOARD_ALIVE(long alive, long total) {
+        return lang().getMessage("scoreboard.alivePlayers", alive, total);
+    }
+    
+    public static String UHC_SCOREBOARD_TEAMS(long teams) {
+        return lang().getMessage("scoreboard.teams", teams);
+    }
+    
+    public static String UHC_SCOREBOARD_BORDER(int size) {
+        return lang().getMessage("scoreboard.border", size);
+    }
+    
+    public static String LOCATOR_BAR_NEARBY_PLAYER(String playerName, int blocks) {
+        return lang().getMessage("locatorBar.nearbyPlayer", playerName, blocks);
+    }
+    
+    public static String INTERACT_CANNOT_TEAM(String playerName) {
+        return lang().getMessage("interact.cannotTeam", playerName);
+    }
+    
+    public static String INTERACT_TEAMS_COMBINED_EXCEED(int maxSize) {
+        return lang().getMessage("interact.teamsCombinedExceed", maxSize);
+    }
+    
+    public static String INTERACT_TEAMS_MERGED(String teamName) {
+        return lang().getMessage("interact.teamsMerged", teamName);
+    }
+    
+    public static String INTERACT_TEAM_MERGED_WITH(String playerName) {
+        return lang().getMessage("interact.teamMergedWith", playerName);
+    }
+    
+    public static String INTERACT_YOUR_TEAM_FULL() {
+        return lang().getMessage("interact.yourTeamFull");
+    }
+    
+    public static String INTERACT_JOINED_TEAM(String playerName) {
+        return lang().getMessage("interact.joinedTeam", playerName);
+    }
+    
+    public static String INTERACT_THEIR_TEAM_FULL(String playerName) {
+        return lang().getMessage("interact.theirTeamFull", playerName);
+    }
+    
+    public static String INTERACT_TEAM_FORMED_WITH(String playerName) {
+        return lang().getMessage("interact.teamFormedWith", playerName);
     }
 }

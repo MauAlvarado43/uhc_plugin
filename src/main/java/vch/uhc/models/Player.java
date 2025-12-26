@@ -15,6 +15,9 @@ public class Player {
     private int lives;
     private Location spawn;
     private boolean isPlaying;
+    private int kills;
+    private int deaths;
+    private boolean ironman;
 
     public Player(UUID uuid, String name) {
         this.uuid = uuid;
@@ -22,6 +25,9 @@ public class Player {
         this.lives = 1;
         this.randomName = generateRandomName();
         this.isPlaying = true;
+        this.kills = 0;
+        this.deaths = 0;
+        this.ironman = false;
     }
 
     public UUID getUuid() {
@@ -84,11 +90,35 @@ public class Player {
         return randomName;
     }
 
+    public int getKills() {
+        return kills;
+    }
+
+    public void addKill() {
+        this.kills++;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public void addDeath() {
+        this.deaths++;
+    }
+
+    public boolean isIronman() {
+        return ironman;
+    }
+
+    public void setIronman(boolean ironman) {
+        this.ironman = ironman;
+    }
+
     private String generateRandomName() {
 
-        String randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String randomChars = "ABCDEFGHIJKLMNOPQ";
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 10; i++)
             sb.append(ChatColor.MAGIC).append(randomChars.charAt((int) (Math.random() * randomChars.length())));
 
         return sb.toString();

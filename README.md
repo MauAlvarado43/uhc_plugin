@@ -1,6 +1,6 @@
 # UHC — Minecraft Plugin
 
-This repository contains the UHC (Ultra Hardcore) plugin for Minecraft developed in Java (Maven). The plugin provides basic functionality to run UHC matches on a Spigot/Paper server.
+This repository contains the UHC (Ultra Hardcore) plugin for Minecraft developed in Java (Maven). The plugin provides basic functionality to run UHC matches on a Paper server.
 
 ## Project structure
 
@@ -31,33 +31,55 @@ test_server/        # Local server files for testing (contains a server jar and 
 
 - Java JDK 17 or newer
 - Maven 3.6+
-- Spigot/Paper server compatible with the configured API version
+- Paper server compatible with the configured API version
 
 ## Quick start (Windows)
 
-Build the plugin using the included script:
+### Option 1: Full automation
 
-```powershell
+Run the master script to setup, build and start the server all at once:
+
+```batch
+.\bin\start.bat
+```
+
+### Option 2: Step by step
+
+1. Setup the test server (downloads Paper and dependencies):
+
+```batch
+.\bin\setup.bat
+```
+
+2. Build the plugin:
+
+```batch
 .\bin\build.bat
 ```
 
-Move the produced JAR to the server `plugins` folder (script):
+3. Run the test server (copies plugin JAR and starts the server):
 
-```powershell
-.\bin\move.bat
+```batch
+.\bin\run.bat
 ```
 
-Run the test server using the provided `bin/server.bat` script (this repository uses `bin/server.bat` as the test server launcher):
+### Option 3: Maven directly
 
-```powershell
-.\bin\server.bat
-```
-
-Alternatively, build with Maven directly:
-
-```powershell
+```batch
 mvn clean package
-# result: target/uhc-<version>.jar
+REM result: target/uhc-<version>.jar
+```
+
+### Running tests
+
+```batch
+.\bin\test.bat
+```
+
+Or with Maven:
+
+```batch
+mvn test
 ```
 
 ## Plugin commands
@@ -128,12 +150,19 @@ Examples:
 
 Run tests and package with Maven:
 
-```powershell
+```batch
 mvn test
 mvn package
 ```
 
-Use the `bin/server.bat` script to launch the local test server and verify the plugin loads correctly.
+Or use the convenience scripts:
+
+```batch
+.\bin\test.bat
+.\bin\build.bat
+```
+
+Use the [run.bat](bin/run.bat) script to launch the local test server and verify the plugin loads correctly.
 
 ## Troubleshooting
 
@@ -145,3 +174,26 @@ Use the `bin/server.bat` script to launch the local test server and verify the p
 ## Notes
 
 - The `plugin.yml` file in `src/main/resources` is the authoritative source for commands and permissions. If you change commands or permissions, update that file and recompile.
+
+### Recomended settings for TAB plugin
+
+Set the following in `plugins/TAB/groups.yml` to show UHC player info in the tab list:
+```yaml
+_DEFAULT_:
+  tabprefix: "%uchteam% %uchplayerlives%"
+  tagprefix: ""
+  customtabname: "%uchplayer%"
+  tabsuffix: " %uchplayerhealth%"
+  tagsuffix: ""
+```
+
+Disable the default health display to avoid conflicts in `plugins/TAB/config.yml`:
+```yaml
+playerlist-objective:
+  enabled: false # This disables the default health display
+  value: "%health%"
+  fancy-value: "&7Ping: %ping%"
+  title: "TAB"
+  render-type: HEARTS
+  disable-condition: '%world%=disabledworld'
+```

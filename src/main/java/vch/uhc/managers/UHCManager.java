@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
@@ -39,14 +39,14 @@ public class UHCManager {
     private int agreementElapsedSeconds = 0;
     private boolean agreementActive = false;
 
+    private int buffsElapsedSeconds = 0;
+    private boolean buffsApplied = false;
+
+    private int skinShuffleElapsedSeconds = 0;
+
     private boolean isCheckingProximity = true;
     private boolean teamsFormed = false;
     private GameStats gameStats;
-    
-
-    private org.bukkit.scoreboard.Scoreboard mainScoreboard;
-    private org.bukkit.scoreboard.Objective mainObjective;
-    private org.bukkit.scoreboard.Objective healthObjective;
 
     public UHCManager() {
         plugin = UHC.getPlugin();
@@ -58,9 +58,16 @@ public class UHCManager {
     public void start() {
 
         settings.setGameStatus(Settings.GameStatus.IN_PROGRESS);
+
+        plugin.getGameModeManager().initializeGameMode();
         currentWorldSize = settings.getMaxWorldSize();
         teamsFormed = false;
 
+        int totalAgreementSeconds = settings.getAgreementHours() * 3600 + 
+                                   settings.getAgreementMinutes() * 60 + 
+                                   settings.getAgreementSeconds();
+        agreementActive = totalAgreementSeconds > 0;
+        agreementElapsedSeconds = 0;
 
         gameStats = new GameStats();
 
@@ -75,7 +82,14 @@ public class UHCManager {
         prepareTeams();
         preparePlayers();
         
-        plugin.getSkinManager().shuffleAndAssignSkins();
+        
+        World world = Bukkit.getWorld("world");
+        if (world != null) {
+            world.setStorm(false);
+            world.setThundering(false);
+            world.setWeatherDuration(Integer.MAX_VALUE);
+            world.setTime(1000);
+        }
         
         startTimedTasks();
 
@@ -106,6 +120,76 @@ public class UHCManager {
         plugin.getSkinManager().clearAssignments();
     }
 
+    public void reload() {
+        
+        if (settings.getGameStatus() != Settings.GameStatus.NONE) {
+            cancel();
+        }
+        
+        if (gameTimeTask != null) {
+            gameTimeTask.cancel();
+            gameTimeTask = null;
+        }
+        
+        plugin.getSkinManager().restoreAllSkins();
+        plugin.getSkinManager().clearAssignments();
+        
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            org.bukkit.scoreboard.Scoreboard scoreboard = p.getScoreboard();
+            if (scoreboard != null) {
+                org.bukkit.scoreboard.Objective objective = scoreboard.getObjective("uhc");
+                if (objective != null) {
+                    objective.unregister();
+                }
+                org.bukkit.scoreboard.Objective healthObjective = scoreboard.getObjective("health");
+                if (healthObjective != null) {
+                    healthObjective.unregister();
+                }
+            }
+            p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        });
+        
+        teamManager.getTeams().clear();
+        
+        playerManager.getPlayers().forEach(player -> {
+            player.setTeam(null);
+            player.setLives(1);
+            player.setPlaying(true);
+        });
+        
+        elapsedSeconds = 0;
+        elapsedMinutes = 0;
+        elapsedHours = 0;
+        agreementElapsedSeconds = 0;
+        agreementActive = false;
+        buffsElapsedSeconds = 0;
+        buffsApplied = false;
+        skinShuffleElapsedSeconds = 0;
+        isCheckingProximity = true;
+        teamsFormed = false;
+        gameStats = null;
+        currentWorldSize = 0;
+        
+        settings.load();
+        
+        Bukkit.getWorlds().forEach(world -> {
+            world.setGameRule(GameRule.NATURAL_REGENERATION, true);
+            world.getWorldBorder().setSize(29999984);
+            world.getWorldBorder().setCenter(0, 0);
+        });
+        
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            if (p.getGameMode() != org.bukkit.GameMode.CREATIVE) {
+                p.setGameMode(org.bukkit.GameMode.SURVIVAL);
+            }
+            p.getActivePotionEffects().forEach(effect -> {
+                p.removePotionEffect(effect.getType());
+            });
+            p.setMaxHealth(20.0);
+            p.setHealth(20.0);
+        });
+    }
+
     private void prepareGame() {
 
         Bukkit.getWorlds().forEach(world -> {
@@ -120,99 +204,117 @@ public class UHCManager {
     }
 
     private void prepareScoreboard() {
+        Bukkit.getOnlinePlayers().forEach(this::createPlayerScoreboard);
+    }
 
-
+    private void createPlayerScoreboard(Player player) {
         org.bukkit.scoreboard.ScoreboardManager manager = Bukkit.getScoreboardManager();
         if (manager == null) return;
 
-        mainScoreboard = manager.getNewScoreboard();
-        mainObjective = mainScoreboard.registerNewObjective(
+        org.bukkit.scoreboard.Scoreboard scoreboard = manager.getNewScoreboard();
+        
+        org.bukkit.scoreboard.Objective objective = scoreboard.registerNewObjective(
             "uhc", 
             "dummy", 
-            org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "UHC"
+            vch.uhc.misc.Messages.UHC_SCOREBOARD_TITLE()
         );
-        mainObjective.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR);
-        
+        objective.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR);
 
-
-
-
-
-
-
-
-
-        Bukkit.getOnlinePlayers().forEach(p -> p.setScoreboard(mainScoreboard));
-
-
+        player.setScoreboard(scoreboard);
     }
 
     public void updateScoreboard() {
-        
-
-        if (mainScoreboard == null || mainObjective == null || healthObjective == null) return;
-        
-
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getScoreboard() != mainScoreboard) {
-                player.setScoreboard(mainScoreboard);
-            }
+            updatePlayerScoreboard(player);
         }
-        
+    }
 
-        mainScoreboard.getEntries().forEach(mainScoreboard::resetScores);
+    private void updatePlayerScoreboard(Player player) {
+        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
+        org.bukkit.scoreboard.Objective objective = scoreboard.getObjective("uhc");
         
+        if (objective == null) {
+            createPlayerScoreboard(player);
+            scoreboard = player.getScoreboard();
+            objective = scoreboard.getObjective("uhc");
+            if (objective == null) return;
+        }
 
-        Player referencePlayer = Bukkit.getOnlinePlayers().stream().findFirst().orElse(null);
-        if (referencePlayer == null) return;
+        for (String entry : scoreboard.getEntries()) {
+            scoreboard.resetScores(entry);
+        }
 
         int score = 15;
 
+        objective.getScore(" ").setScore(score--);
+        objective.getScore(vch.uhc.misc.Messages.UHC_SCOREBOARD_TIME(elapsedHours, elapsedMinutes, elapsedSeconds)).setScore(score--);
+        objective.getScore("  ").setScore(score--);
 
-        mainObjective.getScore(" ").setScore(score--);
-
-
-        String timeStr = String.format("%02d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
-        mainObjective.getScore(org.bukkit.ChatColor.YELLOW + "Tiempo: " + org.bukkit.ChatColor.WHITE + timeStr).setScore(score--);
-
-
-        String pvpStatus = agreementActive ? 
-                         org.bukkit.ChatColor.RED + "✖ Desactivado" : 
-                         org.bukkit.ChatColor.GREEN + "✔ Activado";
-        mainObjective.getScore(org.bukkit.ChatColor.YELLOW + "PvP: " + pvpStatus).setScore(score--);
-
-
-        mainObjective.getScore("  ").setScore(score--);
-
-
-        long alivePlayers = playerManager.getPlayers().stream().filter(vch.uhc.models.Player::isAlive).count();
-        long totalPlayers = playerManager.getPlayers().size();
-        mainObjective.getScore(org.bukkit.ChatColor.AQUA + "Vivos: " + org.bukkit.ChatColor.WHITE + alivePlayers + "/" + totalPlayers).setScore(score--);
-
-
-        if (settings.getTeamMode() != Settings.TeamMode.MANUAL || !teamManager.getTeams().isEmpty()) {
-            long aliveTeams = teamManager.getTeams().stream()
-                .filter(team -> team.getMembers().stream().anyMatch(vch.uhc.models.Player::isAlive))
-                .count();
-            mainObjective.getScore(org.bukkit.ChatColor.GREEN + "Equipos: " + org.bukkit.ChatColor.WHITE + aliveTeams).setScore(score--);
+        vch.uhc.models.Player uhcPlayer = playerManager.getPlayerByUUID(player.getUniqueId());
+        if (uhcPlayer != null && uhcPlayer.getTeam() != null) {
+            Team team = uhcPlayer.getTeam();
+            objective.getScore("§a§lEquipo: §f" + team.getName()).setScore(score--);
+            
+            for (vch.uhc.models.Player member : team.getMembers()) {
+                if (!member.getUuid().equals(player.getUniqueId())) {
+                    Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+                    if (memberPlayer != null && member.isAlive()) {
+                        double health = memberPlayer.getHealth();
+                        String healthDisplay = String.format("§c❤ §f%.1f", health);
+                        objective.getScore("§f" + member.getName() + " " + healthDisplay).setScore(score--);
+                    } else if (!member.isAlive()) {
+                        objective.getScore("§7§m" + member.getName() + " §c✖").setScore(score--);
+                    }
+                }
+            }
+            objective.getScore("   ").setScore(score--);
         }
 
+        if (settings.getGameMode() == Settings.GameMode.RESOURCE_RUSH) {
+            List<Material> items = plugin.getGameModeManager().getResourceRushItems();
+            if (items != null && !items.isEmpty()) {
+                objective.getScore("§e§lObjetivos:").setScore(score--);
+                
+                int itemsToShow = Math.min(items.size(), 5);
+                for (int i = 0; i < itemsToShow; i++) {
+                    Material item = items.get(i);
+                    boolean hasItem = player.getInventory().contains(item);
+                    String status = hasItem ? "§a✔" : "§7○";
+                    String itemName = item.name().replace("_", " ");
+                    objective.getScore(status + "§f " + itemName).setScore(score--);
+                }
+                
+                if (items.size() > 5) {
+                    objective.getScore("§7... y " + (items.size() - 5) + " más").setScore(score--);
+                }
+                objective.getScore("    ").setScore(score--);
+            }
+        }
 
-        mainObjective.getScore("   ").setScore(score--);
-
-
-        World world = referencePlayer.getWorld();
-        int borderSize = (int) (world.getWorldBorder().getSize() / 2);
-        mainObjective.getScore(org.bukkit.ChatColor.LIGHT_PURPLE + "Border: " + org.bukkit.ChatColor.WHITE + "±" + borderSize).setScore(score--);
+        int totalAgreementSeconds = settings.getAgreementHours() * 3600 + 
+                                   settings.getAgreementMinutes() * 60 + 
+                                   settings.getAgreementSeconds();
         
-
-        mainObjective.getScore("    ").setScore(score--);
+        if (totalAgreementSeconds > 0) {
+            objective.getScore("§6§lPacto de Caballeros:").setScore(score--);
+            int remainingSeconds = totalAgreementSeconds - agreementElapsedSeconds;
+            
+            if (remainingSeconds > 0) {
+                int remHours = remainingSeconds / 3600;
+                int remMinutes = (remainingSeconds % 3600) / 60;
+                int remSeconds = remainingSeconds % 60;
+                objective.getScore("§eTermina en: §f" + 
+                    String.format("%02d:%02d:%02d", remHours, remMinutes, remSeconds)).setScore(score--);
+            } else {
+                objective.getScore("§c¡Finalizado!").setScore(score--);
+            }
+            objective.getScore("     ").setScore(score--);
+        }
     }
     
     public void applyScoreboardToPlayer(Player player) {
-        if (mainScoreboard != null) {
-            player.setScoreboard(mainScoreboard);
-        }
+        createPlayerScoreboard(player);
+        updatePlayerScoreboard(player);
     }
 
     private List<Location> getSpawns() {
@@ -223,8 +325,14 @@ public class UHCManager {
         
 
         int spawnCount;
-        if (settings.getTeamMode() == Settings.TeamMode.MANUAL || settings.getTeamMode() == Settings.TeamMode.AUTO) {
-            spawnCount = teamManager.getTeams().size();
+        if (settings.getTeamMode() == Settings.TeamMode.MANUAL) {
+            int teamsCount = teamManager.getTeams().size();
+            int playersWithoutTeam = (int) playerManager.getPlayers().stream()
+                .filter(p -> p.getTeam() == null)
+                .count();
+            spawnCount = teamsCount + playersWithoutTeam;
+        } else if (settings.getTeamMode() == Settings.TeamMode.AUTO) {
+            spawnCount = (int) Math.ceil(playerCount / (double) settings.getTeamSize());
         } else {
             spawnCount = playerCount;
         }
@@ -303,17 +411,50 @@ public class UHCManager {
         return new Location(world, x + 0.5, worldY, z + 0.5);
     }
 
+    public Location getSafeRespawnLocation(Location originalSpawn) {
+        if (originalSpawn == null) {
+            return null;
+        }
+        
+        World world = originalSpawn.getWorld();
+        if (world == null) {
+            return null;
+        }
+        
+        WorldBorder border = world.getWorldBorder();
+        double borderSize = border.getSize() / 2.0;
+        
+        double x = originalSpawn.getX();
+        double z = originalSpawn.getZ();
+        
+        if (Math.abs(x) <= borderSize && Math.abs(z) <= borderSize) {
+            return originalSpawn;
+        }
+        
+        
+        int safeSize = (int)(borderSize * 0.9);
+        int newX = (int)(Math.random() * safeSize * 2 - safeSize);
+        int newZ = (int)(Math.random() * safeSize * 2 - safeSize);
+        
+        return createSpawn(world, newX, newZ);
+    }
+
     private void prepareTeams() {
 
         if (settings.getTeamMode() != Settings.TeamMode.AUTO) {
+            if (settings.getTeamMode() == Settings.TeamMode.MANUAL && !teamManager.getTeams().isEmpty()) {
+                teamsFormed = true;
+                for (Team team : teamManager.getTeams()) {
+                }
+            }
             return;
         }
 
         ArrayList<vch.uhc.models.Player> uhcPlayers = new ArrayList<>(playerManager.getPlayers());
         int playerCount = uhcPlayers.size();
-        int teamCount = (int) Math.ceil(playerCount / (double) settings.getTeamSize());
+        int teamSize = settings.getTeamSize();
+        int teamCount = (int) Math.ceil(playerCount / (double) teamSize);
         Collections.shuffle(uhcPlayers);
-
 
         List<Team> teams = new ArrayList<>();
         for (int i = 0; i < teamCount; i++) {
@@ -361,14 +502,40 @@ public class UHCManager {
                     Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
                     if (bukkitPlayer != null) {
                         bukkitPlayer.teleport(loc);
+                        bukkitPlayer.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.OAK_BOAT));
                     }
 
                 }
 
             }
+            
+            if (settings.getTeamMode() == Settings.TeamMode.MANUAL) {
+                ArrayList<vch.uhc.models.Player> playersWithoutTeam = new ArrayList<>();
+                for (vch.uhc.models.Player p : playerManager.getPlayers()) {
+                    if (p.getTeam() == null) {
+                        playersWithoutTeam.add(p);
+                    }
+                }
+                
+                if (!playersWithoutTeam.isEmpty()) {
+                    int spawnOffset = teams.size();
+                    for (int i = 0; i < playersWithoutTeam.size(); i++) {
+                        vch.uhc.models.Player player = playersWithoutTeam.get(i);
+                        Location loc = spawns.get((spawnOffset + i) % spawns.size()).clone();
+                        
+                        player.setSpawn(loc);
+                        player.setLives(settings.getPlayerLives());
+                        
+                        Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
+                        if (bukkitPlayer != null) {
+                            bukkitPlayer.teleport(loc);
+                            bukkitPlayer.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.OAK_BOAT));
+                        }
+                    }
+                }
+            }
 
         } else {
-
 
             ArrayList<vch.uhc.models.Player> players = new ArrayList<>(plugin.getPlayerManager().getPlayers());
 
@@ -383,6 +550,7 @@ public class UHCManager {
                 Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
                 if (bukkitPlayer != null) {
                     bukkitPlayer.teleport(loc);
+                    bukkitPlayer.getInventory().addItem(new org.bukkit.inventory.ItemStack(org.bukkit.Material.OAK_BOAT));
                 }
 
             }
@@ -396,7 +564,9 @@ public class UHCManager {
             checkInGameTeamsState();
             checkGameState();
             checkAgreementState();
+            checkBuffsState();
             checkWorldBorderState();
+            checkSkinShuffleState();
             checkWinCondition();
         }, 0, 20);
     }
@@ -418,6 +588,20 @@ public class UHCManager {
 
         updateScoreboard();
 
+    }
+
+    private void checkSkinShuffleState() {
+        if (!settings.isSkinShuffleEnabled()) {
+            return;
+        }
+
+        skinShuffleElapsedSeconds++;
+        
+        int targetSeconds = settings.getSkinShuffleMinutes() * 60 + settings.getSkinShuffleSeconds();
+        
+        if (targetSeconds > 0 && skinShuffleElapsedSeconds >= targetSeconds) {
+            skinShuffleElapsedSeconds = 0;
+        }
     }
 
     private void checkInGameTeamsState() {
@@ -456,13 +640,9 @@ public class UHCManager {
 
                     int distanceBlocks = (int) Math.round(distance);
                     bukkitP1.spigot().sendMessage(ChatMessageType.ACTION_BAR, 
-                        new TextComponent(org.bukkit.ChatColor.YELLOW + "Jugador cerca: " + 
-                        org.bukkit.ChatColor.WHITE + p2.getName() + 
-                        org.bukkit.ChatColor.GRAY + " (" + distanceBlocks + " bloques)"));
+                        new TextComponent(vch.uhc.misc.Messages.LOCATOR_BAR_NEARBY_PLAYER(p2.getName(), distanceBlocks)));
                     bukkitP2.spigot().sendMessage(ChatMessageType.ACTION_BAR, 
-                        new TextComponent(org.bukkit.ChatColor.YELLOW + "Jugador cerca: " + 
-                        org.bukkit.ChatColor.WHITE + p1.getName() + 
-                        org.bukkit.ChatColor.GRAY + " (" + distanceBlocks + " bloques)"));
+                        new TextComponent(vch.uhc.misc.Messages.LOCATOR_BAR_NEARBY_PLAYER(p1.getName(), distanceBlocks)));
                 }
                 
 
@@ -478,21 +658,21 @@ public class UHCManager {
 
                     Team newTeam = teamManager.createTeam(p1, "Team " + (teamManager.getTeams().size() + 1));
                     teamManager.addPlayer(newTeam, p2);
-                    bukkitP1.sendMessage(ChatColor.GREEN + "Team formed with " + p2.getName() + "!");
-                    bukkitP2.sendMessage(ChatColor.GREEN + "Team formed with " + p1.getName() + "!");
+                    bukkitP1.sendMessage(vch.uhc.misc.Messages.UHC_TEAM_FORMED(p2.getName()));
+                    bukkitP2.sendMessage(vch.uhc.misc.Messages.UHC_TEAM_FORMED(p1.getName()));
                 } else if (team1 == null && team2 != null) {
 
                     if (team2.getMembers().size() < settings.getTeamSize()) {
                         teamManager.addPlayer(team2, p1);
-                        bukkitP1.sendMessage(ChatColor.GREEN + "You joined " + team2.getName() + "!");
-                        bukkitP2.sendMessage(ChatColor.GREEN + p1.getName() + " joined your team!");
+                        bukkitP1.sendMessage(vch.uhc.misc.Messages.UHC_YOU_JOINED(team2.getName()));
+                        bukkitP2.sendMessage(vch.uhc.misc.Messages.UHC_PLAYER_JOINED_TEAM(p1.getName()));
                     }
                 } else if (team1 != null && team2 == null) {
 
                     if (team1.getMembers().size() < settings.getTeamSize()) {
                         teamManager.addPlayer(team1, p2);
-                        bukkitP2.sendMessage(ChatColor.GREEN + "You joined " + team1.getName() + "!");
-                        bukkitP1.sendMessage(ChatColor.GREEN + p2.getName() + " joined your team!");
+                        bukkitP2.sendMessage(vch.uhc.misc.Messages.UHC_YOU_JOINED(team1.getName()));
+                        bukkitP1.sendMessage(vch.uhc.misc.Messages.UHC_PLAYER_JOINED_TEAM(p2.getName()));
                     }
                 } else if (team1 != team2) {
 
@@ -505,7 +685,7 @@ public class UHCManager {
                             teamManager.addPlayer(team1, member);
                             Player bukkitMember = Bukkit.getPlayer(member.getUuid());
                             if (bukkitMember != null) {
-                                bukkitMember.sendMessage(ChatColor.GREEN + "Teams merged! Now part of " + team1.getName());
+                                bukkitMember.sendMessage(vch.uhc.misc.Messages.UHC_TEAMS_MERGED(team1.getName()));
                             }
                         }
                     }
@@ -545,7 +725,7 @@ public class UHCManager {
 
 
             if (remainingSeconds < 11) {
-                Bukkit.broadcastMessage(org.bukkit.ChatColor.RED + "⚠ PvP se activará en " + remainingSeconds + " segundos!");
+                Bukkit.broadcastMessage(vch.uhc.misc.Messages.PVP_WARNING_SECONDS(remainingSeconds));
                 Bukkit.getOnlinePlayers().forEach(p -> 
                     p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f)
                 );
@@ -556,16 +736,16 @@ public class UHCManager {
             agreementActive = false;
             
             Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(org.bukkit.ChatColor.DARK_RED + "════════════════════════════════");
-            Bukkit.broadcastMessage(org.bukkit.ChatColor.RED + "⚔ " + org.bukkit.ChatColor.BOLD + "PVP ACTIVADO" + org.bukkit.ChatColor.RED + " ⚔");
-            Bukkit.broadcastMessage(org.bukkit.ChatColor.DARK_RED + "════════════════════════════════");
+            Bukkit.broadcastMessage(vch.uhc.misc.Messages.PVP_ACTIVATED());
+            Bukkit.broadcastMessage(vch.uhc.misc.Messages.PVP_ACTIVATED_LINE());
+            Bukkit.broadcastMessage(vch.uhc.misc.Messages.PVP_ACTIVATED());
             Bukkit.broadcastMessage("");
             
 
             Bukkit.getOnlinePlayers().forEach(p -> {
                 p.sendTitle(
-                    org.bukkit.ChatColor.DARK_RED + "⚔ PVP ACTIVADO ⚔",
-                    org.bukkit.ChatColor.YELLOW + "¡El acuerdo ha terminado!",
+                    vch.uhc.misc.Messages.PVP_ACTIVATED_TITLE(),
+                    vch.uhc.misc.Messages.PVP_ACTIVATED_SUBTITLE(),
                     10, 70, 20
                 );
                 p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.0f);
@@ -578,26 +758,92 @@ public class UHCManager {
 
     }
 
-    private void checkWorldBorderState() {
+    private void checkBuffsState() {
+        if (!settings.isBuffsEnabled()) {
+            return;
+        }
 
-        int maxWorldSize = settings.getMaxWorldSize();
-        int maxHours = settings.getGameHours();
-        int maxMinutes = settings.getGameMinutes();
-        int maxSeconds = settings.getGameSeconds();
+        int totalBuffsSeconds = settings.getBuffsHours() * 3600 + 
+                               settings.getBuffsMinutes() * 60 + 
+                               settings.getBuffsSeconds();
 
-        double totalGameTime = maxHours * 3600 + maxMinutes * 60 + maxSeconds;
-        double worldBorderSize = maxWorldSize * 2;
-        double borderStep = worldBorderSize / totalGameTime;
+        if (totalBuffsSeconds <= 0) {
+            return;
+        }
 
-        for (World world : Bukkit.getWorlds()) {
-            WorldBorder border = world.getWorldBorder();
-            border.setSize(border.getSize() - borderStep);
+        buffsElapsedSeconds++;
+
+        int remainingSeconds = totalBuffsSeconds - buffsElapsedSeconds;
+
+        if (remainingSeconds == 0 && !buffsApplied) {
+            buffsApplied = true;
+            
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage("§6§l██████████████████████████████");
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage("§e§l          ¡MEJORAS ACTIVADAS!");
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage("§a» §fVida aumentada: §c+" + (int)settings.getExtraHearts() + " corazones");
+            Bukkit.broadcastMessage("§a» §fResistencia II permanente");
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage("§6§l██████████████████████████████");
+            Bukkit.broadcastMessage("");
+            
+            Bukkit.getOnlinePlayers().forEach(p -> {
+                double newMaxHealth = p.getMaxHealth() + (settings.getExtraHearts() * 2.0);
+                p.setMaxHealth(newMaxHealth);
+                p.setHealth(newMaxHealth);
+                
+                p.addPotionEffect(new PotionEffect(
+                    PotionEffectType.RESISTANCE, 
+                    Integer.MAX_VALUE, 
+                    1,
+                    false, 
+                    true, 
+                    true
+                ));
+                
+                p.sendTitle(
+                    "§6§lMEJORAS ACTIVADAS",
+                    "§e+" + (int)settings.getExtraHearts() + " corazones §7| §bResistencia II",
+                    10, 70, 20
+                );
+                
+                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+            });
+            
         }
 
     }
 
+    private void checkWorldBorderState() {
+        int maxWorldSize = settings.getMaxWorldSize();
+        int minWorldSize = settings.getMinWorldSize();
+        int maxHours = settings.getGameHours();
+        int maxMinutes = settings.getGameMinutes();
+        int maxSeconds = settings.getGameSeconds();
 
-    
+        int totalGameSeconds = maxHours * 3600 + maxMinutes * 60 + maxSeconds;
+        int currentElapsedSeconds = elapsedHours * 3600 + elapsedMinutes * 60 + elapsedSeconds;
+
+        if (settings.isGradualBorderEnabled()) {
+            double totalBorderChange = (maxWorldSize - minWorldSize) * 2.0;
+            double borderStep = totalBorderChange / totalGameSeconds;
+
+            for (World world : Bukkit.getWorlds()) {
+                WorldBorder border = world.getWorldBorder();
+                border.setSize(border.getSize() - borderStep);
+            }
+        } else {
+            if (currentElapsedSeconds >= totalGameSeconds) {
+                for (World world : Bukkit.getWorlds()) {
+                    WorldBorder border = world.getWorldBorder();
+                    border.setSize(minWorldSize * 2.0);
+                }
+            }
+        }
+    }
+
     public boolean isAgreementActive() {
         return agreementActive;
     }
@@ -630,46 +876,45 @@ public class UHCManager {
     }
 
     private void checkWinCondition() {
-        
-
         int totalElapsedSeconds = elapsedHours * 3600 + elapsedMinutes * 60 + elapsedSeconds;
         if (totalElapsedSeconds < 5) {
             return;
         }
         
-
         long totalPlayers = playerManager.getPlayers().size();
         if (totalPlayers < 2) {
-
             return;
         }
         
-
         long alivePlayers = playerManager.getPlayers().stream()
             .filter(vch.uhc.models.Player::isAlive)
             .count();
 
+        boolean hasActualTeams = false;
+        if (!teamManager.getTeams().isEmpty()) {
+            if (settings.getTeamMode() == Settings.TeamMode.MANUAL) {
+                hasActualTeams = true;
+            } else if (teamsFormed) {
+                hasActualTeams = teamManager.getTeams().stream()
+                    .anyMatch(team -> team.getMembers().size() > 1);
+            }
+        }
 
-        if (teamsFormed && !teamManager.getTeams().isEmpty()) {
-            
+        if (hasActualTeams) {
             List<Team> aliveTeams = teamManager.getTeams().stream()
                 .filter(team -> team.getMembers().stream().anyMatch(vch.uhc.models.Player::isAlive))
                 .collect(java.util.stream.Collectors.toList());
 
-            if (aliveTeams.size() == 1 && alivePlayers == 1) {
-
+            if (aliveTeams.size() == 1) {
                 declareTeamWinner(aliveTeams.get(0));
                 return;
             } else if (aliveTeams.isEmpty()) {
-
                 declareDraw();
                 return;
             }
             
         } else {
-
             if (alivePlayers == 1) {
-
                 vch.uhc.models.Player winner = playerManager.getPlayers().stream()
                     .filter(vch.uhc.models.Player::isAlive)
                     .findFirst()
@@ -680,7 +925,6 @@ public class UHCManager {
                 }
                 return;
             } else if (alivePlayers == 0) {
-
                 declareDraw();
                 return;
             }
@@ -694,30 +938,28 @@ public class UHCManager {
         if (gameTimeTask != null) {
             gameTimeTask.cancel();
         }
-        
 
         plugin.getSkinManager().restoreAllSkins();
-
 
         gameStats.setGameEndTime(System.currentTimeMillis());
         gameStats.setWinner(winner.getName());
 
 
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(org.bukkit.ChatColor.GOLD + "════════════════════════════════");
-        Bukkit.broadcastMessage(org.bukkit.ChatColor.YELLOW + "       🏆 " + org.bukkit.ChatColor.BOLD + "VICTORY!" + org.bukkit.ChatColor.YELLOW + " 🏆");
+        Bukkit.broadcastMessage(vch.uhc.misc.Messages.VICTORY_HEADER());
+        Bukkit.broadcastMessage(vch.uhc.misc.Messages.VICTORY_TITLE_LINE());
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(org.bukkit.ChatColor.GREEN + "Winner: " + org.bukkit.ChatColor.GOLD + org.bukkit.ChatColor.BOLD + winner.getName());
+        Bukkit.broadcastMessage(vch.uhc.misc.Messages.VICTORY_WINNER_SOLO(winner.getName()));
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(org.bukkit.ChatColor.AQUA + "Game duration: " + org.bukkit.ChatColor.WHITE + gameStats.getFormattedDuration());
-        Bukkit.broadcastMessage(org.bukkit.ChatColor.GOLD + "════════════════════════════════");
+        Bukkit.broadcastMessage(vch.uhc.misc.Messages.VICTORY_GAME_DURATION(gameStats.getFormattedDuration()));
+        Bukkit.broadcastMessage(vch.uhc.misc.Messages.VICTORY_FOOTER());
         Bukkit.broadcastMessage("");
 
 
         Bukkit.getOnlinePlayers().forEach(p -> {
             p.sendTitle(
-                org.bukkit.ChatColor.GOLD + "🏆 " + winner.getName() + " 🏆",
-                org.bukkit.ChatColor.YELLOW + "Has won the UHC!",
+                vch.uhc.misc.Messages.VICTORY_PLAYER_TITLE(winner.getName()),
+                vch.uhc.misc.Messages.VICTORY_TITLE_WON(),
                 20, 100, 20
             );
         });
@@ -743,9 +985,10 @@ public class UHCManager {
             gameTimeTask.cancel();
         }
 
+        plugin.getSkinManager().restoreAllSkins();
 
         gameStats.setGameEndTime(System.currentTimeMillis());
-        gameStats.setWinner("Equipo " + winningTeam.getName());
+        gameStats.setWinner(vch.uhc.misc.Messages.VICTORY_TEAM_PREFIX() + winningTeam.getName());
 
 
         Bukkit.broadcastMessage("");
@@ -769,8 +1012,8 @@ public class UHCManager {
 
         Bukkit.getOnlinePlayers().forEach(p -> {
             p.sendTitle(
-                org.bukkit.ChatColor.GOLD + "🏆 " + winningTeam.getName() + " 🏆",
-                org.bukkit.ChatColor.YELLOW + "Has won the UHC!",
+                vch.uhc.misc.Messages.VICTORY_TEAM_TITLE(winningTeam.getName()),
+                vch.uhc.misc.Messages.VICTORY_TITLE_WON(),
                 20, 100, 20
             );
         });

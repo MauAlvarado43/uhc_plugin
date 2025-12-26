@@ -28,7 +28,7 @@ public class PvPListener extends BaseListener {
             e.setCancelled(true);
             
             Player damager = (Player) e.getDamager();
-            damager.sendMessage(Messages.PVP_DISABLED_AGREEMENT);
+            damager.sendMessage(Messages.PVP_DISABLED_AGREEMENT());
             
             int remainingSeconds = UHC.getPlugin().getUHCManager().getAgreementRemainingSeconds();
             int minutes = remainingSeconds / 60;

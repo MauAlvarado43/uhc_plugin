@@ -13,6 +13,7 @@ import vch.uhc.items.DragonBreath;
 import vch.uhc.items.GlisteringMelonSlice;
 import vch.uhc.items.HyperGoldenApple;
 import vch.uhc.items.PlayerGoldenApple;
+import vch.uhc.items.SuperGoldenApple;
 
 public class Settings {
 
@@ -29,9 +30,15 @@ public class Settings {
     ENDED
   }
 
+  public enum GameMode {
+    PVD,
+    PVP,
+    RESOURCE_RUSH
+  }
+
   
-  private final Gson gson = new Gson();
-  private final File settingsFile = new File(UHC.getPlugin().getDataFolder(), "settings.json");
+  private transient final Gson gson = new Gson();
+  private transient final File settingsFile = new File(UHC.getPlugin().getDataFolder(), "settings.json");
 
   private int maxWorldSize = 1000;
   private int minWorldSize = 100;
@@ -52,16 +59,44 @@ public class Settings {
   private int maxTeamInGameMinutes = 0;
   private int maxTeamInGameSeconds = 0;
 
+  private int endPortalHours = 0;
+  private int endPortalMinutes = 10;
+  private int endPortalSeconds = 0;
+
+  private boolean shulkerEnabled = false;
+  private int shulkerHours = 0;
+  private int shulkerMinutes = 15;
+  private int shulkerSeconds = 0;
+
+  private boolean locatorBarEnabled = false;
+  private int locatorBarHours = 0;
+  private int locatorBarMinutes = 20;
+  private int locatorBarSeconds = 0;
+
+  private boolean buffsEnabled = false;
+  private int buffsHours = 0;
+  private int buffsMinutes = 30;
+  private int buffsSeconds = 0;
+  private double extraHearts = 10.0;
+
+  private boolean skinShuffleEnabled = true;
+  private int skinShuffleMinutes = 5;
+  private int skinShuffleSeconds = 0;
+
+  private boolean gradualBorderEnabled = true;
+
   private GameStatus gameStatus = GameStatus.NONE;
+  private GameMode gameMode = GameMode.PVP;
 
   private TeamMode teamMode = TeamMode.MANUAL;
   private int teamSize = 2;
 
   private int playerLives = 1;
 
-  private ArrayList<BaseItem> items = new ArrayList<>(Arrays.asList(
+  private transient ArrayList<BaseItem> items = new ArrayList<>(Arrays.asList(
     new DragonBreath(),
     new GlisteringMelonSlice(),
+    new SuperGoldenApple(),
     new HyperGoldenApple(),
     new PlayerGoldenApple()
   ));
@@ -186,6 +221,14 @@ public class Settings {
     return gameStatus;
   }
 
+  public void setGameMode(GameMode gameMode) {
+    this.gameMode = gameMode;
+  }
+
+  public GameMode getGameMode() {
+    return gameMode;
+  }
+
   public void setTeamMode(TeamMode teamMode) {
     this.teamMode = teamMode;
   }
@@ -214,14 +257,237 @@ public class Settings {
     return items;
   }
 
-  public void load() {}
+  public void setEndPortalHours(int endPortalHours) {
+    this.endPortalHours = endPortalHours;
+  }
+
+  public int getEndPortalHours() {
+    return endPortalHours;
+  }
+
+  public void setEndPortalMinutes(int endPortalMinutes) {
+    this.endPortalMinutes = endPortalMinutes;
+  }
+
+  public int getEndPortalMinutes() {
+    return endPortalMinutes;
+  }
+
+  public void setEndPortalSeconds(int endPortalSeconds) {
+    this.endPortalSeconds = endPortalSeconds;
+  }
+
+  public int getEndPortalSeconds() {
+    return endPortalSeconds;
+  }
+
+  public void setShulkerEnabled(boolean shulkerEnabled) {
+    this.shulkerEnabled = shulkerEnabled;
+  }
+
+  public boolean isShulkerEnabled() {
+    return shulkerEnabled;
+  }
+
+  public void setShulkerHours(int shulkerHours) {
+    this.shulkerHours = shulkerHours;
+  }
+
+  public int getShulkerHours() {
+    return shulkerHours;
+  }
+
+  public void setShulkerMinutes(int shulkerMinutes) {
+    this.shulkerMinutes = shulkerMinutes;
+  }
+
+  public int getShulkerMinutes() {
+    return shulkerMinutes;
+  }
+
+  public void setShulkerSeconds(int shulkerSeconds) {
+    this.shulkerSeconds = shulkerSeconds;
+  }
+
+  public int getShulkerSeconds() {
+    return shulkerSeconds;
+  }
+
+  public void setLocatorBarEnabled(boolean locatorBarEnabled) {
+    this.locatorBarEnabled = locatorBarEnabled;
+  }
+
+  public boolean isLocatorBarEnabled() {
+    return locatorBarEnabled;
+  }
+
+  public void setLocatorBarHours(int locatorBarHours) {
+    this.locatorBarHours = locatorBarHours;
+  }
+
+  public int getLocatorBarHours() {
+    return locatorBarHours;
+  }
+
+  public void setLocatorBarMinutes(int locatorBarMinutes) {
+    this.locatorBarMinutes = locatorBarMinutes;
+  }
+
+  public int getLocatorBarMinutes() {
+    return locatorBarMinutes;
+  }
+
+  public void setLocatorBarSeconds(int locatorBarSeconds) {
+    this.locatorBarSeconds = locatorBarSeconds;
+  }
+
+  public int getLocatorBarSeconds() {
+    return locatorBarSeconds;
+  }
+
+  public void setSkinShuffleEnabled(boolean skinShuffleEnabled) {
+    this.skinShuffleEnabled = skinShuffleEnabled;
+  }
+
+  public boolean isSkinShuffleEnabled() {
+    return skinShuffleEnabled;
+  }
+
+  public void setSkinShuffleMinutes(int skinShuffleMinutes) {
+    this.skinShuffleMinutes = skinShuffleMinutes;
+  }
+
+  public int getSkinShuffleMinutes() {
+    return skinShuffleMinutes;
+  }
+
+  public void setSkinShuffleSeconds(int skinShuffleSeconds) {
+    this.skinShuffleSeconds = skinShuffleSeconds;
+  }
+
+  public int getSkinShuffleSeconds() {
+    return skinShuffleSeconds;
+  }
+
+  public void setGradualBorderEnabled(boolean gradualBorderEnabled) {
+    this.gradualBorderEnabled = gradualBorderEnabled;
+  }
+
+  public boolean isGradualBorderEnabled() {
+    return gradualBorderEnabled;
+  }
+
+  public void setBuffsEnabled(boolean buffsEnabled) {
+    this.buffsEnabled = buffsEnabled;
+  }
+
+  public boolean isBuffsEnabled() {
+    return buffsEnabled;
+  }
+
+  public void setBuffsHours(int buffsHours) {
+    this.buffsHours = buffsHours;
+  }
+
+  public int getBuffsHours() {
+    return buffsHours;
+  }
+
+  public void setBuffsMinutes(int buffsMinutes) {
+    this.buffsMinutes = buffsMinutes;
+  }
+
+  public int getBuffsMinutes() {
+    return buffsMinutes;
+  }
+
+  public void setBuffsSeconds(int buffsSeconds) {
+    this.buffsSeconds = buffsSeconds;
+  }
+
+  public int getBuffsSeconds() {
+    return buffsSeconds;
+  }
+
+  public void setExtraHearts(double extraHearts) {
+    this.extraHearts = extraHearts;
+  }
+
+  public double getExtraHearts() {
+    return extraHearts;
+  }
+
+  public void load() {
+    try {
+      if (!settingsFile.exists()) {
+        UHC.getPlugin().getLogger().info("Settings file not found, using defaults");
+        return;
+      }
+      
+      String json = new String(java.nio.file.Files.readAllBytes(settingsFile.toPath()));
+      Settings loadedSettings = gson.fromJson(json, Settings.class);
+      
+      this.maxWorldSize = loadedSettings.maxWorldSize;
+      this.minWorldSize = loadedSettings.minWorldSize;
+      this.gameHours = loadedSettings.gameHours;
+      this.gameMinutes = loadedSettings.gameMinutes;
+      this.gameSeconds = loadedSettings.gameSeconds;
+      this.agreementHours = loadedSettings.agreementHours;
+      this.agreementMinutes = loadedSettings.agreementMinutes;
+      this.agreementSeconds = loadedSettings.agreementSeconds;
+      this.minWorldBorderHours = loadedSettings.minWorldBorderHours;
+      this.minWorldBorderMinutes = loadedSettings.minWorldBorderMinutes;
+      this.minWorldBorderSeconds = loadedSettings.minWorldBorderSeconds;
+      this.maxTeamInGameHours = loadedSettings.maxTeamInGameHours;
+      this.maxTeamInGameMinutes = loadedSettings.maxTeamInGameMinutes;
+      this.maxTeamInGameSeconds = loadedSettings.maxTeamInGameSeconds;
+      this.endPortalHours = loadedSettings.endPortalHours;
+      this.endPortalMinutes = loadedSettings.endPortalMinutes;
+      this.endPortalSeconds = loadedSettings.endPortalSeconds;
+      this.shulkerEnabled = loadedSettings.shulkerEnabled;
+      this.shulkerHours = loadedSettings.shulkerHours;
+      this.shulkerMinutes = loadedSettings.shulkerMinutes;
+      this.shulkerSeconds = loadedSettings.shulkerSeconds;
+      this.locatorBarEnabled = loadedSettings.locatorBarEnabled;
+      this.locatorBarHours = loadedSettings.locatorBarHours;
+      this.locatorBarMinutes = loadedSettings.locatorBarMinutes;
+      this.locatorBarSeconds = loadedSettings.locatorBarSeconds;
+      this.buffsEnabled = loadedSettings.buffsEnabled;
+      this.buffsHours = loadedSettings.buffsHours;
+      this.buffsMinutes = loadedSettings.buffsMinutes;
+      this.buffsSeconds = loadedSettings.buffsSeconds;
+      this.extraHearts = loadedSettings.extraHearts;
+      this.skinShuffleEnabled = loadedSettings.skinShuffleEnabled;
+      this.skinShuffleMinutes = loadedSettings.skinShuffleMinutes;
+      this.skinShuffleSeconds = loadedSettings.skinShuffleSeconds;
+      this.gradualBorderEnabled = loadedSettings.gradualBorderEnabled;
+      this.gameMode = loadedSettings.gameMode;
+      this.teamMode = loadedSettings.teamMode;
+      this.teamSize = loadedSettings.teamSize;
+      this.playerLives = loadedSettings.playerLives;
+      
+      UHC.getPlugin().getLogger().info("Settings loaded successfully from " + settingsFile.getAbsolutePath());
+    } catch (Exception e) {
+      UHC.getPlugin().getLogger().log(Level.SEVERE, "Failed to load settings", e);
+    }
+  }
 
   public void save() {
-    if(!UHC.getPlugin().getDataFolder().exists()) UHC.getPlugin().getDataFolder().mkdirs();
-    try (FileWriter writer = new FileWriter(settingsFile)) {
-      writer.write(gson.toJson(this));
+    try {
+      if(!UHC.getPlugin().getDataFolder().exists()) {
+        UHC.getPlugin().getDataFolder().mkdirs();
+      }
+      
+      String json = gson.toJson(this);
+      
+      try (FileWriter writer = new FileWriter(settingsFile)) {
+        writer.write(json);
+        writer.flush();
+      }
+      
+      UHC.getPlugin().getLogger().info("Settings saved successfully to " + settingsFile.getAbsolutePath());
     } catch (Exception e) {
-      UHC.getPlugin().getLogger().log(Level.SEVERE, "Failed to save settings: {0}", e.getMessage());
+      UHC.getPlugin().getLogger().log(Level.SEVERE, "Failed to save settings", e);
     }
   }
 

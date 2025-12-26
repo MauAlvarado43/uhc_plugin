@@ -34,12 +34,29 @@ public class MainCommandHandler implements CommandExecutor {
 
         switch (args[0]) {
             case "start":
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    return false;
+                }
                 UHC.getPlugin().getUHCManager().start();
                 sender.sendMessage(ChatColor.GREEN + "UHC started.");
                 break;
             case "cancel":
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    return false;
+                }
                 UHC.getPlugin().getUHCManager().cancel();
                 sender.sendMessage(ChatColor.RED + "UHC canceled.");
+                break;
+            case "reload":
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    return false;
+                }
+                sender.sendMessage(ChatColor.YELLOW + "Recargando plugin UHC...");
+                UHC.getPlugin().getUHCManager().reload();
+                sender.sendMessage(ChatColor.GREEN + "Plugin UHC recargado exitosamente.");
                 break;
             case "info":
                 sender.sendMessage(
@@ -81,9 +98,37 @@ public class MainCommandHandler implements CommandExecutor {
                 }
                 break;
             case "settings":
-                return SettingsCommandHandler.onSettingsCommand(sender, args);
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    return false;
+                }
+                SettingsCommandHandler.onSettingsCommand(sender, args);
+                break;
+            case "menu":
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    return false;
+                }
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    UHC.getPlugin().getMenuManager().openMainMenu(player);
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Only players can open the menu.");
+                }
+                break;
+            case "stats":
+                sender.sendMessage(UHC.getPlugin().getStatsManager().getStatsReport());
+                break;
             case "players":
-                return PlayerCommandHandler.onPlayerCommand(sender, args);
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    return false;
+                }
+                PlayerCommandHandler.onPlayerCommand(sender, args);
+                break;
+            case "team":
+                TeamCommandHandler.onTeamCommand(sender, args);
+                break;
             default:
                 sender.sendMessage(ChatColor.RED + "Unknown subcommand.");
                 break;

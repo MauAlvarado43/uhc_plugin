@@ -1,21 +1,28 @@
 package vch.uhc.managers;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.property.SkinIdentifier;
 import net.skinsrestorer.api.storage.PlayerStorage;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import vch.uhc.UHC;
 import vch.uhc.misc.Messages;
 import vch.uhc.models.SkinAssignment;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class SkinManager {
 
@@ -76,11 +83,11 @@ public class SkinManager {
             applySkinToPlayer(assignment);
         }
 
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_BORDER);
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_TITLE);
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_DESCRIPTION);
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_HINT);
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_BORDER);
+        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_BORDER());
+        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_TITLE());
+        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_DESCRIPTION());
+        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_HINT());
+        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_BORDER());
     }
 
     private List<SkinAssignment> createShuffledAssignments(List<Player> players) {
@@ -168,13 +175,13 @@ public class SkinManager {
         restoreOriginalSkin(attacked);
 
         attacker.sendMessage("");
-        attacker.sendMessage(Messages.SKIN_REVEAL_BORDER);
-        attacker.sendMessage(Messages.SKIN_REVEAL_TITLE);
+        attacker.sendMessage(Messages.SKIN_REVEAL_BORDER());
+        attacker.sendMessage(Messages.SKIN_REVEAL_TITLE());
         attacker.sendMessage("");
         attacker.sendMessage(Messages.SKIN_REVEAL_SKIN(assignment.getAssignedSkin()));
         attacker.sendMessage(Messages.SKIN_REVEAL_REAL(assignment.getRealPlayerName()));
         attacker.sendMessage("");
-        attacker.sendMessage(Messages.SKIN_REVEAL_BORDER);
+        attacker.sendMessage(Messages.SKIN_REVEAL_BORDER());
         attacker.sendMessage("");
 
         Bukkit.broadcastMessage(
@@ -220,7 +227,7 @@ public class SkinManager {
             }
         }
 
-        Bukkit.broadcastMessage(Messages.SKIN_RESTORE_SUCCESS);
+        Bukkit.broadcastMessage(Messages.SKIN_RESTORE_SUCCESS());
     }
 
     public void clearAssignments() {

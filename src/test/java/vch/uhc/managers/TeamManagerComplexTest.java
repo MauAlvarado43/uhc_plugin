@@ -273,7 +273,7 @@ class TeamManagerComplexTest {
                 }
             }
 
-            assertThat(team.getMembers()).hasSize(5);
+            assertThat(team.getMembers()).hasSize(6);
         }
 
         @Test

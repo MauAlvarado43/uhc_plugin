@@ -12,6 +12,14 @@ public class TeamManager {
     public Team createTeam(Player owner, String teamName) {
         Team team = new Team(teamName, owner);
         teams.add(team);
+        owner.setTeam(team);
+        team.addMember(owner);
+        return team;
+    }
+
+    public Team createTeam(String teamName) {
+        Team team = new Team(teamName, null);
+        teams.add(team);
         return team;
     }
 
@@ -21,6 +29,13 @@ public class TeamManager {
 
     public ArrayList<Team> getTeams() {
         return teams;
+    }
+
+    public Team getTeamByName(String name) {
+        return teams.stream()
+            .filter(team -> team.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
     }
 
     public void addPlayer(Team team, Player player) {

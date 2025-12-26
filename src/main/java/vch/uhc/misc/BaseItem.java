@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -32,6 +33,17 @@ public class BaseItem {
 
   }
 
+  public BaseItem(ItemStack itemStack, String[] shape, Map<Character, Object> ingredientsWithItems, String name, boolean customRecipe) {
+
+    this.itemStack = itemStack;
+    this.key = new NamespacedKey(UHC.getPlugin(), this.getClass().getSimpleName());
+    this.name = name;
+
+    createItemMeta(name);
+    createCustomRecipe(shape, ingredientsWithItems);
+
+  }
+
   private void createItemMeta(String customName) {
 
     ItemMeta itemMeta = itemStack.getItemMeta();
@@ -50,6 +62,21 @@ public class BaseItem {
 
     for(Map.Entry<Character, Material> entry : ingredients.entrySet())
       recipe.setIngredient(entry.getKey(), entry.getValue());
+
+  }
+
+  private void createCustomRecipe(String[] shape, Map<Character, Object> ingredients) {
+
+    recipe = new ShapedRecipe(key, itemStack);
+    recipe.shape(shape);
+
+    for(Map.Entry<Character, Object> entry : ingredients.entrySet()) {
+      if (entry.getValue() instanceof Material) {
+        recipe.setIngredient(entry.getKey(), (Material) entry.getValue());
+      } else if (entry.getValue() instanceof ItemStack) {
+        recipe.setIngredient(entry.getKey(), new RecipeChoice.ExactChoice((ItemStack) entry.getValue()));
+      }
+    }
 
   }
 

@@ -41,7 +41,15 @@ public class PlayerExpansion extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, String params) {
         vch.uhc.models.Player p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
-        if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) return ChatColor.WHITE + player.getName() + ChatColor.WHITE;
+        
+        if (params.equalsIgnoreCase("lives")) {
+            if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS)
+                return "";
+            return ChatColor.RED + "♣ " + p.getLives();
+        }
+        
+        if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) 
+            return ChatColor.WHITE + player.getName() + ChatColor.WHITE;
         String name = p.isAlive() ? p.getRandomName() : p.getName();
         return ChatColor.WHITE + name + ChatColor.WHITE;
     }

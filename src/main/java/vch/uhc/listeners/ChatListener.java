@@ -1,7 +1,6 @@
 package vch.uhc.listeners;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -9,6 +8,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import vch.uhc.UHC;
 import vch.uhc.managers.PlayerManager;
 import vch.uhc.misc.BaseListener;
+import vch.uhc.misc.Messages;
 import vch.uhc.misc.Settings;
 import vch.uhc.models.Team;
 
@@ -30,7 +30,10 @@ public class ChatListener extends BaseListener {
 
         if (message.startsWith("!")) {
 
-            String globalMessage = ChatColor.AQUA + "[GLOBAL] " + playerManager.getPlayerByUUID(sender.getUniqueId()).getRandomName() + ": " + ChatColor.WHITE + message.substring(1);
+            String globalMessage = Messages.CHAT_GLOBAL_PREFIX(
+                playerManager.getPlayerByUUID(sender.getUniqueId()).getName(),
+                message.substring(1)
+            );
             Bukkit.broadcastMessage(globalMessage);
 
         } else {
@@ -40,7 +43,7 @@ public class ChatListener extends BaseListener {
                 return;
             }
 
-            String teamMessage = ChatColor.GREEN + "[TEAM] " + sender.getName() + ": " + ChatColor.WHITE + message.substring(1);
+            String teamMessage = Messages.CHAT_TEAM_PREFIX(sender.getName(), message.substring(1));
             for (vch.uhc.models.Player member : senderTeam.getMembers()) {
                 Player player = Bukkit.getPlayer(member.getUuid());
                 if (player != null) {

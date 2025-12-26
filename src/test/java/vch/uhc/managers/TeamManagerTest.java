@@ -124,7 +124,7 @@ class TeamManagerTest {
             teamManager.addPlayer(team, player2);
             teamManager.addPlayer(team, player3);
             
-            assertThat(team.getMembers()).containsExactly(player2, player3);
+            assertThat(team.getMembers()).containsExactly(player1, player2, player3);
         }
     }
 
@@ -158,6 +158,7 @@ class TeamManagerTest {
             Team team = teamManager.createTeam(player1, "TestTeam");
             teamManager.addPlayer(team, player2);
             teamManager.removePlayer(team, player2);
+            teamManager.removePlayer(team, player1);
             
             assertThat(teamManager.getTeams()).doesNotContain(team);
         }
@@ -166,7 +167,6 @@ class TeamManagerTest {
         @DisplayName("Should promote new leader when leader leaves")
         void shouldPromoteNewLeaderWhenLeaderLeaves() {
             Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player1);
             teamManager.addPlayer(team, player2);
             teamManager.addPlayer(team, player3);
             
@@ -185,7 +185,7 @@ class TeamManagerTest {
             teamManager.removePlayer(team, player2);
             
             assertThat(teamManager.getTeams()).contains(team);
-            assertThat(team.getMembers()).containsExactly(player3);
+            assertThat(team.getMembers()).containsExactly(player1, player3);
         }
     }
 
@@ -245,15 +245,16 @@ class TeamManagerTest {
             
             teamManager.addPlayer(team, player2);
             teamManager.addPlayer(team, player3);
-            assertThat(team.getMembers()).hasSize(2);
+            assertThat(team.getMembers()).hasSize(3);
             
             teamManager.renameTeam(team, "RenamedTeam");
             assertThat(team.getName()).isEqualTo("RenamedTeam");
             
             teamManager.removePlayer(team, player2);
-            assertThat(team.getMembers()).hasSize(1);
+            assertThat(team.getMembers()).hasSize(2);
             
             teamManager.removePlayer(team, player3);
+            teamManager.removePlayer(team, player1);
             assertThat(teamManager.getTeams()).doesNotContain(team);
         }
 

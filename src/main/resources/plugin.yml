@@ -22,6 +22,10 @@ commands:
         description: Cancel the UHC game
         usage: /uhc cancel
         permission: uhc.cancel
+      reload:
+        description: Reload and reset the entire plugin
+        usage: /uhc reload
+        permission: uhc.reload
       pause:
         description: Pause the UHC game
         usage: /uhc pause
@@ -64,9 +68,17 @@ commands:
             description: Set a UHC setting
             usage: /uhc settings set <setting> <value>
             permission: uhc.settings.set
+      menu:
+        description: Open the settings menu
+        usage: /uhc menu
+        permission: uhc.menu
+      stats:
+        description: Show game statistics
+        usage: /uhc stats
+        permission: uhc.stats
       team:
         description: Team management commands (implementation partial)
-        usage: /uhc team <create|add|remove|rename|leave>
+        usage: /uhc team <create|add|remove|rename|leave|list>
         permission: uhc.team
         children:
           create:
@@ -84,3 +96,87 @@ commands:
           leave:
             description: Leave a team
             permission: uhc.team.leave
+          list:
+            description: List all teams
+            permission: uhc.team.list
+  afk:
+    description: Toggle AFK mode
+    usage: /afk
+    permission: uhc.afk
+
+permissions:
+  uhc.use:
+    description: Base permission for UHC commands
+    default: true
+  uhc.info:
+    description: Permission to view UHC info
+    default: true
+  uhc.join:
+    description: Permission to join UHC
+    default: true
+  uhc.leave:
+    description: Permission to leave UHC
+    default: true
+  uhc.stats:
+    description: Permission to view stats
+    default: true
+  uhc.team:
+    description: Base permission for team commands
+    default: true
+  uhc.team.rename:
+    description: Permission to rename own team (as leader)
+    default: true
+  uhc.team.leave:
+    description: Permission to leave own team
+    default: true
+  uhc.team.list:
+    description: Permission to list teams
+    default: true
+  uhc.afk:
+    description: Permission to toggle AFK
+    default: true
+  uhc.start:
+    description: Permission to start UHC (admin only)
+    default: op
+  uhc.cancel:
+    description: Permission to cancel UHC (admin only)
+    default: op
+  uhc.reload:
+    description: Permission to reload UHC (admin only)
+    default: op
+  uhc.pause:
+    description: Permission to pause UHC (admin only)
+    default: op
+  uhc.menu:
+    description: Permission to open settings menu (admin only)
+    default: op
+  uhc.settings:
+    description: Permission to change settings (admin only)
+    default: op
+  uhc.settings.set:
+    description: Permission to set settings (admin only)
+    default: op
+  uhc.players:
+    description: Permission for player management (admin only)
+    default: op
+  uhc.players.list:
+    description: Permission to list players (admin only)
+    default: op
+  uhc.players.setLives:
+    description: Permission to set player lives (admin only)
+    default: op
+  uhc.players.setHealth:
+    description: Permission to set player health (admin only)
+    default: op
+  uhc.players.revive:
+    description: Permission to revive players (admin only)
+    default: op
+  uhc.team.create:
+    description: Permission to create teams (admin only)
+    default: op
+  uhc.team.add:
+    description: Permission to add players to teams (admin only)
+    default: op
+  uhc.team.remove:
+    description: Permission to remove players from teams (admin only)
+    default: op

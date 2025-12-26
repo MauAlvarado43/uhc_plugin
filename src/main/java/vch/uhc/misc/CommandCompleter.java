@@ -24,6 +24,7 @@ public class CommandCompleter implements TabCompleter {
 
         AvailableCommands start = new AvailableCommands("start");
         AvailableCommands stop = new AvailableCommands("cancel");
+        AvailableCommands reload = new AvailableCommands("reload");
         AvailableCommands pause = new AvailableCommands("pause");
         AvailableCommands info = new AvailableCommands("info");
         AvailableCommands play = new AvailableCommands("play");
@@ -32,6 +33,11 @@ public class CommandCompleter implements TabCompleter {
         AvailableCommands settings = new AvailableCommands("settings");
 
         AvailableCommands set = new AvailableCommands("set");
+
+        AvailableCommands gameMode = new AvailableCommands("gameMode");
+        gameMode.addNextArg(new AvailableCommands("pvd"));
+        gameMode.addNextArg(new AvailableCommands("pvp"));
+        gameMode.addNextArg(new AvailableCommands("resourceRush"));
 
         AvailableCommands teamMode = new AvailableCommands("teamMode");
         teamMode.addNextArg(new AvailableCommands("auto"));
@@ -86,6 +92,45 @@ public class CommandCompleter implements TabCompleter {
         AvailableCommands maxTeamInGameSeconds = new AvailableCommands("maxTeamInGameSeconds");
         maxTeamInGameSeconds.addNextArg(new AvailableCommands("<seconds>"));
 
+        AvailableCommands endPortalHours = new AvailableCommands("endPortalHours");
+        endPortalHours.addNextArg(new AvailableCommands("<hours>"));
+
+        AvailableCommands endPortalMinutes = new AvailableCommands("endPortalMinutes");
+        endPortalMinutes.addNextArg(new AvailableCommands("<minutes>"));
+
+        AvailableCommands endPortalSeconds = new AvailableCommands("endPortalSeconds");
+        endPortalSeconds.addNextArg(new AvailableCommands("<seconds>"));
+
+        AvailableCommands shulkerEnabled = new AvailableCommands("shulkerEnabled");
+        shulkerEnabled.addNextArg(new AvailableCommands("true"));
+        shulkerEnabled.addNextArg(new AvailableCommands("false"));
+        shulkerEnabled.addNextArg(new AvailableCommands("enabled"));
+        shulkerEnabled.addNextArg(new AvailableCommands("disabled"));
+
+        AvailableCommands shulkerHours = new AvailableCommands("shulkerHours");
+        shulkerHours.addNextArg(new AvailableCommands("<hours>"));
+
+        AvailableCommands shulkerMinutes = new AvailableCommands("shulkerMinutes");
+        shulkerMinutes.addNextArg(new AvailableCommands("<minutes>"));
+
+        AvailableCommands shulkerSeconds = new AvailableCommands("shulkerSeconds");
+        shulkerSeconds.addNextArg(new AvailableCommands("<seconds>"));
+
+        AvailableCommands locatorBarEnabled = new AvailableCommands("locatorBarEnabled");
+        locatorBarEnabled.addNextArg(new AvailableCommands("true"));
+        locatorBarEnabled.addNextArg(new AvailableCommands("false"));
+        locatorBarEnabled.addNextArg(new AvailableCommands("enabled"));
+        locatorBarEnabled.addNextArg(new AvailableCommands("disabled"));
+
+        AvailableCommands locatorBarHours = new AvailableCommands("locatorBarHours");
+        locatorBarHours.addNextArg(new AvailableCommands("<hours>"));
+
+        AvailableCommands locatorBarMinutes = new AvailableCommands("locatorBarMinutes");
+        locatorBarMinutes.addNextArg(new AvailableCommands("<minutes>"));
+
+        AvailableCommands locatorBarSeconds = new AvailableCommands("locatorBarSeconds");
+        locatorBarSeconds.addNextArg(new AvailableCommands("<seconds>"));
+
         AvailableCommands recipe = new AvailableCommands("recipe");
         UHC.getPlugin().getSettings().getItems().stream().forEach(item -> {
             AvailableCommands recipeCommands = new AvailableCommands(item.getKey().getKey());
@@ -94,6 +139,7 @@ public class CommandCompleter implements TabCompleter {
             recipe.addNextArg(recipeCommands);
         });
 
+        set.addNextArg(gameMode);
         set.addNextArg(teamMode);
         set.addNextArg(teamSize);
         set.addNextArg(playerLives);
@@ -111,6 +157,17 @@ public class CommandCompleter implements TabCompleter {
         set.addNextArg(maxTeamInGameHours);
         set.addNextArg(maxTeamInGameMinutes);
         set.addNextArg(maxTeamInGameSeconds);
+        set.addNextArg(endPortalHours);
+        set.addNextArg(endPortalMinutes);
+        set.addNextArg(endPortalSeconds);
+        set.addNextArg(shulkerEnabled);
+        set.addNextArg(shulkerHours);
+        set.addNextArg(shulkerMinutes);
+        set.addNextArg(shulkerSeconds);
+        set.addNextArg(locatorBarEnabled);
+        set.addNextArg(locatorBarHours);
+        set.addNextArg(locatorBarMinutes);
+        set.addNextArg(locatorBarSeconds);
         set.addNextArg(recipe);
 
         settings.addNextArg(set);
@@ -144,14 +201,62 @@ public class CommandCompleter implements TabCompleter {
         player.addNextArg(setHealth);
         player.addNextArg(revive);
 
+        AvailableCommands team = new AvailableCommands("team");
+        
+        AvailableCommands teamCreate = new AvailableCommands("create");
+        teamCreate.addNextArg(new AvailableCommands("<nombre>"));
+        
+        AvailableCommands teamAdd = new AvailableCommands("add");
+        Bukkit.getOnlinePlayers().stream().forEach(p -> {
+            AvailableCommands playerCommand = new AvailableCommands(p.getName());
+            UHC.getPlugin().getTeamManager().getTeams().stream().forEach(t -> {
+                playerCommand.addNextArg(new AvailableCommands(t.getName()));
+            });
+            teamAdd.addNextArg(playerCommand);
+        });
+        
+        AvailableCommands teamRemove = new AvailableCommands("remove");
+        Bukkit.getOnlinePlayers().stream().forEach(p -> {
+            AvailableCommands playerCommand = new AvailableCommands(p.getName());
+            UHC.getPlugin().getTeamManager().getTeams().stream().forEach(t -> {
+                playerCommand.addNextArg(new AvailableCommands(t.getName()));
+            });
+            teamRemove.addNextArg(playerCommand);
+        });
+        
+        AvailableCommands teamRename = new AvailableCommands("rename");
+        UHC.getPlugin().getTeamManager().getTeams().stream().forEach(t -> {
+            AvailableCommands teamCommand = new AvailableCommands(t.getName());
+            teamCommand.addNextArg(new AvailableCommands("<nuevoNombre>"));
+            teamRename.addNextArg(teamCommand);
+        });
+        
+        AvailableCommands teamLeave = new AvailableCommands("leave");
+        
+        AvailableCommands teamList = new AvailableCommands("list");
+        
+        team.addNextArg(teamCreate);
+        team.addNextArg(teamAdd);
+        team.addNextArg(teamRemove);
+        team.addNextArg(teamRename);
+        team.addNextArg(teamLeave);
+        team.addNextArg(teamList);
+
+        AvailableCommands menu = new AvailableCommands("menu");
+        AvailableCommands stats = new AvailableCommands("stats");
+
         rootCommands.add(start);
         rootCommands.add(stop);
+        rootCommands.add(reload);
         rootCommands.add(pause);
         rootCommands.add(info);
         rootCommands.add(settings);
         rootCommands.add(player);
+        rootCommands.add(team);
         rootCommands.add(play);
         rootCommands.add(leave);
+        rootCommands.add(menu);
+        rootCommands.add(stats);
 
     }
 

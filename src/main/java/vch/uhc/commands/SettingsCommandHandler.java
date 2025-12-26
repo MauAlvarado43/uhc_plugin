@@ -8,13 +8,14 @@ import org.bukkit.command.CommandSender;
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseItem;
 import vch.uhc.misc.Settings;
+import vch.uhc.misc.Messages;
 
 public class SettingsCommandHandler {
 
     public static boolean onSettingsCommand(CommandSender sender, String[] args) {
 
         if (args.length < 3) {
-            sender.sendMessage(ChatColor.RED + "Please specify a settings subcommand.");
+            sender.sendMessage(Messages.SETTINGS_SPECIFY_SUBCOMMAND());
             return false;
         }
 
@@ -22,7 +23,7 @@ public class SettingsCommandHandler {
             case "set":
 
                 if (args.length < 4) {
-                    sender.sendMessage(ChatColor.RED + "Please specify a setting and value.");
+                    sender.sendMessage(Messages.SETTINGS_SPECIFY_VALUE());
                     return false;
                 }
 
@@ -30,6 +31,24 @@ public class SettingsCommandHandler {
                 String value = args[3];
 
                 switch (setting) {
+
+                    case "gameMode":
+
+                        Map<String, Settings.GameMode> gameModes = Map.of(
+                                "pvd", Settings.GameMode.PVD,
+                                "pvp", Settings.GameMode.PVP,
+                                "resourceRush", Settings.GameMode.RESOURCE_RUSH
+                        );
+
+                        Settings.GameMode gameMode = gameModes.get(value);
+                        if (gameMode == null) {
+                            sender.sendMessage(Messages.SETTINGS_UNKNOWN_SUBCOMMAND());
+                            return false;
+                        }
+
+                        UHC.getPlugin().getSettings().setGameMode(gameMode);
+                        sender.sendMessage(Messages.SETTINGS_TEAM_MODE_SET(gameMode.toString()));
+                        break;
 
                     case "teamMode":
 
@@ -206,6 +225,116 @@ public class SettingsCommandHandler {
                             sender.sendMessage(ChatColor.GREEN + "Max team in game seconds set to " + seconds + ".");
                         } catch (NumberFormatException e) {
                             sender.sendMessage(ChatColor.RED + "Invalid max team in game seconds.");
+                        }
+                        break;
+
+                    case "endPortalHours":
+                        try {
+                            int hours = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setEndPortalHours(hours);
+                            sender.sendMessage(ChatColor.GREEN + "End portal activation hours set to " + hours + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid end portal hours.");
+                        }
+                        break;
+
+                    case "endPortalMinutes":
+                        try {
+                            int minutes = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setEndPortalMinutes(minutes);
+                            sender.sendMessage(ChatColor.GREEN + "End portal activation minutes set to " + minutes + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid end portal minutes.");
+                        }
+                        break;
+
+                    case "endPortalSeconds":
+                        try {
+                            int seconds = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setEndPortalSeconds(seconds);
+                            sender.sendMessage(ChatColor.GREEN + "End portal activation seconds set to " + seconds + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid end portal seconds.");
+                        }
+                        break;
+
+                    case "shulkerEnabled":
+                        boolean shulkerEnabled;
+                        if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("enabled")) {
+                            shulkerEnabled = true;
+                        } else if (value.equalsIgnoreCase("false") || value.equalsIgnoreCase("disabled")) {
+                            shulkerEnabled = false;
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "Invalid value. Use: true/false or enabled/disabled");
+                            return false;
+                        }
+                        UHC.getPlugin().getSettings().setShulkerEnabled(shulkerEnabled);
+                        sender.sendMessage(ChatColor.GREEN + "Shulker spawn set to " + (shulkerEnabled ? "enabled" : "disabled") + ".");
+                        break;
+
+                    case "shulkerHours":
+                        try {
+                            int hours = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setShulkerHours(hours);
+                            sender.sendMessage(ChatColor.GREEN + "Shulker spawn hours set to " + hours + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid shulker hours.");
+                        }
+                        break;
+
+                    case "shulkerMinutes":
+                        try {
+                            int minutes = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setShulkerMinutes(minutes);
+                            sender.sendMessage(ChatColor.GREEN + "Shulker spawn minutes set to " + minutes + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid shulker minutes.");
+                        }
+                        break;
+
+                    case "shulkerSeconds":
+                        try {
+                            int seconds = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setShulkerSeconds(seconds);
+                            sender.sendMessage(ChatColor.GREEN + "Shulker spawn seconds set to " + seconds + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid shulker seconds.");
+                        }
+                        break;
+
+                    case "locatorBarEnabled":
+                        boolean locatorBarEnabled = value.equalsIgnoreCase("true") || value.equalsIgnoreCase("enabled");
+                        UHC.getPlugin().getSettings().setLocatorBarEnabled(locatorBarEnabled);
+                        sender.sendMessage(ChatColor.GREEN + "Locator bar (muestra jugadores cercanos) " + (locatorBarEnabled ? "habilitado" : "deshabilitado") + ".");
+                        break;
+
+                    case "locatorBarHours":
+                        try {
+                            int hours = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setLocatorBarHours(hours);
+                            sender.sendMessage(ChatColor.GREEN + "Locator bar activation hours set to " + hours + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid locator bar hours.");
+                        }
+                        break;
+
+                    case "locatorBarMinutes":
+                        try {
+                            int minutes = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setLocatorBarMinutes(minutes);
+                            sender.sendMessage(ChatColor.GREEN + "Locator bar activation minutes set to " + minutes + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid locator bar minutes.");
+                        }
+                        break;
+
+                    case "locatorBarSeconds":
+                        try {
+                            int seconds = Integer.parseInt(value);
+                            UHC.getPlugin().getSettings().setLocatorBarSeconds(seconds);
+                            sender.sendMessage(ChatColor.GREEN + "Locator bar activation seconds set to " + seconds + ".");
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid locator bar seconds.");
                         }
                         break;
 

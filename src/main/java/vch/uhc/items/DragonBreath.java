@@ -2,7 +2,6 @@ package vch.uhc.items;
 
 import java.util.Map;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,6 +13,6 @@ public class DragonBreath extends BaseItem {
                 'P', Material.BLAZE_POWDER,
                 'E', Material.ENDER_PEARL,
                 'B', Material.GLASS_BOTTLE
-        ), ChatColor.DARK_PURPLE + "Dragon Breath");
+        ), vch.uhc.misc.Messages.ITEM_DRAGON_BREATH());
     }
 }

@@ -28,14 +28,29 @@ public class PlayerCommandHandler {
                 );
                 break;
             case "setLives":
+                if (args.length < 4) {
+                    sender.sendMessage(ChatColor.RED + "Uso: /uhc players setLives <jugador> <vidas>");
+                    return false;
+                }
                 String playerName = args[2];
                 try {
                     int lives = Integer.parseInt(args[3]);
                     Player player = Bukkit.getPlayer(playerName);
-                    UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId()).setLives(lives);
-                    sender.sendMessage(ChatColor.GREEN + "Set lives for " + playerName + " to " + lives);
+                    if (player == null) {
+                        sender.sendMessage(ChatColor.RED + "Jugador " + playerName + " no encontrado.");
+                        return false;
+                    }
+                    vch.uhc.models.Player uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+                    if (uhcPlayer == null) {
+                        sender.sendMessage(ChatColor.RED + "Jugador " + playerName + " no está en el UHC.");
+                        return false;
+                    }
+                    uhcPlayer.setLives(lives);
+                    sender.sendMessage(ChatColor.GREEN + "Vidas de " + playerName + " establecidas a " + lives);
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + "Número de vidas inválido: " + args[3]);
                 } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Error setting lives for " + playerName);
+                    sender.sendMessage(ChatColor.RED + "Error al establecer vidas para " + playerName + ": " + e.getMessage());
                 }
                 break;
             case "setHealth":

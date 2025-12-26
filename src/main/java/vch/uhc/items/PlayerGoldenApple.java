@@ -2,7 +2,6 @@ package vch.uhc.items;
 
 import java.util.Map;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -21,7 +20,7 @@ public class PlayerGoldenApple extends BaseItem {
                 'G', Material.GOLD_INGOT,
                 'D', Material.DIAMOND,
                 'H', Material.PLAYER_HEAD
-        ), ChatColor.RED + "Head Apple");
+        ), vch.uhc.misc.Messages.ITEM_HEAD_APPLE());
     }
 
     @Override

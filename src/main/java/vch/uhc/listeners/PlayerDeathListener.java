@@ -3,17 +3,24 @@ package vch.uhc.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseListener;
 import vch.uhc.misc.Messages;
 import vch.uhc.misc.enums.GameState;
 import vch.uhc.models.UHCPlayer;
+
+import java.util.List;
 
 public class PlayerDeathListener extends BaseListener {
 
@@ -30,10 +37,43 @@ public class PlayerDeathListener extends BaseListener {
         UHCPlayer uhcVictim = UHC.getPlugin().getPlayerManager().getPlayerByUUID(victim.getUniqueId());
 
         if (uhcVictim != null) {
-            uhcVictim.removeLife();
 
-            if (!uhcVictim.isAlive()) {
-                victim.setGameMode(GameMode.SPECTATOR);
+            // Create chest with player's items
+            Location deathLoc = victim.getLocation();
+            List<ItemStack> drops = e.getDrops();
+            
+            if (!drops.isEmpty() && deathLoc.getWorld() != null) {
+                Block block = deathLoc.getBlock();
+                block.setType(Material.CHEST);
+                
+                if (block.getState() instanceof Chest chest) {
+                    Inventory chestInv = chest.getInventory();
+                    for (ItemStack item : drops) {
+                        if (item != null && item.getType() != Material.AIR) {
+                            chestInv.addItem(item);
+                        }
+                    }
+                    chest.update();
+                }
+                
+                e.getDrops().clear();
+            }
+
+            uhcVictim.removeLife();
+            int livesAfterDeath = uhcVictim.getLives();
+
+            boolean wasEliminated = livesAfterDeath <= 0 || (killer != null && killer instanceof Player);
+
+            if (wasEliminated) {
+
+                uhcVictim.setLives(0);
+                uhcVictim.setPlaying(false);
+                
+                Bukkit.getScheduler().runTaskLater(UHC.getPlugin(), () -> {
+                    victim.setGameMode(GameMode.SPECTATOR);
+                    victim.sendMessage(Messages.ELIMINATED());
+                }, 20L);
+                
             } else {
 
                 Bukkit.getScheduler().runTaskLater(UHC.getPlugin(), () -> {
@@ -51,8 +91,6 @@ public class PlayerDeathListener extends BaseListener {
                             if (maxHealthAttr != null) {
                                 victim.setHealth(maxHealthAttr.getValue());
                             }
-                            victim.setFoodLevel(20);
-                            victim.setSaturation(20);
                             victim.sendMessage(Messages.RESPAWN_MESSAGE(uhcVictim.getLives()));
                         }
                     }

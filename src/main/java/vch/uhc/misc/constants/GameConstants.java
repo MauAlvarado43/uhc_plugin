@@ -34,6 +34,9 @@ public final class GameConstants {
     /** Default maximum health for players (in half-hearts) */
     public static final double DEFAULT_MAX_HEALTH = 20.0;
     
+    /** Default configurable maximum health limit (in half-hearts) */
+    public static final double DEFAULT_CONFIGURABLE_MAX_HEALTH = 60.0;
+    
     /** Minimum health value */
     public static final double MIN_HEALTH = 0.0;
     

@@ -59,6 +59,8 @@ public class Settings {
   private int buffsSeconds = 0;
   private double extraHearts = GameConstants.DEFAULT_EXTRA_HEARTS;
 
+  private double maxHealth = GameConstants.DEFAULT_CONFIGURABLE_MAX_HEALTH;
+
   private boolean skinShuffleEnabled = true;
   private int skinShuffleMinutes = GameConstants.DEFAULT_SKIN_SHUFFLE_TIME_MINUTES;
   private int skinShuffleSeconds = 0;
@@ -395,6 +397,14 @@ public class Settings {
 
   public double getExtraHearts() {
     return extraHearts;
+  }
+
+  public void setMaxHealth(double maxHealth) {
+    this.maxHealth = maxHealth;
+  }
+
+  public double getMaxHealth() {
+    return maxHealth;
   }
 
   public void load() {

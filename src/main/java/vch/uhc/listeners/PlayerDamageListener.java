@@ -23,9 +23,7 @@ public class PlayerDamageListener extends BaseListener {
         Player bukkitPlayer = (Player) e.getEntity();
         vch.uhc.models.UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(bukkitPlayer.getUniqueId());
 
-        if (uhcPlayer != null) {
+        if (uhcPlayer != null)
             UHC.getPlugin().getStatsManager().markAsIronman(uhcPlayer);
-            bukkitPlayer.setSaturation(20.0f);
-        }
     }
 }

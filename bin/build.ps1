@@ -52,7 +52,7 @@ function Update-Version {
     # Update plugin.yml version
     $pluginPath = "src\main\resources\plugin.yml"
     $pluginContent = Get-Content $pluginPath -Raw
-    $pluginContent = $pluginContent -replace "version: [\d\.]+", "version: $newVersion"
+    $pluginContent = $pluginContent -replace "(?m)^version: [\d\.]+", "version: $newVersion"
     Set-Content -Path $pluginPath -Value $pluginContent -NoNewline
     
     Write-Host "New version: $newVersion" -ForegroundColor Green

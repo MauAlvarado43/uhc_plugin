@@ -3,11 +3,10 @@ package vch.uhc.items;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -29,22 +28,14 @@ public class PlayerGoldenApple extends BaseItem {
         Player player = e.getPlayer();
         ItemStack item = e.getItem();
 
-        if(item.getItemMeta() == null || !item.getItemMeta().getPersistentDataContainer().has(getKey(), null))
+        if(item.getItemMeta() == null || !item.getItemMeta().getPersistentDataContainer().has(getKey(), PersistentDataType.STRING))
             return false;
 
         if (!isEnabled())
             return false;
 
-        AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
-        if (attribute != null) {
-            double currentMaxHealth = attribute.getBaseValue();
-
-            if (!(currentMaxHealth + 4.0D > 60.0D))
-                attribute.setBaseValue(currentMaxHealth + 4.0D);
-        }
-
-        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 130, 1));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,100, 3));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 240, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,100, 4));
         player.getInventory().getItemInMainHand().setAmount(item.getAmount() - 1);
         
         return true;

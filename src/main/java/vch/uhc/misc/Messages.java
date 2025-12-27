@@ -106,6 +106,14 @@ public class Messages {
         return lang().getMessage("team.created", teamName);
     }
 
+    public static String TEAM_CREATED_WITH_LEADER(String teamName, String leaderName) {
+        return lang().getMessage("team.createdWithLeader", teamName, leaderName);
+    }
+
+    public static String TEAM_NO_PLAYERS_AVAILABLE() {
+        return lang().getMessage("team.noPlayersAvailable");
+    }
+
     public static String TEAM_YOU_ARE_LEADER() {
         return lang().getMessage("team.youAreLeader");
     }
@@ -1443,8 +1451,8 @@ public class Messages {
         return lang().getMessage("scoreboard.border", size);
     }
 
-    public static String LOCATOR_BAR_NEARBY_PLAYER(String playerName, int blocks) {
-        return lang().getMessage("locatorBar.nearbyPlayer", playerName, blocks);
+    public static String LOCATOR_BAR_NEARBY_PLAYER(int blocks) {
+        return lang().getMessage("locatorBar.nearbyPlayer", blocks);
     }
 
     public static String SCOREBOARD_TEAM(String name) {
@@ -1509,6 +1517,82 @@ public class Messages {
 
     public static String MENU_PLAYER_BUFFS_EXTRA_HEARTS(int hearts) {
         return lang().getMessage("menu.playerBuffs.extraHearts", hearts);
+    }
+
+    public static String MENU_PLAYER_BUFFS_MAX_HEALTH(int maxHealth) {
+        return lang().getMessage("menu.playerBuffs.maxHealth", maxHealth);
+    }
+
+    public static String MENU_PLAYER_BUFFS_EXTRA_HEARTS_CONFIG() {
+        return lang().getMessage("menu.playerBuffs.extraHearts.config");
+    }
+
+    public static String MENU_PLAYER_BUFFS_EXTRA_HEARTS_DESC(int hearts) {
+        return lang().getMessage("menu.playerBuffs.extraHearts.desc", hearts);
+    }
+
+    public static String MENU_PLAYER_BUFFS_MAX_HEALTH_CONFIG() {
+        return lang().getMessage("menu.playerBuffs.maxHealth.config");
+    }
+
+    public static String MENU_PLAYER_BUFFS_MAX_HEALTH_DESC(int maxHealth) {
+        return lang().getMessage("menu.playerBuffs.maxHealth.desc", maxHealth);
+    }
+
+    public static String MENU_TEAMS() {
+        return lang().getMessage("menu.teams");
+    }
+
+    public static String MENU_TEAMS_DESC() {
+        return lang().getMessage("menu.teams.desc");
+    }
+
+    public static String MENU_TEAMS_MODE(String mode) {
+        return lang().getMessage("menu.teams.mode", mode);
+    }
+
+    public static String MENU_TEAMS_TITLE() {
+        return lang().getMessage("menu.teams.title");
+    }
+
+    public static String MENU_TEAMS_CREATE_TEAM() {
+        return lang().getMessage("menu.teams.createTeam");
+    }
+
+    public static String MENU_TEAMS_CREATE_TEAM_DESC() {
+        return lang().getMessage("menu.teams.createTeam.desc");
+    }
+
+    public static String MENU_TEAMS_DELETE_TEAM() {
+        return lang().getMessage("menu.teams.deleteTeam");
+    }
+
+    public static String MENU_TEAMS_DELETE_TEAM_DESC() {
+        return lang().getMessage("menu.teams.deleteTeam.desc");
+    }
+
+    public static String MENU_TEAMS_ADD_PLAYER() {
+        return lang().getMessage("menu.teams.addPlayer");
+    }
+
+    public static String MENU_TEAMS_ADD_PLAYER_DESC() {
+        return lang().getMessage("menu.teams.addPlayer.desc");
+    }
+
+    public static String MENU_TEAMS_REMOVE_PLAYER() {
+        return lang().getMessage("menu.teams.removePlayer");
+    }
+
+    public static String MENU_TEAMS_NO_TEAMS() {
+        return lang().getMessage("menu.teams.noTeams");
+    }
+
+    public static String MENU_TEAMS_MEMBERS(int count) {
+        return lang().getMessage("menu.teams.members", count);
+    }
+
+    public static String MENU_TEAMS_CLICK_TO_MANAGE() {
+        return lang().getMessage("menu.teams.clickToManage");
     }
 
     public static String MENU_START_GAME() {

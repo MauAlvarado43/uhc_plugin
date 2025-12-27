@@ -58,8 +58,9 @@ public class HyperGoldenApple extends BaseItem {
         AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
         if (attribute != null) {
             double currentMaxHealth = attribute.getBaseValue();
+            double maxHealthLimit = UHC.getPlugin().getSettings().getMaxHealth();
 
-            if (!(currentMaxHealth + 4.0D > 60.0D))
+            if (!(currentMaxHealth + 4.0D > maxHealthLimit))
                 attribute.setBaseValue(currentMaxHealth + 4.0D);
         }
 

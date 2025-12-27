@@ -18,7 +18,7 @@ import vch.uhc.models.UHCPlayer;
 
 public class AdvancementListener extends BaseListener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onAdvancementDone(PlayerAdvancementDoneEvent event) {
 
         if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
@@ -32,6 +32,11 @@ public class AdvancementListener extends BaseListener {
             return;
         }
 
+        AdvancementDisplay display = advancement.getDisplay();
+        if (display == null || !display.doesAnnounceToChat()) {
+            return;
+        }
+
         Player player = event.getPlayer();
         UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
         
@@ -39,13 +44,15 @@ public class AdvancementListener extends BaseListener {
             return;
         }
 
+        try {
+            event.message(null);
+        } catch (Exception e) {
+        }
+
         String advancementTitle = advancementKey;
-        AdvancementDisplay display = advancement.getDisplay();
-        if (display != null) {
-            Component title = display.title();
-            if (title != null) {
-                advancementTitle = PlainTextComponentSerializer.plainText().serialize(title);
-            }
+        Component title = display.title();
+        if (title != null) {
+            advancementTitle = PlainTextComponentSerializer.plainText().serialize(title);
         }
 
         String randomName = uhcPlayer.getRandomName();

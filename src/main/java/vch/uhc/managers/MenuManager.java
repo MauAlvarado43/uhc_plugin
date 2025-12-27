@@ -18,6 +18,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseItem;
 import vch.uhc.misc.Settings;
+import vch.uhc.models.UHCTeam;
+import vch.uhc.models.UHCPlayer;
 import vch.uhc.misc.enums.GameMode;
 import vch.uhc.misc.enums.GameState;
 import vch.uhc.misc.enums.TeamMode;
@@ -101,6 +103,17 @@ public class MenuManager {
                         vch.uhc.misc.Messages.MENU_SKIN_SHUFFLE_INTERVAL(settings.getSkinShuffleMinutes(), settings.getSkinShuffleSeconds()),
                         "",
                         vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
+                )
+        ));
+
+        menu.setItem(5, createMenuItem(
+                Material.WHITE_BANNER,
+                vch.uhc.misc.Messages.MENU_TEAMS(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_TEAMS_DESC(),
+                        vch.uhc.misc.Messages.MENU_TEAMS_MODE(settings.getTeamMode().name()),
+                        "",
+                        vch.uhc.misc.Messages.MENU_TEAMS_CLICK_TO_MANAGE()
                 )
         ));
 
@@ -249,6 +262,7 @@ public class MenuManager {
                                 settings.getBuffsMinutes(),
                                 settings.getBuffsSeconds()),
                         vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_EXTRA_HEARTS((int) settings.getExtraHearts()),
+                        vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_MAX_HEALTH((int) settings.getMaxHealth()),
                         vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_RESISTANCE(),
                         "",
                         vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
@@ -467,6 +481,143 @@ public class MenuManager {
         player.openInventory(menu);
     }
 
+    public void openBuffsMenu(Player player) {
+        Inventory menu = Bukkit.createInventory(null, 54, Component.text(vch.uhc.misc.Messages.MENU_PLAYER_BUFFS()));
+        
+        Settings settings = UHC.getPlugin().getSettings();
+        
+        menu.setItem(10, createMenuItem(
+                Material.REDSTONE,
+                vch.uhc.misc.Messages.MENU_TIME_HOURS(settings.getBuffsHours()),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_LEFT(),
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_RIGHT()
+                )
+        ));
+        
+        menu.setItem(12, createMenuItem(
+                Material.GLOWSTONE_DUST,
+                vch.uhc.misc.Messages.MENU_TIME_MINUTES(settings.getBuffsMinutes()),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_LEFT(),
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_RIGHT()
+                )
+        ));
+        
+        menu.setItem(14, createMenuItem(
+                Material.GUNPOWDER,
+                vch.uhc.misc.Messages.MENU_TIME_SECONDS(settings.getBuffsSeconds()),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_LEFT(),
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_RIGHT()
+                )
+        ));
+        
+        menu.setItem(16, createMenuItem(
+                settings.isBuffsEnabled() ? Material.LIME_DYE : Material.GRAY_DYE,
+                settings.isBuffsEnabled() ? vch.uhc.misc.Messages.MENU_ENABLED() : vch.uhc.misc.Messages.MENU_DISABLED(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_CLICK_TO_TOGGLE(settings.isBuffsEnabled()
+                                ? vch.uhc.misc.Messages.MENU_DISABLE() : vch.uhc.misc.Messages.MENU_ENABLE())
+                )
+        ));
+        
+        menu.setItem(21, createMenuItem(
+                Material.GOLDEN_APPLE,
+                vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_EXTRA_HEARTS_CONFIG(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_EXTRA_HEARTS_DESC((int) settings.getExtraHearts()),
+                        "",
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_LEFT(),
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_RIGHT()
+                )
+        ));
+        
+        menu.setItem(23, createMenuItem(
+                Material.ENCHANTED_GOLDEN_APPLE,
+                vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_MAX_HEALTH_CONFIG(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_PLAYER_BUFFS_MAX_HEALTH_DESC((int) settings.getMaxHealth()),
+                        "",
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_LEFT(),
+                        vch.uhc.misc.Messages.MENU_TEAM_SIZE_RIGHT()
+                )
+        ));
+        
+        menu.setItem(49, createMenuItem(
+                Material.ARROW,
+                vch.uhc.misc.Messages.MENU_BACK(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_BACK_TO_MAIN()
+                )
+        ));
+        
+        playerMenuContext.put(player.getUniqueId(), "BUFFS");
+        player.openInventory(menu);
+    }
+
+    public void openTeamsMenu(Player player) {
+        Inventory menu = Bukkit.createInventory(null, 54, Component.text(vch.uhc.misc.Messages.MENU_TEAMS_TITLE()));
+        
+        List<UHCTeam> teams = UHC.getPlugin().getTeamManager().getTeams();
+        
+        // Create Team button
+        menu.setItem(49, createMenuItem(
+                Material.LIME_DYE,
+                vch.uhc.misc.Messages.MENU_TEAMS_CREATE_TEAM(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_TEAMS_CREATE_TEAM_DESC()
+                )
+        ));
+        
+        // Back button
+        menu.setItem(45, createMenuItem(
+                Material.ARROW,
+                vch.uhc.misc.Messages.MENU_BACK(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_BACK_TO_MAIN()
+                )
+        ));
+        
+        // Display teams
+        if (teams.isEmpty()) {
+            menu.setItem(22, createMenuItem(
+                    Material.BARRIER,
+                    vch.uhc.misc.Messages.MENU_TEAMS_NO_TEAMS(),
+                    Arrays.asList()
+            ));
+        } else {
+            int slot = 10;
+            for (UHCTeam team : teams) {
+                if (slot >= 44 && slot != 49) break;
+                
+                List<String> lore = new java.util.ArrayList<>();
+                lore.add(vch.uhc.misc.Messages.MENU_TEAMS_MEMBERS(team.getMembers().size()));
+                lore.add("");
+                
+                for (vch.uhc.models.UHCPlayer member : team.getMembers()) {
+                    String prefix = member == team.getLeader() ? "§6★ " : "§f  • ";
+                    lore.add(prefix + member.getName());
+                }
+                
+                lore.add("");
+                lore.add(vch.uhc.misc.Messages.MENU_TEAMS_CLICK_TO_MANAGE());
+                
+                menu.setItem(slot, createMenuItem(
+                        Material.PLAYER_HEAD,
+                        "§b" + team.getName(),
+                        lore
+                ));
+                
+                slot++;
+                if (slot % 9 == 8) slot += 2;
+            }
+        }
+        
+        playerMenuContext.put(player.getUniqueId(), "TEAMS");
+        player.openInventory(menu);
+    }
+
     private ItemStack createMenuItem(Material material, String name, List<String> lore) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -524,6 +675,28 @@ public class MenuManager {
             return;
         }
 
+        if (context != null && context.equals("BUFFS")) {
+            handleBuffsMenuClick(player, slot, leftClick, settings);
+            return;
+        }
+
+        if (context != null && context.equals("TEAMS")) {
+            handleTeamsMenuClick(player, slot);
+            return;
+        }
+
+        if (context != null && context.startsWith("TEAM_MANAGE:")) {
+            String teamName = context.substring("TEAM_MANAGE:".length());
+            handleTeamManagementClick(player, slot, teamName);
+            return;
+        }
+
+        if (context != null && context.startsWith("PLAYER_SELECT:")) {
+            String teamName = context.substring("PLAYER_SELECT:".length());
+            handlePlayerSelectionClick(player, slot, teamName);
+            return;
+        }
+
         if (menuTitle.equals(getMainMenuTitle())) {
             handleMainMenuClick(player, slot, leftClick, settings);
         }
@@ -551,6 +724,10 @@ public class MenuManager {
             }
             case 4 -> {
                 openTimeMenu(player, "Skin Shuffle");
+                return;
+            }
+            case 5 -> {
+                openTeamsMenu(player);
                 return;
             }
             case 9 -> {
@@ -598,7 +775,7 @@ public class MenuManager {
                 return;
             }
             case 27 -> {
-                openTimeMenu(player, "Buffs");
+                openBuffsMenu(player);
                 return;
             }
             case 28 -> {
@@ -774,6 +951,263 @@ public class MenuManager {
 
         int nextIndex = (current.ordinal() + 1) % modes.length;
         settings.setTeamMode(modes[nextIndex]);
+    }
+
+    private void handleBuffsMenuClick(Player player, int slot, boolean leftClick, Settings settings) {
+        switch (slot) {
+            case 10 -> {
+                // Hours
+                int delta = leftClick ? 1 : -1;
+                settings.setBuffsHours(Math.max(0, settings.getBuffsHours() + delta));
+                openBuffsMenu(player);
+            }
+            case 12 -> {
+                // Minutes
+                int delta = leftClick ? 1 : -1;
+                settings.setBuffsMinutes(Math.max(0, settings.getBuffsMinutes() + delta));
+                openBuffsMenu(player);
+            }
+            case 14 -> {
+                // Seconds
+                int delta = leftClick ? 1 : -1;
+                settings.setBuffsSeconds(Math.max(0, settings.getBuffsSeconds() + delta));
+                openBuffsMenu(player);
+            }
+            case 16 -> {
+                // Toggle enabled/disabled
+                settings.setBuffsEnabled(!settings.isBuffsEnabled());
+                openBuffsMenu(player);
+            }
+            case 21 -> {
+                // Extra Hearts
+                int delta = leftClick ? 1 : -1;
+                settings.setExtraHearts(Math.max(1, settings.getExtraHearts() + delta));
+                openBuffsMenu(player);
+            }
+            case 23 -> {
+                // Max Health
+                int delta = leftClick ? 2 : -2;
+                settings.setMaxHealth(Math.max(20, settings.getMaxHealth() + delta));
+                openBuffsMenu(player);
+            }
+            case 49 -> {
+                // Back button
+                openMainMenu(player);
+            }
+        }
+    }
+
+    private void handleTeamsMenuClick(Player player, int slot) {
+        if (slot == 45) {
+            // Back button
+            openMainMenu(player);
+        } else if (slot == 49) {
+            // Create team button - auto create with Team i name and random leader
+            List<UHCTeam> teams = UHC.getPlugin().getTeamManager().getTeams();
+            String teamName = "Team " + (teams.size() + 1);
+            
+            // Get players without team
+            List<UHCPlayer> playersWithoutTeam = UHC.getPlugin().getPlayerManager().getPlayers().stream()
+                    .filter(p -> p.getTeam() == null)
+                    .collect(java.util.stream.Collectors.toList());
+            
+            if (playersWithoutTeam.isEmpty()) {
+                player.sendMessage(vch.uhc.misc.Messages.TEAM_NO_PLAYERS_AVAILABLE());
+                return;
+            }
+            
+            // Select random player as leader
+            UHCPlayer randomLeader = playersWithoutTeam.get(new java.util.Random().nextInt(playersWithoutTeam.size()));
+            UHC.getPlugin().getTeamManager().createTeam(randomLeader, teamName);
+            player.sendMessage(vch.uhc.misc.Messages.TEAM_CREATED_WITH_LEADER(teamName, randomLeader.getName()));
+            openTeamsMenu(player);
+        } else if (slot >= 10 && slot < 44) {
+            // Click on a team - open team management menu
+            List<UHCTeam> teams = UHC.getPlugin().getTeamManager().getTeams();
+            int teamIndex = calculateTeamIndex(slot);
+            if (teamIndex >= 0 && teamIndex < teams.size()) {
+                openTeamManagementMenu(player, teams.get(teamIndex));
+            }
+        }
+    }
+
+    private int calculateTeamIndex(int slot) {
+        int row = slot / 9;
+        int col = slot % 9;
+        
+        if (col < 1 || col > 7) return -1;
+        if (row < 1 || row > 4) return -1;
+        
+        int index = (row - 1) * 7 + (col - 1);
+        return index;
+    }
+
+    public void openTeamManagementMenu(Player player, UHCTeam team) {
+        Inventory menu = Bukkit.createInventory(null, 54, Component.text("§6UHC - " + team.getName()));
+        
+        // Team info
+        menu.setItem(4, createMenuItem(
+                Material.PLAYER_HEAD,
+                "§b" + team.getName(),
+                Arrays.asList(
+                        "§7Miembros: §f" + team.getMembers().size(),
+                        "§7Líder: §f" + team.getLeader().getName()
+                )
+        ));
+        
+        // Add player button
+        menu.setItem(20, createMenuItem(
+                Material.LIME_DYE,
+                "§aAgregar Jugador",
+                Arrays.asList(
+                        "§7Click para seleccionar jugador"
+                )
+        ));
+        
+        // Delete team button
+        menu.setItem(24, createMenuItem(
+                Material.RED_DYE,
+                "§cEliminar Equipo",
+                Arrays.asList(
+                        "§7Click para eliminar este equipo"
+                )
+        ));
+        
+        // Display members
+        int slot = 28;
+        for (UHCPlayer member : team.getMembers()) {
+            if (slot >= 35) break;
+            menu.setItem(slot, createMenuItem(
+                    Material.PLAYER_HEAD,
+                    (member == team.getLeader() ? "§6★ " : "§f") + member.getName(),
+                    Arrays.asList(
+                            member == team.getLeader() ? "§7Líder del equipo" : "§7Click para remover"
+                    )
+            ));
+            slot++;
+        }
+        
+        // Back button
+        menu.setItem(45, createMenuItem(
+                Material.ARROW,
+                vch.uhc.misc.Messages.MENU_BACK(),
+                Arrays.asList(
+                        "§7Volver al menú de equipos"
+                )
+        ));
+        
+        playerMenuContext.put(player.getUniqueId(), "TEAM_MANAGE:" + team.getName());
+        player.openInventory(menu);
+    }
+
+    public void openPlayerSelectionMenu(Player player, UHCTeam team) {
+        Inventory menu = Bukkit.createInventory(null, 54, Component.text("§6Seleccionar Jugador"));
+        
+        List<UHCPlayer> availablePlayers = UHC.getPlugin().getPlayerManager().getPlayers().stream()
+                .filter(p -> p.getTeam() == null)
+                .collect(java.util.stream.Collectors.toList());
+        
+        int slot = 10;
+        for (UHCPlayer uhcPlayer : availablePlayers) {
+            if (slot >= 44) break;
+            menu.setItem(slot, createMenuItem(
+                    Material.PLAYER_HEAD,
+                    "§f" + uhcPlayer.getName(),
+                    Arrays.asList(
+                            "§7Click para agregar al equipo"
+                    )
+            ));
+            slot++;
+            if (slot % 9 == 8) slot += 2;
+        }
+        
+        // Back button
+        menu.setItem(45, createMenuItem(
+                Material.ARROW,
+                vch.uhc.misc.Messages.MENU_BACK(),
+                Arrays.asList(
+                        "§7Volver a gestión del equipo"
+                )
+        ));
+        
+        playerMenuContext.put(player.getUniqueId(), "PLAYER_SELECT:" + team.getName());
+        player.openInventory(menu);
+    }
+
+    private void handleTeamManagementClick(Player player, int slot, String teamName) {
+        UHCTeam team = UHC.getPlugin().getTeamManager().getTeams().stream()
+                .filter(t -> t.getName().equals(teamName))
+                .findFirst()
+                .orElse(null);
+        
+        if (team == null) {
+            openTeamsMenu(player);
+            return;
+        }
+        
+        if (slot == 45) {
+            // Back to teams menu
+            openTeamsMenu(player);
+        } else if (slot == 20) {
+            // Add player
+            openPlayerSelectionMenu(player, team);
+        } else if (slot == 24) {
+            // Delete team
+            UHC.getPlugin().getTeamManager().deleteTeam(team);
+            player.sendMessage("§cEquipo eliminado: " + teamName);
+            openTeamsMenu(player);
+        } else if (slot >= 28 && slot < 35) {
+            // Remove member
+            int memberIndex = slot - 28;
+            if (memberIndex < team.getMembers().size()) {
+                UHCPlayer member = team.getMembers().get(memberIndex);
+                if (member != team.getLeader()) {
+                    UHC.getPlugin().getTeamManager().removePlayer(team, member);
+                    player.sendMessage("§eJugador removido: " + member.getName());
+                    openTeamManagementMenu(player, team);
+                }
+            }
+        }
+    }
+
+    private void handlePlayerSelectionClick(Player player, int slot, String teamName) {
+        UHCTeam team = UHC.getPlugin().getTeamManager().getTeams().stream()
+                .filter(t -> t.getName().equals(teamName))
+                .findFirst()
+                .orElse(null);
+        
+        if (team == null) {
+            openTeamsMenu(player);
+            return;
+        }
+        
+        if (slot == 45) {
+            // Back to team management
+            openTeamManagementMenu(player, team);
+        } else if (slot >= 10 && slot < 44) {
+            // Select player
+            List<UHCPlayer> availablePlayers = UHC.getPlugin().getPlayerManager().getPlayers().stream()
+                    .filter(p -> p.getTeam() == null)
+                    .collect(java.util.stream.Collectors.toList());
+            
+            int playerIndex = calculatePlayerSelectionIndex(slot);
+            if (playerIndex >= 0 && playerIndex < availablePlayers.size()) {
+                UHCPlayer selectedPlayer = availablePlayers.get(playerIndex);
+                UHC.getPlugin().getTeamManager().addPlayer(team, selectedPlayer);
+                player.sendMessage("§aJugador agregado: " + selectedPlayer.getName());
+                openTeamManagementMenu(player, team);
+            }
+        }
+    }
+
+    private int calculatePlayerSelectionIndex(int slot) {
+        int row = slot / 9;
+        int col = slot % 9;
+        
+        if (col < 1 || col > 7) return -1;
+        if (row < 1 || row > 4) return -1;
+        
+        return (row - 1) * 7 + (col - 1);
     }
 
     public void cleanupPlayer(UUID playerId) {

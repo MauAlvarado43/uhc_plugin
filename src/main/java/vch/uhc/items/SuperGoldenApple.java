@@ -3,8 +3,6 @@ package vch.uhc.items;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -35,15 +33,8 @@ public class SuperGoldenApple extends BaseItem {
         if (!isEnabled())
             return false;
 
-        AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
-        if (attribute != null) {
-            double currentMaxHealth = attribute.getBaseValue();
-
-            if (!(currentMaxHealth + 8.0D > 60.0D))
-                attribute.setBaseValue(currentMaxHealth + 8.0D);
-        }
-
-        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 200, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 240, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,100, 4));
         player.getInventory().getItemInMainHand().setAmount(item.getAmount() - 1);
         
         return true;

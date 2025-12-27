@@ -6,7 +6,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseListener;
-import vch.uhc.misc.Messages;
 
 public class MenuListener extends BaseListener {
 
@@ -14,7 +13,7 @@ public class MenuListener extends BaseListener {
     public void onInventoryClick(InventoryClickEvent e) {
         String title = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(e.getView().title());
         
-        if (title.startsWith(Messages.MENU_MAIN_TITLE().substring(0, 6))) {
+        if (title.startsWith("§6UHC") || title.contains("UHC")) {
             e.setCancelled(true);
             
             if (!(e.getWhoClicked() instanceof Player)) {

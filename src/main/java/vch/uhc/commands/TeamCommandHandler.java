@@ -176,7 +176,9 @@ public class TeamCommandHandler {
                     }
                     newNameBuilder.append(args[i]);
                 }
-                String newName = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(newNameBuilder.toString()).toString();
+                String newName = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().serialize(
+                    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(newNameBuilder.toString())
+                );
                 playerRenameTeam.setName(newName);
                 sender.sendMessage(Messages.TEAM_RENAMED(oldName, newName));
                 playerRenameTeam.getMembers().forEach(m -> {

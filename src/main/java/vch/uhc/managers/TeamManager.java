@@ -67,13 +67,13 @@ public class TeamManager {
     }
 
     public boolean canPlayersJoinTeam(UHCPlayer p1, UHCPlayer p2) {
-        if (p1.getTeam() == null || p2.getTeam() == null)
+        if (p1.getUuid().equals(p2.getUuid()))
             return false;
         
-        if (p1.getTeam() != p2.getTeam())
+        if (p1.getTeam() != null && p2.getTeam() != null && p1.getTeam() == p2.getTeam())
             return false;
         
-        return p1.getTeam().getMembers().size() < 5;
+        return true;
     }
 
 }

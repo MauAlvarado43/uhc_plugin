@@ -18,7 +18,7 @@ public class SuperGoldenApple extends BaseItem {
 
     public SuperGoldenApple() {
         super(new ItemStack(Material.GOLDEN_APPLE), new String[]{"GGG", "GAG", "GGG"}, Map.of(
-                'G', Material.GOLD_BLOCK,
+                'G', Material.GOLD_INGOT,
                 'A', Material.GOLDEN_APPLE
         ), vch.uhc.misc.Messages.ITEM_SUPER_GOLDEN_APPLE());
     }

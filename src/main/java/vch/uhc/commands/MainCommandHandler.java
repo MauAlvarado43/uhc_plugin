@@ -1,141 +1,172 @@
 package vch.uhc.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import vch.uhc.UHC;
+import vch.uhc.misc.Messages;
+import vch.uhc.misc.enums.Permission;
 
+/**
+ * Main command handler for /uhc command. Handles subcommands like start,
+ * cancel, reload, info, join, leave, settings, menu, stats, players, and team.
+ */
 public class MainCommandHandler implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        switch (command.getName()) {
-            case "uhc":
-                return onUCHCommand(sender, args);
-            default:
-                sender.sendMessage(ChatColor.RED + "Unknown subcommand.");
-                break;
+        // Only handling "uhc" command
+        if (command.getName().equalsIgnoreCase("uhc")) {
+            return onUCHCommand(sender, args);
         }
 
+        sender.sendMessage(Messages.COMMAND_UNKNOWN_SUBCOMMAND());
         return true;
-        
     }
 
+    /**
+     * Handles the logic for /uhc subcommands.
+     *
+     * @param sender The sender of the command
+     * @param args The arguments passed to the command
+     * @return true if handled, false otherwise
+     */
     public boolean onUCHCommand(CommandSender sender, String[] args) {
 
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "Please specify a subcommand.");
+            sender.sendMessage(Messages.COMMAND_SPECIFY_SUBCOMMAND());
             return false;
         }
 
-        switch (args[0]) {
-            case "start":
-                if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+        UHC plugin = UHC.getPlugin();
+        if (plugin == null) {
+            return false;
+        }
+
+        // Handle subcommands using modern switch rule syntax
+        switch (args[0].toLowerCase()) {
+            case "start" -> {
+                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
-                UHC.getPlugin().getUHCManager().start();
-                sender.sendMessage(ChatColor.GREEN + "UHC started.");
-                break;
-            case "cancel":
-                if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                plugin.getUHCManager().start();
+                sender.sendMessage(Messages.GAME_STARTED());
+            }
+            case "cancel" -> {
+                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
-                UHC.getPlugin().getUHCManager().cancel();
-                sender.sendMessage(ChatColor.RED + "UHC canceled.");
-                break;
-            case "reload":
-                if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                plugin.getUHCManager().cancel();
+                sender.sendMessage(Messages.GAME_CANCELLED());
+            }
+            case "reload" -> {
+                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
-                sender.sendMessage(ChatColor.YELLOW + "Recargando plugin UHC...");
-                UHC.getPlugin().getUHCManager().reload();
-                sender.sendMessage(ChatColor.GREEN + "Plugin UHC recargado exitosamente.");
-                break;
-            case "info":
-                sender.sendMessage(
-                    ChatColor.YELLOW + "UHC Information:"
-                    + ChatColor.GOLD + "\n- Game Status: " + UHC.getPlugin().getSettings().getGameStatus()
-                    + ChatColor.GOLD + "\n- Team mode: " + UHC.getPlugin().getSettings().getTeamMode()
-                    + ChatColor.GOLD + "\n- Team size: " + UHC.getPlugin().getSettings().getTeamSize()
-                    + ChatColor.GOLD + "\n- Player lives: " + UHC.getPlugin().getSettings().getPlayerLives()
-                    + ChatColor.GOLD + "\n- Max World Size: " + UHC.getPlugin().getSettings().getMaxWorldSize()
-                    + ChatColor.GOLD + "\n- Min World Size: " + UHC.getPlugin().getSettings().getMinWorldSize()
-                    + ChatColor.GOLD + "\n- Game Time: " + UHC.getPlugin().getSettings().getGameHours() + ":" + UHC.getPlugin().getSettings().getGameMinutes() + ":" + UHC.getPlugin().getSettings().getGameSeconds()
-                    + ChatColor.GOLD + "\n- Agreement Time: " + UHC.getPlugin().getSettings().getAgreementHours() + ":" + UHC.getPlugin().getSettings().getAgreementMinutes() + ":" + UHC.getPlugin().getSettings().getAgreementSeconds()
-                    + ChatColor.GOLD + "\n- Min World Border Time: " + UHC.getPlugin().getSettings().getMinWorldBorderHours() + ":" + UHC.getPlugin().getSettings().getMinWorldBorderMinutes() + ":" + UHC.getPlugin().getSettings().getMinWorldBorderSeconds()
-                    + ChatColor.GOLD + "\n- Max In Game Teams Time Limit: " + UHC.getPlugin().getSettings().getMaxTeamInGameHours() + ":" + UHC.getPlugin().getSettings().getMaxTeamInGameMinutes() + ":" + UHC.getPlugin().getSettings().getMaxTeamInGameSeconds()
-                    + ChatColor.GOLD + "\n- Teams: " + UHC.getPlugin().getTeamManager().getTeams().size()
-                    + ChatColor.GOLD + "\n- Players: " + UHC.getPlugin().getPlayerManager().getPlayers().size()
-                    + ChatColor.GOLD + "\n- Recipes: " 
-                    + ChatColor.AQUA + "\n  " + UHC.getPlugin().getSettings().getItems().stream()
-                        .map(item -> ChatColor.AQUA + "- " + item.getName() + ChatColor.AQUA + " (" + item.isEnabled() + ")")
-                        .reduce((a, b) -> a + "\n  " + b).orElse("None")
-                );
-                break;
-            case "join":
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId()).setPlaying(true);
-                    sender.sendMessage(ChatColor.GREEN + "You have joined the UHC.");
+                sender.sendMessage(Messages.SETTINGS_LOADED());
+                plugin.getUHCManager().reload();
+            }
+            case "info" -> {
+                sender.sendMessage(Messages.INFO_HEADER());
+                sender.sendMessage(Messages.INFO_GAME_STATE(plugin.getSettings().getGameState()));
+                sender.sendMessage(Messages.INFO_TEAM_MODE(plugin.getSettings().getTeamMode()));
+                sender.sendMessage(Messages.INFO_TEAM_SIZE(plugin.getSettings().getTeamSize()));
+                sender.sendMessage(Messages.INFO_PLAYER_LIVES(plugin.getSettings().getPlayerLives()));
+                sender.sendMessage(Messages.INFO_MAX_WORLD_SIZE(plugin.getSettings().getMaxWorldSize()));
+                sender.sendMessage(Messages.INFO_MIN_WORLD_SIZE(plugin.getSettings().getMinWorldSize()));
+                sender.sendMessage(Messages.INFO_GAME_TIME(
+                        plugin.getSettings().getGameHours(),
+                        plugin.getSettings().getGameMinutes(),
+                        plugin.getSettings().getGameSeconds()
+                ));
+                sender.sendMessage(Messages.INFO_AGREEMENT_TIME(
+                        plugin.getSettings().getAgreementHours(),
+                        plugin.getSettings().getAgreementMinutes(),
+                        plugin.getSettings().getAgreementSeconds()
+                ));
+                sender.sendMessage(Messages.INFO_MIN_BORDER_TIME(
+                        plugin.getSettings().getMinWorldBorderHours(),
+                        plugin.getSettings().getMinWorldBorderMinutes(),
+                        plugin.getSettings().getMinWorldBorderSeconds()
+                ));
+                sender.sendMessage(Messages.INFO_MAX_INGAME_TEAMS_TIME(
+                        plugin.getSettings().getMaxTeamInGameHours(),
+                        plugin.getSettings().getMaxTeamInGameMinutes(),
+                        plugin.getSettings().getMaxTeamInGameSeconds()
+                ));
+                sender.sendMessage(Messages.INFO_TEAMS_COUNT(plugin.getTeamManager().getTeams().size()));
+                sender.sendMessage(Messages.INFO_PLAYERS_COUNT(plugin.getPlayerManager().getPlayers().size()));
+
+                sender.sendMessage(Messages.INFO_RECIPES_HEADER());
+                plugin.getSettings().getItems().forEach(item -> {
+                    String status = item.isEnabled() ? Messages.INFO_ENABLED() : Messages.INFO_DISABLED();
+                    sender.sendMessage(Messages.INFO_RECIPES_ITEM(item.getName(), status));
+                });
+            }
+            case "join" -> {
+                if (sender instanceof Player player) {
+                    vch.uhc.models.UHCPlayer uhcPlayer = plugin.getPlayerManager().getPlayerByUUID(player.getUniqueId());
+                    if (uhcPlayer != null) {
+                        uhcPlayer.setPlaying(true);
+                        sender.sendMessage(Messages.MAIN_JOINED_UHC());
+                    }
                 } else {
-                    sender.sendMessage(ChatColor.RED + "Only players can join the UHC.");
+                    if (sender != null) {
+                        sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_JOIN());
+                    }
                 }
-                break;
-            case "leave":
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId()).setPlaying(false);
-                    sender.sendMessage(ChatColor.RED + "You have left the UHC.");
+            }
+            case "leave" -> {
+                if (sender instanceof Player player) {
+                    vch.uhc.models.UHCPlayer uhcPlayer = plugin.getPlayerManager().getPlayerByUUID(player.getUniqueId());
+                    if (uhcPlayer != null) {
+                        uhcPlayer.setPlaying(false);
+                        sender.sendMessage(Messages.MAIN_LEFT_UHC());
+                    }
                 } else {
-                    sender.sendMessage(ChatColor.RED + "Only players can leave the UHC.");
+                    if (sender != null) {
+                        sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_LEAVE());
+                    }
                 }
-                break;
-            case "settings":
+            }
+            case "settings" -> {
                 if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
                 SettingsCommandHandler.onSettingsCommand(sender, args);
-                break;
-            case "menu":
-                if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
-                    return false;
-                }
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    UHC.getPlugin().getMenuManager().openMainMenu(player);
+            }
+            case "menu" -> {
+                if (sender instanceof Player player) {
+                    plugin.getMenuManager().openMainMenu(player);
                 } else {
-                    sender.sendMessage(ChatColor.RED + "Only players can open the menu.");
+                    if (sender != null) {
+                        sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_MENU());
+                    }
                 }
-                break;
-            case "stats":
-                sender.sendMessage(UHC.getPlugin().getStatsManager().getStatsReport());
-                break;
-            case "players":
+            }
+            case "stats" ->
+                sender.sendMessage(plugin.getStatsManager().getStatsReport());
+            case "players" -> {
                 if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
                 PlayerCommandHandler.onPlayerCommand(sender, args);
-                break;
-            case "team":
+            }
+            case "team" ->
                 TeamCommandHandler.onTeamCommand(sender, args);
-                break;
-            default:
-                sender.sendMessage(ChatColor.RED + "Unknown subcommand.");
-                break;
+            default -> {
+                sender.sendMessage(Messages.COMMAND_UNKNOWN_SUBCOMMAND());
+                return false;
+            }
         }
 
         return true;
-
     }
-    
 }

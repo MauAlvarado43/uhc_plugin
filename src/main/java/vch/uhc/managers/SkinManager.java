@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import net.kyori.adventure.text.Component;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.exception.DataRequestException;
@@ -46,7 +47,7 @@ public class SkinManager {
                 plugin.getLogger().warning("SkinsRestorer plugin not found! Skin disguise disabled.");
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("Failed to initialize SkinsRestorer API: " + e.getMessage());
+            plugin.getLogger().severe(() -> "Failed to initialize SkinsRestorer API: " + e.getMessage());
         }
     }
 
@@ -56,7 +57,7 @@ public class SkinManager {
             return;
         }
 
-        Collection<vch.uhc.models.Player> uhcPlayers = plugin.getPlayerManager().getPlayers();
+        Collection<vch.uhc.models.UHCPlayer> uhcPlayers = plugin.getPlayerManager().getPlayers();
         List<Player> onlinePlayers = uhcPlayers.stream()
             .map(p -> Bukkit.getPlayer(p.getUuid()))
             .filter(Objects::nonNull)
@@ -83,11 +84,11 @@ public class SkinManager {
             applySkinToPlayer(assignment);
         }
 
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_BORDER());
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_TITLE());
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_DESCRIPTION());
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_HINT());
-        Bukkit.broadcastMessage(Messages.SKIN_SHUFFLE_BORDER());
+        Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_BORDER()));
+        Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_TITLE()));
+        Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_DESCRIPTION()));
+        Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_HINT()));
+        Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_BORDER()));
     }
 
     private List<SkinAssignment> createShuffledAssignments(List<Player> players) {
@@ -104,7 +105,7 @@ public class SkinManager {
                 .collect(Collectors.toList());
 
             if (validSkins.isEmpty()) {
-                plugin.getLogger().warning("No valid skins for " + player.getName());
+                plugin.getLogger().warning(() -> "No valid skins for " + player.getName());
                 continue;
             }
 
@@ -136,18 +137,18 @@ public class SkinManager {
                 playerStorage.setSkinIdOfPlayer(player.getUniqueId(), 
                     SkinIdentifier.ofPlayer(assignedPlayer.getUniqueId()));
             } else {
-                plugin.getLogger().warning("Could not find player: " + assignment.getAssignedSkin());
+                plugin.getLogger().warning(() -> "Could not find player: " + assignment.getAssignedSkin());
             }
             
             Bukkit.getScheduler().runTask(plugin, () -> {
                 try {
                     skinsAPI.getSkinApplier(Player.class).applySkin(player);
                 } catch (DataRequestException e) {
-                    plugin.getLogger().warning("Failed to apply skin: " + e.getMessage());
+                    plugin.getLogger().warning(() -> "Failed to apply skin: " + e.getMessage());
                 }
             });
 
-            plugin.getLogger().info("Applied skin '" + assignment.getAssignedSkin() + 
+            plugin.getLogger().info(() -> "Applied skin '" + assignment.getAssignedSkin() + 
                                    "' to " + assignment.getRealPlayerName());
         });
     }
@@ -184,10 +185,12 @@ public class SkinManager {
         attacker.sendMessage(Messages.SKIN_REVEAL_BORDER());
         attacker.sendMessage("");
 
-        Bukkit.broadcastMessage(
-            Messages.SKIN_REVEAL_BROADCAST(
-                attacker.getName(),
-                assignment.getRealPlayerName()
+        Bukkit.getServer().broadcast(
+            Component.text(
+                Messages.SKIN_REVEAL_BROADCAST(
+                    attacker.getName(),
+                    assignment.getRealPlayerName()
+                )
             )
         );
 
@@ -211,7 +214,7 @@ public class SkinManager {
                 try {
                     skinsAPI.getSkinApplier(Player.class).applySkin(player);
                 } catch (DataRequestException e) {
-                    plugin.getLogger().warning("Failed to restore skin: " + e.getMessage());
+                    plugin.getLogger().warning(() -> "Failed to restore skin: " + e.getMessage());
                 }
             });
         });
@@ -227,7 +230,7 @@ public class SkinManager {
             }
         }
 
-        Bukkit.broadcastMessage(Messages.SKIN_RESTORE_SUCCESS());
+        Bukkit.getServer().broadcast(Component.text(Messages.SKIN_RESTORE_SUCCESS()));
     }
 
     public void clearAssignments() {

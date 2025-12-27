@@ -1,19 +1,19 @@
 package vch.uhc;
 
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.neznamy.tab.api.TabAPI;
 import vch.uhc.commands.AFKCommandHandler;
 import vch.uhc.commands.MainCommandHandler;
 import vch.uhc.expansions.PlayerExpansion;
 import vch.uhc.expansions.PlayerHealthExpansion;
 import vch.uhc.expansions.PlayerLivesExpansion;
 import vch.uhc.expansions.TeamExpansion;
-import vch.uhc.listeners.AdvancementListener;
 import vch.uhc.listeners.AFKListener;
+import vch.uhc.listeners.AdvancementListener;
 import vch.uhc.listeners.ChatListener;
 import vch.uhc.listeners.EntityDeathListener;
 import vch.uhc.listeners.FoodListener;
@@ -35,8 +35,6 @@ import vch.uhc.misc.Settings;
 
 public class UHC extends JavaPlugin {
 
-    private TabAPI tabAPI;
-
     private Settings settings;
     private LanguageManager languageManager;
 
@@ -49,6 +47,7 @@ public class UHC extends JavaPlugin {
     private GameModeManager gameModeManager;
     private MenuManager menuManager;
 
+    @Override
     public void onEnable() {
 
         languageManager = new LanguageManager();
@@ -73,9 +72,9 @@ public class UHC extends JavaPlugin {
         new MenuListener().register();
         new AdvancementListener().register();
 
-        getCommand("uhc").setTabCompleter(new CommandCompleter());
-        getCommand("uhc").setExecutor(new MainCommandHandler());
-        getCommand("afk").setExecutor(new AFKCommandHandler());
+        Objects.requireNonNull(getCommand("uhc")).setTabCompleter(new CommandCompleter());
+        Objects.requireNonNull(getCommand("uhc")).setExecutor(new MainCommandHandler());
+        Objects.requireNonNull(getCommand("afk")).setExecutor(new AFKCommandHandler());
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new TeamExpansion().register();
@@ -88,24 +87,26 @@ public class UHC extends JavaPlugin {
         }
 
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        String version = this.getDescription().getVersion();
-        console.sendMessage("\n"
-                + ChatColor.GOLD + "==========================" + ChatColor.RESET + "\n"
-                + ChatColor.GREEN + "    UHC " + version + ChatColor.RESET + "\n"
-                + ChatColor.AQUA
-                + "        /\\\n"
-                + "       /  \\\n"
-                + "      /" + ChatColor.WHITE + " /\\ " + ChatColor.AQUA + "\\\n"
-                + "     /" + ChatColor.WHITE + "_/__\\_" + ChatColor.AQUA + "\\\n"
-                + "     \\      /\n"
-                + "      \\    /\n"
-                + "       \\  /\n"
-                + "        \\/" + ChatColor.RESET + "\n"
-                + ChatColor.GOLD + "==========================" + ChatColor.RESET + "\n"
+        String version = this.getPluginMeta().getVersion();
+        console.sendMessage("""
+
+                \u00a76==========================\u00a7r
+                \u00a7a    UHC %s\u00a7r
+                \u00a7b        /\\
+                       /  \\
+                      /\u00a7f /\\ \u00a7b\\
+                     /\u00a7f_/__\\_\u00a7b\\
+                     \\      /
+                      \\    /
+                       \\  /
+                        \\/\u00a7r
+                """.formatted(version)
+                + "\u00a76==========================" + "\u00a7r" + "\n"
         );
 
     }
 
+    @Override
     public void onDisable() {
     }
 

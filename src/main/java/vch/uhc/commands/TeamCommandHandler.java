@@ -1,190 +1,229 @@
 package vch.uhc.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import vch.uhc.UHC;
-import vch.uhc.models.Team;
+import vch.uhc.misc.Messages;
+import vch.uhc.models.UHCTeam;
+import vch.uhc.misc.enums.TeamMode;
+import vch.uhc.misc.enums.GameState;
 
+/**
+ * Handler for team management subcommands under /uhc team. Includes
+ * functionality for creating, adding, removing, renaming, leaving, and listing
+ * teams.
+ */
 public class TeamCommandHandler {
 
+    /**
+     * Executes team-related subcommands.
+     *
+     * @param sender The command sender
+     * @param args The command arguments
+     * @return true if handled, false otherwise
+     */
     public static boolean onTeamCommand(CommandSender sender, String[] args) {
 
         if (args.length < 2) {
-            sender.sendMessage(ChatColor.RED + "Uso: /uhc team <create|add|remove|rename|leave|list> [args]");
+            sender.sendMessage(Messages.TEAM_USAGE());
             return false;
         }
 
-        String subcommand = args[1];
+        String subcommand = args[1].toLowerCase();
 
         switch (subcommand) {
-            case "list":
+            case "list" -> {
+                // List all teams and their members
                 if (UHC.getPlugin().getTeamManager().getTeams().isEmpty()) {
-                    sender.sendMessage(ChatColor.YELLOW + "No hay equipos creados.");
+                    sender.sendMessage(Messages.TEAM_NONE_CREATED());
                     return true;
                 }
-                sender.sendMessage(ChatColor.GOLD + "=== Equipos (Total: " + UHC.getPlugin().getTeamManager().getTeams().size() + ") ===");
-                for (Team team : UHC.getPlugin().getTeamManager().getTeams()) {
-                    sender.sendMessage(ChatColor.AQUA + team.getName() + ChatColor.GRAY + " (" + team.getMembers().size() + " miembros):");
-                    for (vch.uhc.models.Player member : team.getMembers()) {
-                        String prefix = member == team.getLeader() ? ChatColor.GOLD + "★ " : ChatColor.WHITE + "  - ";
-                        sender.sendMessage(prefix + member.getName() + ChatColor.GRAY + " (UUID: " + member.getUuid() + ")");
+                sender.sendMessage(Messages.TEAM_LIST_HEADER());
+                for (UHCTeam team : UHC.getPlugin().getTeamManager().getTeams()) {
+                    sender.sendMessage(Messages.TEAM_LIST_ENTRY(team.getName(), team.getMembers().size()));
+                    for (vch.uhc.models.UHCPlayer member : team.getMembers()) {
+                        String prefix = member == team.getLeader() ? "\u00a76★ " : "\u00a7f  - ";
+                        sender.sendMessage(prefix + member.getName());
                     }
                 }
-                return true;
-                
-            case "create":
+                sender.sendMessage(Messages.TEAM_LIST_FOOTER());
+            }
+            case "create" -> {
+                // Create a new team (Admins only, manual mode)
                 if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
-                if (UHC.getPlugin().getSettings().getTeamMode() != vch.uhc.misc.Settings.TeamMode.MANUAL) {
-                    sender.sendMessage(ChatColor.RED + "Este comando solo está disponible en modo de equipos MANUAL.");
+                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
+                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (args.length < 3) {
-                    sender.sendMessage(ChatColor.RED + "Uso: /uhc team create <nombre>");
+                    sender.sendMessage(Messages.TEAM_CREATE_USAGE());
                     return false;
                 }
                 String teamName = args[2];
-                Team newTeam = UHC.getPlugin().getTeamManager().createTeam(teamName);
-                sender.sendMessage(ChatColor.GREEN + "Equipo '" + teamName + "' creado.");
-                break;
-
-            case "add":
-                if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                if (UHC.getPlugin().getTeamManager().getTeamByName(teamName) != null) {
+                    sender.sendMessage(Messages.TEAM_NAME_TAKEN());
                     return false;
                 }
-                if (UHC.getPlugin().getSettings().getTeamMode() != vch.uhc.misc.Settings.TeamMode.MANUAL) {
-                    sender.sendMessage(ChatColor.RED + "Este comando solo está disponible en modo de equipos MANUAL.");
+                UHC.getPlugin().getTeamManager().createTeam(teamName);
+                sender.sendMessage(Messages.TEAM_CREATED(teamName));
+            }
+            case "add" -> {
+                // Add a player to a team (Admins only, manual mode)
+                if (!sender.hasPermission("uhc.admin")) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
+                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
+                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (args.length < 4) {
-                    sender.sendMessage(ChatColor.RED + "Uso: /uhc team add <jugador> <equipo>");
+                    sender.sendMessage(Messages.TEAM_ADD_USAGE());
                     return false;
                 }
-                String playerName = args[2];
-                String targetTeam = args[3];
-                Player bukkitPlayer = Bukkit.getPlayer(playerName);
-                if (bukkitPlayer == null) {
-                    sender.sendMessage(ChatColor.RED + "Jugador no encontrado.");
+                String addPlayerName = args[2];
+                String targetTeamName = args[3];
+                Player addBukkitPlayer = Bukkit.getPlayer(addPlayerName);
+                if (addBukkitPlayer == null) {
+                    sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
                     return false;
                 }
-                vch.uhc.models.Player uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(bukkitPlayer.getUniqueId());
-                if (uhcPlayer == null) {
-                    sender.sendMessage(ChatColor.RED + "Jugador no está en el UHC.");
+                vch.uhc.models.UHCPlayer addUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(addBukkitPlayer.getUniqueId());
+                if (addUhcPlayer == null) {
+                    sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
                     return false;
                 }
-                Team team = UHC.getPlugin().getTeamManager().getTeamByName(targetTeam);
-                if (team == null) {
-                    sender.sendMessage(ChatColor.RED + "Equipo no encontrado.");
+                UHCTeam addTeam = UHC.getPlugin().getTeamManager().getTeamByName(targetTeamName);
+                if (addTeam == null) {
+                    sender.sendMessage(Messages.TEAM_NOT_FOUND(targetTeamName));
                     return false;
                 }
-                UHC.getPlugin().getTeamManager().addPlayer(team, uhcPlayer);
-                sender.sendMessage(ChatColor.GREEN + "Jugador " + playerName + " agregado al equipo '" + targetTeam + "'.");
-                break;
-
-            case "remove":
+                if (addTeam.getMembers().size() >= UHC.getPlugin().getSettings().getTeamSize()) {
+                    sender.sendMessage(Messages.TEAM_FULL(UHC.getPlugin().getSettings().getTeamSize()));
+                    return false;
+                }
+                UHC.getPlugin().getTeamManager().addPlayer(addTeam, addUhcPlayer);
+                sender.sendMessage(Messages.TEAM_PLAYER_ADDED(addPlayerName, targetTeamName));
+                addBukkitPlayer.sendMessage(Messages.TEAM_YOU_WERE_ADDED(targetTeamName));
+            }
+            case "remove" -> {
+                // Remove a player from a team (Admins only, manual mode)
                 if (!sender.hasPermission("uhc.admin")) {
-                    sender.sendMessage(ChatColor.RED + "No tienes permisos para ejecutar este comando.");
+                    sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
-                if (UHC.getPlugin().getSettings().getTeamMode() != vch.uhc.misc.Settings.TeamMode.MANUAL) {
-                    sender.sendMessage(ChatColor.RED + "Este comando solo está disponible en modo de equipos MANUAL.");
+                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
+                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (args.length < 4) {
-                    sender.sendMessage(ChatColor.RED + "Uso: /uhc team remove <jugador> <equipo>");
+                    sender.sendMessage(Messages.TEAM_REMOVE_USAGE());
                     return false;
                 }
                 String removePlayerName = args[2];
                 String removeTeamName = args[3];
                 Player removeBukkitPlayer = Bukkit.getPlayer(removePlayerName);
                 if (removeBukkitPlayer == null) {
-                    sender.sendMessage(ChatColor.RED + "Jugador no encontrado.");
+                    sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
                     return false;
                 }
-                vch.uhc.models.Player removeUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(removeBukkitPlayer.getUniqueId());
+                vch.uhc.models.UHCPlayer removeUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(removeBukkitPlayer.getUniqueId());
                 if (removeUhcPlayer == null) {
-                    sender.sendMessage(ChatColor.RED + "Jugador no está en el UHC.");
+                    sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
                     return false;
                 }
-                Team removeTeam = UHC.getPlugin().getTeamManager().getTeamByName(removeTeamName);
+                UHCTeam removeTeam = UHC.getPlugin().getTeamManager().getTeamByName(removeTeamName);
                 if (removeTeam == null) {
-                    sender.sendMessage(ChatColor.RED + "Equipo no encontrado.");
+                    sender.sendMessage(Messages.TEAM_NOT_FOUND(removeTeamName));
                     return false;
                 }
                 UHC.getPlugin().getTeamManager().removePlayer(removeTeam, removeUhcPlayer);
-                sender.sendMessage(ChatColor.GREEN + "Jugador " + removePlayerName + " removido del equipo '" + removeTeamName + "'.");
-                break;
-
-            case "rename":
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "Solo jugadores pueden usar este comando.");
+                sender.sendMessage(Messages.TEAM_PLAYER_REMOVED(removePlayerName, removeTeamName));
+                removeBukkitPlayer.sendMessage(Messages.TEAM_YOU_WERE_REMOVED(removeTeamName));
+            }
+            case "rename" -> {
+                // Rename your own team (Leader only)
+                if (!(sender instanceof Player renamePlayer)) {
+                    if (sender != null) {
+                        sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
+                    }
                     return false;
                 }
-                Player renamePlayer = (Player) sender;
-                vch.uhc.models.Player renameUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(renamePlayer.getUniqueId());
-                if (renameUhcPlayer == null || renameUhcPlayer.getTeam() == null) {
-                    sender.sendMessage(ChatColor.RED + "No estás en ningún equipo.");
+                vch.uhc.models.UHCPlayer renameUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(renamePlayer.getUniqueId());
+                UHCTeam playerRenameTeam = renameUhcPlayer != null ? renameUhcPlayer.getTeam() : null;
+                if (renameUhcPlayer == null || playerRenameTeam == null) {
+                    sender.sendMessage(Messages.TEAM_NOT_IN_TEAM());
                     return false;
                 }
-                Team playerTeam = renameUhcPlayer.getTeam();
-                if (playerTeam.getLeader() != renameUhcPlayer) {
-                    sender.sendMessage(ChatColor.RED + "Solo el líder del equipo puede renombrarlo.");
+                if (playerRenameTeam.getLeader() != renameUhcPlayer) {
+                    sender.sendMessage(Messages.TEAM_LEADER_ONLY());
                     return false;
                 }
                 if (args.length < 3) {
-                    sender.sendMessage(ChatColor.RED + "Uso: /uhc team rename <nuevoNombre>");
-                    sender.sendMessage(ChatColor.GRAY + "Usa & para colores. Ejemplo: &aVerde &b&lAzul Negrita");
+                    sender.sendMessage(Messages.TEAM_RENAME_USAGE());
                     return false;
                 }
-                String oldTeamName = playerTeam.getName();
-                StringBuilder newTeamNameBuilder = new StringBuilder();
+                String oldName = playerRenameTeam.getName();
+                StringBuilder newNameBuilder = new StringBuilder();
                 for (int i = 2; i < args.length; i++) {
-                    if (i > 2) newTeamNameBuilder.append(" ");
-                    newTeamNameBuilder.append(args[i]);
+                    if (i > 2) {
+                        newNameBuilder.append(" ");
+                    }
+                    newNameBuilder.append(args[i]);
                 }
-                String newTeamName = ChatColor.translateAlternateColorCodes('&', newTeamNameBuilder.toString());
-                playerTeam.setName(newTeamName);
-                sender.sendMessage(ChatColor.GREEN + "Equipo renombrado de '" + oldTeamName + "' a '" + newTeamName + "'.");
-                break;
-
-            case "leave":
-                if (UHC.getPlugin().getSettings().getTeamMode() != vch.uhc.misc.Settings.TeamMode.MANUAL) {
-                    sender.sendMessage(ChatColor.RED + "Este comando solo está disponible en modo de equipos MANUAL.");
+                String newName = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(newNameBuilder.toString()).toString();
+                playerRenameTeam.setName(newName);
+                sender.sendMessage(Messages.TEAM_RENAMED(oldName, newName));
+                playerRenameTeam.getMembers().forEach(m -> {
+                    Player p = Bukkit.getPlayer(m.getUuid());
+                    if (p != null) {
+                        p.sendMessage(Messages.TEAM_YOU_WERE_RENAMED(newName));
+                    }
+                });
+            }
+            case "leave" -> {
+                // Leave your current team (Manual mode before game start)
+                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
+                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
-                if (UHC.getPlugin().getSettings().getGameStatus() == vch.uhc.misc.Settings.GameStatus.IN_PROGRESS) {
-                    sender.sendMessage(ChatColor.RED + "No puedes salir de un equipo mientras el UHC está en progreso.");
+                if (UHC.getPlugin().getSettings().getGameState() == GameState.IN_PROGRESS) {
+                    sender.sendMessage(Messages.TEAM_LEAVE_IN_PROGRESS());
                     return false;
                 }
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "Solo jugadores pueden usar este comando.");
+                if (!(sender instanceof Player leavePlayer)) {
+                    if (sender != null) {
+                        sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
+                    }
                     return false;
                 }
-                Player leavePlayer = (Player) sender;
-                vch.uhc.models.Player leaveUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(leavePlayer.getUniqueId());
+                vch.uhc.models.UHCPlayer leaveUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(leavePlayer.getUniqueId());
                 if (leaveUhcPlayer == null || leaveUhcPlayer.getTeam() == null) {
-                    sender.sendMessage(ChatColor.RED + "No estás en ningún equipo.");
+                    sender.sendMessage(Messages.TEAM_NOT_IN_TEAM());
                     return false;
                 }
-                Team leaveTeam = leaveUhcPlayer.getTeam();
+                UHCTeam leaveTeam = leaveUhcPlayer.getTeam();
                 String leaveTeamName = leaveTeam.getName();
                 UHC.getPlugin().getTeamManager().removePlayer(leaveTeam, leaveUhcPlayer);
-                sender.sendMessage(ChatColor.GREEN + "Has salido del equipo '" + leaveTeamName + "'.");
-                break;
-
-            default:
-                sender.sendMessage(ChatColor.RED + "Subcomando desconocido. Usa: create, add, remove, rename, leave, list");
+                sender.sendMessage(Messages.TEAM_YOU_LEFT(leaveTeamName));
+                leaveTeam.getMembers().forEach(m -> {
+                    Player p = Bukkit.getPlayer(m.getUuid());
+                    if (p != null) {
+                        p.sendMessage(Messages.TEAM_PLAYER_LEFT(leavePlayer.getName()));
+                    }
+                });
+            }
+            default -> {
+                sender.sendMessage(Messages.TEAM_UNKNOWN_SUBCOMMAND());
                 return false;
+            }
         }
 
         return true;
-
     }
-
 }

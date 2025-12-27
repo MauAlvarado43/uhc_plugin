@@ -5,9 +5,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.md_5.bungee.api.ChatColor;
 import vch.uhc.UHC;
-import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
 
 public class PlayerHealthExpansion extends PlaceholderExpansion {
 
@@ -33,21 +32,29 @@ public class PlayerHealthExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) return "";
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
+            return "";
+        }
         Player onlinePlayer = Bukkit.getPlayer(player.getUniqueId());
-        if (onlinePlayer == null) return "";
-        
+        if (onlinePlayer == null) {
+            return "";
+        }
+
         double health = onlinePlayer.getHealth();
-        return String.format(ChatColor.RED + "❤ " + ChatColor.WHITE + "%.1f", health);
+        return String.format("\u00a7c❤ " + "\u00a7f" + "%.1f", health);
     }
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) return "";
-        if (player == null) return "";
-        
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
+            return "";
+        }
+        if (player == null) {
+            return "";
+        }
+
         double health = player.getHealth();
-        return String.format(ChatColor.RED + "❤ " + ChatColor.WHITE + "%.1f", health);
+        return String.format("\u00a7c❤ " + "\u00a7f" + "%.1f", health);
     }
 
 }

@@ -9,52 +9,52 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import vch.uhc.models.Player;
-import vch.uhc.models.Team;
+import vch.uhc.models.UHCPlayer;
+import vch.uhc.models.UHCTeam;
 
 @DisplayName("TeamManager Tests")
 class TeamManagerTest {
 
     private TeamManager teamManager;
-    private Player player1;
-    private Player player2;
-    private Player player3;
+    private UHCPlayer player1;
+    private UHCPlayer player2;
+    private UHCPlayer player3;
 
     @BeforeEach
     void setUp() {
         teamManager = new TeamManager();
-        player1 = new Player(UUID.randomUUID(), "Player1");
-        player2 = new Player(UUID.randomUUID(), "Player2");
-        player3 = new Player(UUID.randomUUID(), "Player3");
+        player1 = new UHCPlayer(UUID.randomUUID(), "Player1");
+        player2 = new UHCPlayer(UUID.randomUUID(), "Player2");
+        player3 = new UHCPlayer(UUID.randomUUID(), "Player3");
     }
 
     @Nested
-    @DisplayName("Create Team Tests")
+    @DisplayName("Create UHCTeam Tests")
     class CreateTeamTests {
 
         @Test
-        @DisplayName("Should create team with correct name and owner")
+        @DisplayName("Should create UHCTeam with correct name and owner")
         void shouldCreateTeamWithCorrectNameAndOwner() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
             
-            assertThat(team).isNotNull();
-            assertThat(team.getName()).isEqualTo("TestTeam");
-            assertThat(team.getLeader()).isEqualTo(player1);
+            assertThat(UHCTeam).isNotNull();
+            assertThat(UHCTeam.getName()).isEqualTo("TestTeam");
+            assertThat(UHCTeam.getLeader()).isEqualTo(player1);
         }
 
         @Test
-        @DisplayName("Should add created team to teams list")
+        @DisplayName("Should add created UHCTeam to teams list")
         void shouldAddCreatedTeamToTeamsList() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
             
-            assertThat(teamManager.getTeams()).contains(team);
+            assertThat(teamManager.getTeams()).contains(UHCTeam);
         }
 
         @Test
         @DisplayName("Should create multiple teams")
         void shouldCreateMultipleTeams() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player2, "Team2");
+            UHCTeam team1 = teamManager.createTeam(player1, "Team1");
+            UHCTeam team2 = teamManager.createTeam(player2, "Team2");
             
             assertThat(teamManager.getTeams()).hasSize(2);
             assertThat(teamManager.getTeams()).containsExactly(team1, team2);
@@ -62,32 +62,32 @@ class TeamManagerTest {
     }
 
     @Nested
-    @DisplayName("Delete Team Tests")
+    @DisplayName("Delete UHCTeam Tests")
     class DeleteTeamTests {
 
         @Test
-        @DisplayName("Should delete team successfully")
+        @DisplayName("Should delete UHCTeam successfully")
         void shouldDeleteTeam() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.deleteTeam(team);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.deleteTeam(UHCTeam);
             
-            assertThat(teamManager.getTeams()).doesNotContain(team);
+            assertThat(teamManager.getTeams()).doesNotContain(UHCTeam);
         }
 
         @Test
-        @DisplayName("Should handle deleting non-existent team")
+        @DisplayName("Should handle deleting non-existent UHCTeam")
         void shouldHandleDeletingNonExistentTeam() {
-            Team team = new Team("NonExistent", player1);
+            UHCTeam UHCTeam = new UHCTeam("NonExistent", player1);
             
-            assertThatCode(() -> teamManager.deleteTeam(team))
+            assertThatCode(() -> teamManager.deleteTeam(UHCTeam))
                     .doesNotThrowAnyException();
         }
 
         @Test
-        @DisplayName("Should only delete specified team")
+        @DisplayName("Should only delete specified UHCTeam")
         void shouldOnlyDeleteSpecifiedTeam() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player2, "Team2");
+            UHCTeam team1 = teamManager.createTeam(player1, "Team1");
+            UHCTeam team2 = teamManager.createTeam(player2, "Team2");
             
             teamManager.deleteTeam(team1);
             
@@ -96,119 +96,119 @@ class TeamManagerTest {
     }
 
     @Nested
-    @DisplayName("Add Player Tests")
+    @DisplayName("Add UHCPlayer Tests")
     class AddPlayerTests {
 
         @Test
-        @DisplayName("Should add player to team")
+        @DisplayName("Should add UHCPlayer to UHCTeam")
         void shouldAddPlayerToTeam() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
             
-            assertThat(team.getMembers()).contains(player2);
+            assertThat(UHCTeam.getMembers()).contains(player2);
         }
 
         @Test
-        @DisplayName("Should set player's team reference")
+        @DisplayName("Should set UHCPlayer's UHCTeam reference")
         void shouldSetPlayerTeamReference() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
             
-            assertThat(player2.getTeam()).isEqualTo(team);
+            assertThat(player2.getTeam()).isEqualTo(UHCTeam);
         }
 
         @Test
-        @DisplayName("Should add multiple players to team")
+        @DisplayName("Should add multiple players to UHCTeam")
         void shouldAddMultiplePlayersToTeam() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
-            teamManager.addPlayer(team, player3);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.addPlayer(UHCTeam, player3);
             
-            assertThat(team.getMembers()).containsExactly(player1, player2, player3);
+            assertThat(UHCTeam.getMembers()).containsExactly(player1, player2, player3);
         }
     }
 
     @Nested
-    @DisplayName("Remove Player Tests")
+    @DisplayName("Remove UHCPlayer Tests")
     class RemovePlayerTests {
 
         @Test
-        @DisplayName("Should remove player from team")
+        @DisplayName("Should remove UHCPlayer from UHCTeam")
         void shouldRemovePlayerFromTeam() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
-            teamManager.removePlayer(team, player2);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.removePlayer(UHCTeam, player2);
             
-            assertThat(team.getMembers()).doesNotContain(player2);
+            assertThat(UHCTeam.getMembers()).doesNotContain(player2);
         }
 
         @Test
-        @DisplayName("Should clear player's team reference")
+        @DisplayName("Should clear UHCPlayer's UHCTeam reference")
         void shouldClearPlayerTeamReference() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
-            teamManager.removePlayer(team, player2);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.removePlayer(UHCTeam, player2);
             
             assertThat(player2.getTeam()).isNull();
         }
 
         @Test
-        @DisplayName("Should delete team when last member is removed")
+        @DisplayName("Should delete UHCTeam when last member is removed")
         void shouldDeleteTeamWhenLastMemberRemoved() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
-            teamManager.removePlayer(team, player2);
-            teamManager.removePlayer(team, player1);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.removePlayer(UHCTeam, player2);
+            teamManager.removePlayer(UHCTeam, player1);
             
-            assertThat(teamManager.getTeams()).doesNotContain(team);
+            assertThat(teamManager.getTeams()).doesNotContain(UHCTeam);
         }
 
         @Test
         @DisplayName("Should promote new leader when leader leaves")
         void shouldPromoteNewLeaderWhenLeaderLeaves() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
-            teamManager.addPlayer(team, player3);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.addPlayer(UHCTeam, player3);
             
-            teamManager.removePlayer(team, player1);
+            teamManager.removePlayer(UHCTeam, player1);
             
-            assertThat(team.getLeader()).isEqualTo(player2);
+            assertThat(UHCTeam.getLeader()).isEqualTo(player2);
         }
 
         @Test
-        @DisplayName("Should not delete team if members remain")
+        @DisplayName("Should not delete UHCTeam if members remain")
         void shouldNotDeleteTeamIfMembersRemain() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            teamManager.addPlayer(team, player2);
-            teamManager.addPlayer(team, player3);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.addPlayer(UHCTeam, player3);
             
-            teamManager.removePlayer(team, player2);
+            teamManager.removePlayer(UHCTeam, player2);
             
-            assertThat(teamManager.getTeams()).contains(team);
-            assertThat(team.getMembers()).containsExactly(player1, player3);
+            assertThat(teamManager.getTeams()).contains(UHCTeam);
+            assertThat(UHCTeam.getMembers()).containsExactly(player1, player3);
         }
     }
 
     @Nested
-    @DisplayName("Rename Team Tests")
+    @DisplayName("Rename UHCTeam Tests")
     class RenameTeamTests {
 
         @Test
-        @DisplayName("Should rename team successfully")
+        @DisplayName("Should rename UHCTeam successfully")
         void shouldRenameTeam() {
-            Team team = teamManager.createTeam(player1, "OldName");
-            teamManager.renameTeam(team, "NewName");
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "OldName");
+            teamManager.renameTeam(UHCTeam, "NewName");
             
-            assertThat(team.getName()).isEqualTo("NewName");
+            assertThat(UHCTeam.getName()).isEqualTo("NewName");
         }
 
         @Test
-        @DisplayName("Should keep team in teams list after rename")
+        @DisplayName("Should keep UHCTeam in teams list after rename")
         void shouldKeepTeamInTeamsListAfterRename() {
-            Team team = teamManager.createTeam(player1, "OldName");
-            teamManager.renameTeam(team, "NewName");
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "OldName");
+            teamManager.renameTeam(UHCTeam, "NewName");
             
-            assertThat(teamManager.getTeams()).contains(team);
+            assertThat(teamManager.getTeams()).contains(UHCTeam);
         }
     }
 
@@ -225,8 +225,8 @@ class TeamManagerTest {
         @Test
         @DisplayName("Should return all teams")
         void shouldReturnAllTeams() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player2, "Team2");
+            UHCTeam team1 = teamManager.createTeam(player1, "Team1");
+            UHCTeam team2 = teamManager.createTeam(player2, "Team2");
             
             assertThat(teamManager.getTeams()).hasSize(2);
             assertThat(teamManager.getTeams()).containsExactly(team1, team2);
@@ -238,31 +238,31 @@ class TeamManagerTest {
     class IntegrationTests {
 
         @Test
-        @DisplayName("Should handle complete team lifecycle")
+        @DisplayName("Should handle complete UHCTeam lifecycle")
         void shouldHandleCompleteTeamLifecycle() {
-            Team team = teamManager.createTeam(player1, "TestTeam");
-            assertThat(teamManager.getTeams()).contains(team);
+            UHCTeam UHCTeam = teamManager.createTeam(player1, "TestTeam");
+            assertThat(teamManager.getTeams()).contains(UHCTeam);
             
-            teamManager.addPlayer(team, player2);
-            teamManager.addPlayer(team, player3);
-            assertThat(team.getMembers()).hasSize(3);
+            teamManager.addPlayer(UHCTeam, player2);
+            teamManager.addPlayer(UHCTeam, player3);
+            assertThat(UHCTeam.getMembers()).hasSize(3);
             
-            teamManager.renameTeam(team, "RenamedTeam");
-            assertThat(team.getName()).isEqualTo("RenamedTeam");
+            teamManager.renameTeam(UHCTeam, "RenamedTeam");
+            assertThat(UHCTeam.getName()).isEqualTo("RenamedTeam");
             
-            teamManager.removePlayer(team, player2);
-            assertThat(team.getMembers()).hasSize(2);
+            teamManager.removePlayer(UHCTeam, player2);
+            assertThat(UHCTeam.getMembers()).hasSize(2);
             
-            teamManager.removePlayer(team, player3);
-            teamManager.removePlayer(team, player1);
-            assertThat(teamManager.getTeams()).doesNotContain(team);
+            teamManager.removePlayer(UHCTeam, player3);
+            teamManager.removePlayer(UHCTeam, player1);
+            assertThat(teamManager.getTeams()).doesNotContain(UHCTeam);
         }
 
         @Test
-        @DisplayName("Should handle player switching teams")
+        @DisplayName("Should handle UHCPlayer switching teams")
         void shouldHandlePlayerSwitchingTeams() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player2, "Team2");
+            UHCTeam team1 = teamManager.createTeam(player1, "Team1");
+            UHCTeam team2 = teamManager.createTeam(player2, "Team2");
             
             teamManager.addPlayer(team1, player3);
             assertThat(player3.getTeam()).isEqualTo(team1);

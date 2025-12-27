@@ -7,9 +7,11 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -19,9 +21,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import vch.uhc.UHC;
 import vch.uhc.misc.Settings;
-import vch.uhc.models.Team;
+import vch.uhc.misc.enums.GameMode;
+import vch.uhc.misc.enums.GameState;
+import vch.uhc.models.UHCTeam;
+import vch.uhc.models.UHCPlayer;
 
 public class GameModeManager {
 
@@ -29,7 +36,7 @@ public class GameModeManager {
     private final TeamManager teamManager;
     private BossBar dragonHealthBar;
     private List<Material> resourceRushItems;
-    private Team winningTeam;
+    private UHCTeam winningTeam;
     private BukkitTask endPortalTask;
     private BukkitTask shulkerTask;
     private BukkitTask locatorBarTask;
@@ -41,18 +48,11 @@ public class GameModeManager {
     }
 
     public void initializeGameMode() {
-        Settings.GameMode mode = settings.getGameMode();
-        
+        GameMode mode = settings.getGameMode();
         switch (mode) {
-            case PVD:
-                initializePvD();
-                break;
-            case PVP:
-                initializePvP();
-                break;
-            case RESOURCE_RUSH:
-                initializeResourceRush();
-                break;
+            case PVD -> initializePvD();
+            case PVP -> initializePvP();
+            case RESOURCE_RUSH -> initializeResourceRush();
         }
     }
 
@@ -77,22 +77,22 @@ public class GameModeManager {
             scheduleLocatorBar();
         }
         
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVD_HEADER());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVD_OBJECTIVE());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVD_PVP_ENABLED());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVD_HEADER());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVD_OBJECTIVE());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVD_PVP_ENABLED());
         
         int totalSeconds = settings.getEndPortalHours() * 3600 + 
                           settings.getEndPortalMinutes() * 60 + 
                           settings.getEndPortalSeconds();
         int minutes = totalSeconds / 60;
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVD_END_PORTAL(minutes));
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVD_END_PORTAL(minutes));
         
         if (settings.isShulkerEnabled()) {
             int shulkerTotalSeconds = settings.getShulkerHours() * 3600 + 
                                      settings.getShulkerMinutes() * 60 + 
                                      settings.getShulkerSeconds();
             int shulkerMinutes = shulkerTotalSeconds / 60;
-            Bukkit.broadcastMessage(vch.uhc.misc.Messages.SHULKER_WILL_SPAWN(shulkerMinutes));
+            broadcast(vch.uhc.misc.Messages.SHULKER_WILL_SPAWN(shulkerMinutes));
         }
         
         if (settings.isLocatorBarEnabled()) {
@@ -100,7 +100,7 @@ public class GameModeManager {
                                      settings.getLocatorBarMinutes() * 60 + 
                                      settings.getLocatorBarSeconds();
             int locatorMinutes = locatorTotalSeconds / 60;
-            Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_WILL_ACTIVATE(locatorMinutes));
+            broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_WILL_ACTIVATE(locatorMinutes));
         }
     }
 
@@ -109,26 +109,26 @@ public class GameModeManager {
             scheduleLocatorBar();
         }
         
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVP_HEADER());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVP_OBJECTIVE());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_PVP_PREPARE());        
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVP_HEADER());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVP_OBJECTIVE());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_PVP_PREPARE());        
         if (settings.isLocatorBarEnabled()) {
             int locatorTotalSeconds = settings.getLocatorBarHours() * 3600 + 
                                      settings.getLocatorBarMinutes() * 60 + 
                                      settings.getLocatorBarSeconds();
             int locatorMinutes = locatorTotalSeconds / 60;
-            Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_WILL_ACTIVATE(locatorMinutes));
+            broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_WILL_ACTIVATE(locatorMinutes));
         }    }
 
     private void initializeResourceRush() {
         generateResourceRushList();
         
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_HEADER());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_OBJECTIVE());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_ITEMS_LIST());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_HEADER());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_OBJECTIVE());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_ITEMS_LIST());
         
         for (Material material : resourceRushItems) {
-            Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_ITEM(material.name()));
+            broadcast(vch.uhc.misc.Messages.GAMEMODE_RESOURCE_RUSH_ITEM(material.name()));
         }
     }
 
@@ -169,23 +169,17 @@ public class GameModeManager {
     }
 
     public void checkWinCondition() {
-        Settings.GameMode mode = settings.getGameMode();
-        
+        GameMode mode = settings.getGameMode();
         switch (mode) {
-            case PVD:
-                break;
-            case PVP:
-                checkPvPWinCondition();
-                break;
-            case RESOURCE_RUSH:
-                checkResourceRushWinCondition();
-                break;
+            case PVD -> {}
+            case PVP -> checkPvPWinCondition();
+            case RESOURCE_RUSH -> checkResourceRushWinCondition();
         }
     }
 
     private void checkPvPWinCondition() {
-        List<Team> aliveTeams = teamManager.getTeams().stream()
-            .filter(team -> team.getMembers().stream().anyMatch(vch.uhc.models.Player::isAlive))
+        List<UHCTeam> aliveTeams = teamManager.getTeams().stream()
+            .filter(team -> team.getMembers().stream().anyMatch(vch.uhc.models.UHCPlayer::isAlive))
             .collect(Collectors.toList());
 
         if (aliveTeams.size() == 1) {
@@ -198,7 +192,7 @@ public class GameModeManager {
             return;
         }
 
-        for (Team team : teamManager.getTeams()) {
+        for (UHCTeam team : teamManager.getTeams()) {
             if (teamHasAllItems(team)) {
                 endGame(team);
                 break;
@@ -206,24 +200,30 @@ public class GameModeManager {
         }
     }
 
-    private boolean teamHasAllItems(Team team) {
+    private boolean teamHasAllItems(UHCTeam team) {
         List<Material> foundItems = new ArrayList<>();
         
-        for (vch.uhc.models.Player uhcPlayer : team.getMembers()) {
+        for (vch.uhc.models.UHCPlayer uhcPlayer : team.getMembers()) {
             Player bukkitPlayer = uhcPlayer.getBukkitPlayer();
             if (bukkitPlayer == null || !bukkitPlayer.isOnline()) {
                 continue;
             }
             
-            for (ItemStack item : bukkitPlayer.getInventory().getContents()) {
-                if (item != null && resourceRushItems.contains(item.getType()) && !foundItems.contains(item.getType())) {
-                    foundItems.add(item.getType());
+            ItemStack[] inventoryContents = bukkitPlayer.getInventory().getContents();
+            if (inventoryContents != null) {
+                for (ItemStack item : inventoryContents) {
+                    if (item != null && resourceRushItems.contains(item.getType()) && !foundItems.contains(item.getType())) {
+                        foundItems.add(item.getType());
+                    }
                 }
             }
             
-            for (ItemStack item : bukkitPlayer.getEnderChest().getContents()) {
-                if (item != null && resourceRushItems.contains(item.getType()) && !foundItems.contains(item.getType())) {
-                    foundItems.add(item.getType());
+            ItemStack[] enderChestContents = bukkitPlayer.getEnderChest().getContents();
+            if (enderChestContents != null) {
+                for (ItemStack item : enderChestContents) {
+                    if (item != null && resourceRushItems.contains(item.getType()) && !foundItems.contains(item.getType())) {
+                        foundItems.add(item.getType());
+                    }
                 }
             }
         }
@@ -232,11 +232,11 @@ public class GameModeManager {
     }
 
     public void onDragonKilled(EnderDragon dragon, Player killer) {
-        if (settings.getGameMode() != Settings.GameMode.PVD) {
+        if (settings.getGameMode() != GameMode.PVD) {
             return;
         }
 
-        vch.uhc.models.Player uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(killer.getUniqueId());
+        UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(killer.getUniqueId());
         if (uhcPlayer != null && uhcPlayer.getTeam() != null) {
             endGame(uhcPlayer.getTeam());
         }
@@ -244,25 +244,29 @@ public class GameModeManager {
 
     public void updateDragonHealthBar(EnderDragon dragon) {
         if (dragonHealthBar != null && dragon != null) {
-            double healthPercentage = dragon.getHealth() / dragon.getMaxHealth();
-            dragonHealthBar.setProgress(Math.max(0.0, Math.min(1.0, healthPercentage)));
+            var maxHealthAttr = dragon.getAttribute(Attribute.MAX_HEALTH);
+            if (maxHealthAttr != null) {
+                double maxHealth = maxHealthAttr.getValue();
+                double healthPercentage = dragon.getHealth() / maxHealth;
+                dragonHealthBar.setProgress(Math.max(0.0, Math.min(1.0, healthPercentage)));
+            }
         }
     }
 
-    private void endGame(Team winningTeam) {
+    private void endGame(UHCTeam winningTeam) {
         this.winningTeam = winningTeam;
-        settings.setGameStatus(Settings.GameStatus.ENDED);
+        settings.setGameState(GameState.ENDED);
 
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED_TITLE());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_WINNING_TEAM(winningTeam.getName()));
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_MODE_USED(settings.getGameMode().name()));
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
-        Bukkit.broadcastMessage("");
+        broadcast("");
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED_TITLE());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_WINNING_TEAM(winningTeam.getName()));
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_MODE_USED(settings.getGameMode().name()));
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
+        broadcast("");
 
         String stats = UHC.getPlugin().getStatsManager().getStatsReport();
-        Bukkit.broadcastMessage(stats);
+        broadcast(stats);
     }
 
     public List<Material> getResourceRushItems() {
@@ -351,13 +355,13 @@ public class GameModeManager {
             }
         }
 
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_END_PORTAL_ACTIVATED());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_END_PORTAL_LOCATION(y));
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_END_PORTAL_GO());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
-        Bukkit.broadcastMessage("");
+        broadcast("");
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_END_PORTAL_ACTIVATED());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_END_PORTAL_LOCATION(y));
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_END_PORTAL_GO());
+        broadcast(vch.uhc.misc.Messages.GAMEMODE_GAME_ENDED());
+        broadcast("");
     }
 
     private void scheduleShulkerSpawn() {
@@ -373,12 +377,12 @@ public class GameModeManager {
     }
 
     private void giveShulkerBoxes() {
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.SHULKER_BORDER());
-        Bukkit.broadcastMessage("§d§l¡SHULKER BOXES ENTREGADAS!");
-        Bukkit.broadcastMessage("§eCada jugador ha recibido una Shulker Box");
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.SHULKER_BORDER());
-        Bukkit.broadcastMessage("");
+        broadcast("");
+        broadcast(vch.uhc.misc.Messages.SHULKER_BORDER());
+        broadcast("§d§l¡SHULKER BOXES ENTREGADAS!");
+        broadcast("§eCada jugador ha recibido una Shulker Box");
+        broadcast(vch.uhc.misc.Messages.SHULKER_BORDER());
+        broadcast("");
 
         for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
             org.bukkit.inventory.ItemStack shulkerBox = new org.bukkit.inventory.ItemStack(
@@ -404,19 +408,24 @@ public class GameModeManager {
     private void activateLocatorBar() {
         World world = Bukkit.getWorld("world");
         if (world != null) {
-            world.setGameRuleValue("locator_bar", "true");
+            world.setGameRule(GameRules.LOCATOR_BAR, true);
         }
         
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_BORDER());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_ACTIVATED_TITLE());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_ACTIVATED_DESC());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_HIDDEN_INFO());
-        Bukkit.broadcastMessage(vch.uhc.misc.Messages.LOCATOR_BAR_BORDER());
-        Bukkit.broadcastMessage("");
+        broadcast("");
+        broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_BORDER());
+        broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_ACTIVATED_TITLE());
+        broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_ACTIVATED_DESC());
+        broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_HIDDEN_INFO());
+        broadcast(vch.uhc.misc.Messages.LOCATOR_BAR_BORDER());
+        broadcast("");
     }
 
-    public Team getWinningTeam() {
+    public UHCTeam getWinningTeam() {
         return winningTeam;
+    }
+
+    private void broadcast(String message) {
+        Component component = LegacyComponentSerializer.legacySection().deserialize(message);
+        Bukkit.broadcast(component);
     }
 }

@@ -12,7 +12,7 @@ public class MenuListener extends BaseListener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        String title = e.getView().getTitle();
+        String title = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(e.getView().title());
         
         if (title.startsWith(Messages.MENU_MAIN_TITLE().substring(0, 6))) {
             e.setCancelled(true);

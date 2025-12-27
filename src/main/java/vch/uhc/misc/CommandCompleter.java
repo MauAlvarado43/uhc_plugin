@@ -295,8 +295,8 @@ public class CommandCompleter implements TabCompleter {
 
 class AvailableCommands {
 
-    private String arg;
-    private List<AvailableCommands> nextArgs;
+    private final String arg;
+    private final List<AvailableCommands> nextArgs;
 
     public AvailableCommands(String arg) {
         this.arg = arg;

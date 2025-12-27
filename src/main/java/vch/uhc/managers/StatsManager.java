@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import vch.uhc.UHC;
-import vch.uhc.models.Player;
+import vch.uhc.models.UHCPlayer;
 
+/**
+ * Manages player statistics and rankings.
+ * Provides access to top performers and stat queries.
+ */
 public class StatsManager {
 
     private final PlayerManager playerManager;
@@ -15,26 +19,26 @@ public class StatsManager {
         this.playerManager = UHC.getPlugin().getPlayerManager();
     }
 
-    public Player getTopKiller() {
+    public UHCPlayer getTopKiller() {
         return playerManager.getPlayers().stream()
-            .max(Comparator.comparingInt(Player::getKills))
+            .max(Comparator.comparingInt(UHCPlayer::getKills))
             .orElse(null);
     }
 
-    public List<Player> getTopKillers(int limit) {
+    public List<UHCPlayer> getTopKillers(int limit) {
         return playerManager.getPlayers().stream()
-            .sorted(Comparator.comparingInt(Player::getKills).reversed())
+            .sorted(Comparator.comparingInt(UHCPlayer::getKills).reversed())
             .limit(limit)
             .collect(Collectors.toList());
     }
 
-    public List<Player> getIronmanPlayers() {
+    public List<UHCPlayer> getIronmanPlayers() {
         return playerManager.getPlayers().stream()
-            .filter(Player::isIronman)
+            .filter(UHCPlayer::isIronman)
             .collect(Collectors.toList());
     }
 
-    public boolean isIronmanWinner(Player player) {
+    public boolean isIronmanWinner(UHCPlayer player) {
         return player.isIronman() && player.isAlive();
     }
 
@@ -42,12 +46,12 @@ public class StatsManager {
         StringBuilder report = new StringBuilder();
         report.append(vch.uhc.misc.Messages.STATS_HEADER()).append("\n");
         
-        Player topKiller = getTopKiller();
+        UHCPlayer topKiller = getTopKiller();
         if (topKiller != null) {
             report.append(vch.uhc.misc.Messages.STATS_TOP_KILLER(topKiller.getName(), topKiller.getKills())).append("\n");
         }
 
-        List<Player> ironmen = getIronmanPlayers();
+        List<UHCPlayer> ironmen = getIronmanPlayers();
         if (!ironmen.isEmpty()) {
             report.append(vch.uhc.misc.Messages.STATS_IRONMAN(ironmen.size())).append("\n");
             ironmen.forEach(p -> 
@@ -62,9 +66,9 @@ public class StatsManager {
         StringBuilder leaderboard = new StringBuilder();
         leaderboard.append(vch.uhc.misc.Messages.STATS_TOP_KILLERS_HEADER()).append("\n");
         
-        List<Player> topPlayers = getTopKillers(limit);
+        List<UHCPlayer> topPlayers = getTopKillers(limit);
         int position = 1;
-        for (Player player : topPlayers) {
+        for (UHCPlayer player : topPlayers) {
             leaderboard.append(vch.uhc.misc.Messages.STATS_TOP_KILLERS_ENTRY(position, player.getName(), player.getKills())).append("\n");
             position++;
         }
@@ -72,7 +76,7 @@ public class StatsManager {
         return leaderboard.toString();
     }
 
-    public void recordKill(Player killer, Player victim) {
+    public void recordKill(UHCPlayer killer, UHCPlayer victim) {
         if (killer != null) {
             killer.addKill();
         }
@@ -87,7 +91,7 @@ public class StatsManager {
         });
     }
 
-    public void markAsIronman(Player player) {
+    public void markAsIronman(UHCPlayer player) {
         playerManager.getPlayers().forEach(p -> p.setIronman(false));
         player.setIronman(true);
     }

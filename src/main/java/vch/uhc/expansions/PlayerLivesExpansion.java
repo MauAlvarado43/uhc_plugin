@@ -4,9 +4,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.md_5.bungee.api.ChatColor;
 import vch.uhc.UHC;
-import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
 
 public class PlayerLivesExpansion extends PlaceholderExpansion {
 
@@ -32,16 +31,20 @@ public class PlayerLivesExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        vch.uhc.models.Player p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
-        if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS)  return "";
-        return ChatColor.GREEN + "♣ " + p.getLives();
+        vch.uhc.models.UHCPlayer p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+        if (p == null || UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
+            return "";
+        }
+        return "\u00a7a♣ " + p.getLives();
     }
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        vch.uhc.models.Player p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
-        if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS)  return "";
-        return ChatColor.GREEN + "♣ " + p.getLives();
+        vch.uhc.models.UHCPlayer p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+        if (p == null || UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
+            return "";
+        }
+        return "\u00a7a♣ " + p.getLives();
     }
 
 }

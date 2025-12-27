@@ -2,16 +2,20 @@ package vch.uhc.models;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-import net.md_5.bungee.api.ChatColor;
+/**
+ * Represents a UHC player with game-specific stats and state.
+ * Wraps Bukkit player functionality with UHC-specific data.
+ */
+public class UHCPlayer {
 
-public class Player {
-
-    final private UUID uuid;
-    final private String name;
-    final private String randomName;
-    private Team team;
+    private final UUID uuid;
+    private final String name;
+    private final String randomName;
+    private UHCTeam team;
     private int lives;
     private Location spawn;
     private boolean isPlaying;
@@ -19,7 +23,13 @@ public class Player {
     private int deaths;
     private boolean ironman;
 
-    public Player(UUID uuid, String name) {
+    /**
+     * Creates a new UHC player instance.
+     * 
+     * @param uuid the player's unique identifier
+     * @param name the player's display name
+     */
+    public UHCPlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
         this.lives = 1;
@@ -38,11 +48,11 @@ public class Player {
         return name;
     }
 
-    public Team getTeam() {
+    public UHCTeam getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(UHCTeam team) {
         this.team = team;
     }
 
@@ -82,8 +92,8 @@ public class Player {
         this.isPlaying = isPlaying;
     }
 
-    public org.bukkit.entity.Player getBukkitPlayer() {
-        return org.bukkit.Bukkit.getPlayer(this.uuid);
+    public Player getBukkitPlayer() {
+        return Bukkit.getPlayer(this.uuid);
     }
 
     public String getRandomName() {
@@ -114,12 +124,19 @@ public class Player {
         this.ironman = ironman;
     }
 
+    /**
+     * Generates a randomized obfuscated name for anonymization.
+     * Uses Minecraft color codes for obfuscation effect.
+     * 
+     * @return obfuscated random name string
+     */
     private String generateRandomName() {
 
         String randomChars = "ABCDEFGHIJKLMNOPQ";
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 10; i++)
-            sb.append(ChatColor.MAGIC).append(randomChars.charAt((int) (Math.random() * randomChars.length())));
+        java.lang.StringBuilder sb = new java.lang.StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            sb.append("\u00a7k").append(randomChars.charAt((int) (Math.random() * randomChars.length())));
+        }
 
         return sb.toString();
 

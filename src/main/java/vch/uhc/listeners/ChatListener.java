@@ -3,30 +3,31 @@ package vch.uhc.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import vch.uhc.UHC;
 import vch.uhc.managers.PlayerManager;
 import vch.uhc.misc.BaseListener;
 import vch.uhc.misc.Messages;
-import vch.uhc.misc.Settings;
-import vch.uhc.models.Team;
+import vch.uhc.misc.enums.GameState;
+import vch.uhc.models.UHCTeam;
 
 public class ChatListener extends BaseListener {
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent e) {
+    public void onPlayerChat(AsyncChatEvent e) {
 
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) {
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
             return;
         }
 
         e.setCancelled(true);
 
         Player sender = e.getPlayer();
-        String message = e.getMessage();
+        String message = PlainTextComponentSerializer.plainText().serialize(e.message());
         PlayerManager playerManager = UHC.getPlugin().getPlayerManager();
-        Team senderTeam = playerManager.getPlayerByUUID(sender.getUniqueId()).getTeam();
+        UHCTeam senderTeam = playerManager.getPlayerByUUID(sender.getUniqueId()).getTeam();
 
         if (message.startsWith("!")) {
 
@@ -34,7 +35,7 @@ public class ChatListener extends BaseListener {
                 playerManager.getPlayerByUUID(sender.getUniqueId()).getName(),
                 message.substring(1)
             );
-            Bukkit.broadcastMessage(globalMessage);
+            Bukkit.getServer().broadcast(net.kyori.adventure.text.Component.text(globalMessage));
 
         } else {
 
@@ -43,8 +44,8 @@ public class ChatListener extends BaseListener {
                 return;
             }
 
-            String teamMessage = Messages.CHAT_TEAM_PREFIX(sender.getName(), message.substring(1));
-            for (vch.uhc.models.Player member : senderTeam.getMembers()) {
+            String teamMessage = Messages.CHAT_TEAM_PREFIX(sender.getName(), message);
+            for (vch.uhc.models.UHCPlayer member : senderTeam.getMembers()) {
                 Player player = Bukkit.getPlayer(member.getUuid());
                 if (player != null) {
                     player.sendMessage(teamMessage);

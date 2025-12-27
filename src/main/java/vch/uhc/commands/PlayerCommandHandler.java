@@ -1,35 +1,51 @@
 package vch.uhc.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import vch.uhc.UHC;
+import vch.uhc.misc.Messages;
 
+/**
+ * Handler for player management subcommands under /uhc players. Includes
+ * functionality for listing players, setting lives, health, and reviving
+ * players.
+ */
 public class PlayerCommandHandler {
 
+    /**
+     * Executes player-related subcommands.
+     *
+     * @param sender The command sender
+     * @param args The command arguments
+     * @return true if handled, false otherwise
+     */
     public static boolean onPlayerCommand(CommandSender sender, String[] args) {
 
         if (args.length < 2) {
-            sender.sendMessage(ChatColor.RED + "Please specify a player subcommand.");
+            sender.sendMessage(Messages.PLAYER_SPECIFY_SUBCOMMAND());
             return false;
         }
 
-        switch (args[1]) {
-            case "list":
-                sender.sendMessage(
-                        ChatColor.YELLOW + "UHC Players:"
-                        + ChatColor.AQUA + "\n  " + UHC.getPlugin().getPlayerManager().getPlayers().stream()
-                                .map(item -> ChatColor.AQUA + "- " + ChatColor.GOLD + item.getName() + ChatColor.AQUA + " (" + item.getLives() + " lives)")
-                                .reduce((a, b) -> a + "\n  " + b).orElse("None")
-                );
-                break;
-            case "setLives":
+        switch (args[1].toLowerCase()) {
+            case "list" -> {
+                // List all UHC players and their current lives
+                sender.sendMessage(Messages.PLAYER_LIST_HEADER());
+                if (UHC.getPlugin().getPlayerManager().getPlayers().isEmpty()) {
+                    sender.sendMessage(Messages.PLAYER_LIST_NONE());
+                } else {
+                    UHC.getPlugin().getPlayerManager().getPlayers().forEach(item
+                            -> sender.sendMessage(Messages.PLAYER_LIST_ITEM(item.getName(), item.getLives()))
+                    );
+                }
+            }
+            case "setlives" -> {
+                // Set the number of lives for a specific player
                 if (args.length < 4) {
-                    sender.sendMessage(ChatColor.RED + "Uso: /uhc players setLives <jugador> <vidas>");
+                    sender.sendMessage(Messages.PLAYER_SETLIVES_USAGE());
                     return false;
                 }
                 String playerName = args[2];
@@ -37,52 +53,73 @@ public class PlayerCommandHandler {
                     int lives = Integer.parseInt(args[3]);
                     Player player = Bukkit.getPlayer(playerName);
                     if (player == null) {
-                        sender.sendMessage(ChatColor.RED + "Jugador " + playerName + " no encontrado.");
+                        sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
                         return false;
                     }
-                    vch.uhc.models.Player uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+                    vch.uhc.models.UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
                     if (uhcPlayer == null) {
-                        sender.sendMessage(ChatColor.RED + "Jugador " + playerName + " no está en el UHC.");
+                        sender.sendMessage(Messages.PLAYER_LIVES_ERROR(playerName));
                         return false;
                     }
                     uhcPlayer.setLives(lives);
-                    sender.sendMessage(ChatColor.GREEN + "Vidas de " + playerName + " establecidas a " + lives);
+                    sender.sendMessage(Messages.PLAYER_LIVES_SET(playerName, lives));
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(ChatColor.RED + "Número de vidas inválido: " + args[3]);
-                } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Error al establecer vidas para " + playerName + ": " + e.getMessage());
+                    sender.sendMessage(Messages.SETTINGS_PLAYER_LIVES_INVALID());
+                } catch (NullPointerException e) {
+                    sender.sendMessage(Messages.PLAYER_LIVES_ERROR(playerName));
                 }
-                break;
-            case "setHealth":
+            }
+            case "sethealth" -> {
+                // Set the maximum health for a specific player
+                if (args.length < 4) {
+                    sender.sendMessage(Messages.PLAYER_SETHEALTH_USAGE());
+                    return false;
+                }
                 String playerHealthName = args[2];
                 try {
                     int health = Integer.parseInt(args[3]);
                     Player player = Bukkit.getPlayer(playerHealthName);
+                    if (player == null) {
+                        sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
+                        return false;
+                    }
                     AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
-                    attribute.setBaseValue(health);
-                    sender.sendMessage(ChatColor.GREEN + "Set health for " + playerHealthName + " to " + health);
-                } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Error setting health for " + playerHealthName);
+                    if (attribute != null) {
+                        attribute.setBaseValue(health);
+                        player.setHealth(health); // Also set current health to max
+                        sender.sendMessage(Messages.PLAYER_HEALTH_SET(playerHealthName, health));
+                    }
+                } catch (NumberFormatException | NullPointerException e) {
+                    sender.sendMessage(Messages.PLAYER_HEALTH_ERROR(playerHealthName));
                 }
-                break;
-            case "revive":
+            }
+            case "revive" -> {
+                // Revive a player and teleport them to their spawn
+                if (args.length < 3) {
+                    sender.sendMessage(Messages.PLAYER_REVIVE_USAGE());
+                    return false;
+                }
                 String playerReviveName = args[2];
                 try {
                     Player player = Bukkit.getPlayer(playerReviveName);
-                    UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId()).setLives(1);
-                    player.teleport(UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId()).getSpawn());
-                    sender.sendMessage(ChatColor.GREEN + "Revived " + playerReviveName);
-                } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Error reviving " + playerReviveName);
+                    if (player == null) {
+                        sender.sendMessage(Messages.TEAM_PLAYER_NOT_FOUND());
+                        return false;
+                    }
+                    vch.uhc.models.UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+                    if (uhcPlayer != null) {
+                        uhcPlayer.setLives(1);
+                        player.teleport(uhcPlayer.getSpawn());
+                        sender.sendMessage(Messages.PLAYER_REVIVED(playerReviveName));
+                    }
+                } catch (NullPointerException e) {
+                    sender.sendMessage(Messages.PLAYER_REVIVE_ERROR(playerReviveName));
                 }
-                break;
-            default:
-                sender.sendMessage(ChatColor.RED + "Unknown subcommand.");
-                break;
+            }
+            default ->
+                sender.sendMessage(Messages.PLAYER_UNKNOWN_SUBCOMMAND());
         }
 
         return true;
-
     }
-    
 }

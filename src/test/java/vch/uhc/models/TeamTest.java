@@ -8,20 +8,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Team Model Tests")
-class TeamTest {
+@DisplayName("UHCTeam Model Tests")
+class UHCTeamTest {
 
-    private Team team;
-    private Player leader;
-    private Player member1;
-    private Player member2;
+    private UHCTeam team;
+    private UHCPlayer leader;
+    private UHCPlayer member1;
+    private UHCPlayer member2;
 
     @BeforeEach
     void setUp() {
-        leader = new Player(UUID.randomUUID(), "Leader");
-        member1 = new Player(UUID.randomUUID(), "Member1");
-        member2 = new Player(UUID.randomUUID(), "Member2");
-        team = new Team("TestTeam", leader);
+        leader = new UHCPlayer(UUID.randomUUID(), "Leader");
+        member1 = new UHCPlayer(UUID.randomUUID(), "Member1");
+        member2 = new UHCPlayer(UUID.randomUUID(), "Member2");
+        team = new UHCTeam("TestUHCTeam", leader);
     }
 
     @Nested
@@ -30,13 +30,13 @@ class TeamTest {
 
         @Test
         @DisplayName("Should create team with correct name")
-        void shouldCreateTeamWithCorrectName() {
-            assertThat(team.getName()).isEqualTo("TestTeam");
+        void shouldCreateUHCTeamWithCorrectName() {
+            assertThat(team.getName()).isEqualTo("TestUHCTeam");
         }
 
         @Test
         @DisplayName("Should create team with correct leader")
-        void shouldCreateTeamWithCorrectLeader() {
+        void shouldCreateUHCTeamWithCorrectLeader() {
             assertThat(team.getLeader()).isEqualTo(leader);
         }
 
@@ -48,14 +48,14 @@ class TeamTest {
     }
 
     @Nested
-    @DisplayName("Team Name Tests")
-    class TeamNameTests {
+    @DisplayName("UHCTeam Name Tests")
+    class UHCTeamNameTests {
 
         @Test
         @DisplayName("Should change team name")
-        void shouldChangeTeamName() {
-            team.setName("NewTeamName");
-            assertThat(team.getName()).isEqualTo("NewTeamName");
+        void shouldChangeUHCTeamName() {
+            team.setName("NewUHCTeamName");
+            assertThat(team.getName()).isEqualTo("NewUHCTeamName");
         }
 
         @Test
@@ -179,8 +179,8 @@ class TeamTest {
     class IntegrationTests {
 
         @Test
-        @DisplayName("Team should work with player team assignment")
-        void teamShouldWorkWithPlayerTeamAssignment() {
+        @DisplayName("UHCTeam should work with player team assignment")
+        void teamShouldWorkWithUHCPlayerUHCTeamAssignment() {
             member1.setTeam(team);
             team.addMember(member1);
             
@@ -190,9 +190,9 @@ class TeamTest {
 
         @Test
         @DisplayName("Should handle team switching")
-        void shouldHandleTeamSwitching() {
-            Player newLeader = new Player(UUID.randomUUID(), "NewLeader");
-            Team team2 = new Team("Team2", newLeader);
+        void shouldHandleUHCTeamSwitching() {
+            UHCPlayer newLeader = new UHCPlayer(UUID.randomUUID(), "NewLeader");
+            UHCTeam team2 = new UHCTeam("UHCTeam2", newLeader);
             
             member1.setTeam(team);
             team.addMember(member1);

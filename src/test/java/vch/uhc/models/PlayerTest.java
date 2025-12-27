@@ -8,16 +8,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Player Model Tests")
+@DisplayName("UHCPlayer Model Tests")
 class PlayerTest {
 
-    private Player player;
+    private UHCPlayer player;
     private UUID testUUID;
 
     @BeforeEach
     void setUp() {
         testUUID = UUID.randomUUID();
-        player = new Player(testUUID, "TestPlayer");
+        player = new UHCPlayer(testUUID, "TestUHCPlayer");
     }
 
     @Nested
@@ -26,9 +26,9 @@ class PlayerTest {
 
         @Test
         @DisplayName("Should create player with correct UUID and name")
-        void shouldCreatePlayerWithCorrectUUIDAndName() {
+        void shouldCreateUHCPlayerWithCorrectUUIDAndName() {
             assertThat(player.getUuid()).isEqualTo(testUUID);
-            assertThat(player.getName()).isEqualTo("TestPlayer");
+            assertThat(player.getName()).isEqualTo("TestUHCPlayer");
         }
 
         @Test
@@ -53,7 +53,7 @@ class PlayerTest {
         @Test
         @DisplayName("Random names should be unique between players")
         void randomNamesShouldBeUnique() {
-            Player player2 = new Player(UUID.randomUUID(), "Player2");
+            UHCPlayer player2 = new UHCPlayer(UUID.randomUUID(), "UHCPlayer2");
             String name1 = player.getRandomName().replaceAll("§.", "");
             String name2 = player2.getRandomName().replaceAll("§.", "");
             assertThat(name1).isNotEqualTo(name2);
@@ -115,8 +115,8 @@ class PlayerTest {
         @Test
         @DisplayName("Should set team correctly")
         void shouldSetTeam() {
-            Player leader = new Player(UUID.randomUUID(), "Leader");
-            Team team = new Team("TestTeam", leader);
+            UHCPlayer leader = new UHCPlayer(UUID.randomUUID(), "Leader");
+            UHCTeam team = new UHCTeam("TestTeam", leader);
             player.setTeam(team);
             assertThat(player.getTeam()).isEqualTo(team);
         }

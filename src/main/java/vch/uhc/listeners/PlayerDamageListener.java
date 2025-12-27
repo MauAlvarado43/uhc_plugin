@@ -6,13 +6,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseListener;
-import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
 
 public class PlayerDamageListener extends BaseListener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) {
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
             return;
         }
 
@@ -21,7 +21,7 @@ public class PlayerDamageListener extends BaseListener {
         }
 
         Player bukkitPlayer = (Player) e.getEntity();
-        vch.uhc.models.Player uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(bukkitPlayer.getUniqueId());
+        vch.uhc.models.UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(bukkitPlayer.getUniqueId());
 
         if (uhcPlayer != null) {
             UHC.getPlugin().getStatsManager().markAsIronman(uhcPlayer);

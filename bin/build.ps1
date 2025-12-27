@@ -11,10 +11,10 @@ function Update-Version {
     [xml]$pom = Get-Content $pomPath
     
     $currentVersion = $pom.project.version
-    Write-Host "Versión actual: $currentVersion" -ForegroundColor Cyan
+    Write-Host "Current version: $currentVersion" -ForegroundColor Cyan
     
     if ($type -eq "none") {
-        Write-Host "No se modificará la versión" -ForegroundColor Yellow
+        Write-Host "Version will not be modified" -ForegroundColor Yellow
         return
     }
     
@@ -49,7 +49,13 @@ function Update-Version {
     $pom.project.version = $newVersion
     $pom.Save((Resolve-Path $pomPath))
     
-    Write-Host "Nueva versión: $newVersion" -ForegroundColor Green
+    # Update plugin.yml version
+    $pluginPath = "src\main\resources\plugin.yml"
+    $pluginContent = Get-Content $pluginPath -Raw
+    $pluginContent = $pluginContent -replace "version: [\d\.]+", "version: $newVersion"
+    Set-Content -Path $pluginPath -Value $pluginContent -NoNewline
+    
+    Write-Host "New version: $newVersion" -ForegroundColor Green
 }
 
 Update-Version -type $versionType

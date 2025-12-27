@@ -7,17 +7,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 
+import io.papermc.paper.advancement.AdvancementDisplay;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseListener;
 import vch.uhc.misc.Messages;
-import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
+import vch.uhc.models.UHCPlayer;
 
 public class AdvancementListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAdvancementDone(PlayerAdvancementDoneEvent event) {
 
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) {
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
             return;
         }
 
@@ -29,22 +33,26 @@ public class AdvancementListener extends BaseListener {
         }
 
         Player player = event.getPlayer();
-        vch.uhc.models.Player uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+        UHCPlayer uhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
         
         if (uhcPlayer == null) {
             return;
         }
 
         String advancementTitle = advancementKey;
-        if (advancement.getDisplay() != null && advancement.getDisplay().title() != null) {
-            advancementTitle = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(advancement.getDisplay().title());
+        AdvancementDisplay display = advancement.getDisplay();
+        if (display != null) {
+            Component title = display.title();
+            if (title != null) {
+                advancementTitle = PlainTextComponentSerializer.plainText().serialize(title);
+            }
         }
 
         String randomName = uhcPlayer.getRandomName();
         String message = Messages.ADVANCEMENT_MADE(randomName, advancementTitle);
         
         Bukkit.getScheduler().runTask(UHC.getPlugin(), () -> {
-            Bukkit.getServer().broadcast(net.kyori.adventure.text.Component.text(message));
+            Bukkit.getServer().broadcast(Component.text(message));
         });
 
     }

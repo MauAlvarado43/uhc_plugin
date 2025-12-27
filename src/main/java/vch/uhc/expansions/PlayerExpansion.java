@@ -4,10 +4,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.md_5.bungee.api.ChatColor;
 import vch.uhc.UHC;
-import vch.uhc.misc.Settings;
-
+import vch.uhc.misc.enums.GameState;
 public class PlayerExpansion extends PlaceholderExpansion {
 
     @Override
@@ -32,26 +30,30 @@ public class PlayerExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        vch.uhc.models.Player p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
-        if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) return ChatColor.WHITE + player.getName() + ChatColor.WHITE;
+        vch.uhc.models.UHCPlayer p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+        if (p == null || UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
+            return "\u00a7f" + player.getName() + "\u00a7f";
+        }
         String name = p.isAlive() ? p.getRandomName() : p.getName();
-        return ChatColor.WHITE + name + ChatColor.WHITE;
+        return "\u00a7f" + name + "\u00a7f";
     }
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        vch.uhc.models.Player p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
-        
+        vch.uhc.models.UHCPlayer p = UHC.getPlugin().getPlayerManager().getPlayerByUUID(player.getUniqueId());
+
         if (params.equalsIgnoreCase("lives")) {
-            if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS)
+            if (p == null || UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
                 return "";
-            return ChatColor.RED + "♣ " + p.getLives();
+            }
+            return "\u00a7c♣ " + p.getLives();
         }
-        
-        if (p == null || UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) 
-            return ChatColor.WHITE + player.getName() + ChatColor.WHITE;
+
+        if (p == null || UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
+            return "\u00a7f" + player.getName() + "\u00a7f";
+        }
         String name = p.isAlive() ? p.getRandomName() : p.getName();
-        return ChatColor.WHITE + name + ChatColor.WHITE;
+        return "\u00a7f" + name + "\u00a7f";
     }
 
 }

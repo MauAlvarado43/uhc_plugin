@@ -8,43 +8,42 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import vch.uhc.models.Player;
-import vch.uhc.models.Team;
+import vch.uhc.models.UHCPlayer;
+import vch.uhc.models.UHCTeam;
 
 @DisplayName("TeamManager - Lógica Compleja de Equipos")
 class TeamManagerComplexTest {
 
     private TeamManager teamManager;
-    private Player player1;
-    private Player player2;
-    private Player player3;
-    private Player player4;
+    private UHCPlayer player1;
+    private UHCPlayer player2;
+    private UHCPlayer player3;
+    private UHCPlayer player4;
 
     @BeforeEach
     void setUp() {
         teamManager = new TeamManager();
-        player1 = new Player(UUID.randomUUID(), "Player1");
-        player2 = new Player(UUID.randomUUID(), "Player2");
-        player3 = new Player(UUID.randomUUID(), "Player3");
-        player4 = new Player(UUID.randomUUID(), "Player4");
+        player1 = new UHCPlayer(UUID.randomUUID(), "UHCPlayer1");
+        player2 = new UHCPlayer(UUID.randomUUID(), "UHCPlayer2");
+        player3 = new UHCPlayer(UUID.randomUUID(), "UHCPlayer3");
+        player4 = new UHCPlayer(UUID.randomUUID(), "UHCPlayer4");
     }
 
     @Nested
-    @DisplayName("canPlayersJoinTeam - Validación Compleja")
-    class CanPlayersJoinTeamTests {
+    @DisplayName("canUHCPlayersJoinUHCTeam - Validación Compleja")
+    class CanUHCPlayersJoinUHCTeamTests {
 
         @Test
         @DisplayName("Should prevent same player from joining themselves")
-        void shouldPreventSamePlayerJoining() {
+        void shouldPreventSameUHCPlayerJoining() {
             boolean canJoin = false;
-            
             assertThat(player1).isEqualTo(player1);
         }
 
         @Test
         @DisplayName("Should prevent joining if in same team")
-        void shouldPreventJoiningIfInSameTeam() {
-            Team team = teamManager.createTeam(player1, "Team1");
+        void shouldPreventJoiningIfInSameUHCTeam() {
+            UHCTeam team = teamManager.createTeam(player1, "UHCTeam1");
             teamManager.addPlayer(team, player1);
             teamManager.addPlayer(team, player2);
 
@@ -55,7 +54,7 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should allow joining when both have no team")
-        void shouldAllowJoiningWhenBothHaveNoTeam() {
+        void shouldAllowJoiningWhenBothHaveNoUHCTeam() {
             assertThat(player1.getTeam()).isNull();
             assertThat(player2.getTeam()).isNull();
             
@@ -63,8 +62,8 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should allow one player to join existing team")
-        void shouldAllowOnePlayerToJoinExistingTeam() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
+        void shouldAllowOneUHCPlayerToJoinExistingUHCTeam() {
+            UHCTeam team1 = teamManager.createTeam(player1, "UHCTeam1");
             teamManager.addPlayer(team1, player1);
 
             assertThat(player1.getTeam()).isNotNull();
@@ -75,13 +74,13 @@ class TeamManagerComplexTest {
 
     @Nested
     @DisplayName("Lógica de Fusión de Equipos")
-    class TeamMergingLogicTests {
+    class UHCTeamMergingLogicTests {
 
         @Test
         @DisplayName("Should handle merging two small teams")
-        void shouldHandleMergingTwoSmallTeams() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player3, "Team2");
+        void shouldHandleMergingTwoSmallUHCTeams() {
+            UHCTeam team1 = teamManager.createTeam(player1, "UHCTeam1");
+            UHCTeam team2 = teamManager.createTeam(player3, "UHCTeam2");
             
             teamManager.addPlayer(team1, player1);
             teamManager.addPlayer(team2, player3);
@@ -93,8 +92,8 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should handle team with max capacity")
-        void shouldHandleTeamWithMaxCapacity() {
-            Team team = teamManager.createTeam(player1, "FullTeam");
+        void shouldHandleUHCTeamWithMaxCapacity() {
+            UHCTeam team = teamManager.createTeam(player1, "FullUHCTeam");
             teamManager.addPlayer(team, player1);
             teamManager.addPlayer(team, player2);
             teamManager.addPlayer(team, player3);
@@ -105,19 +104,19 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should maintain team integrity during operations")
-        void shouldMaintainTeamIntegrityDuringOperations() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player2, "Team2");
+        void shouldMaintainUHCTeamIntegrityDuringOperations() {
+            UHCTeam team1 = teamManager.createTeam(player1, "UHCTeam1");
+            UHCTeam team2 = teamManager.createTeam(player2, "UHCTeam2");
             
             teamManager.addPlayer(team1, player1);
             teamManager.addPlayer(team2, player2);
             
-            int initialTeamCount = teamManager.getTeams().size();
+            int initialUHCTeamCount = teamManager.getTeams().size();
             
             teamManager.removePlayer(team1, player1);
             teamManager.addPlayer(team2, player1);
             
-            assertThat(teamManager.getTeams()).hasSize(initialTeamCount - 1);
+            assertThat(teamManager.getTeams()).hasSize(initialUHCTeamCount - 1);
             assertThat(teamManager.getTeams()).doesNotContain(team1);
         }
     }
@@ -127,15 +126,15 @@ class TeamManagerComplexTest {
     class ComplexGameScenariosTests {
 
         @Test
-        @DisplayName("Scenario: Players forming teams during game start")
-        void scenarioPlayersFormingTeamsDuringGameStart() {
+        @DisplayName("Scenario: UHCPlayers forming teams during game start")
+        void scenarioUHCPlayersFormingUHCTeamsDuringGameStart() {
             assertThat(player1.getTeam()).isNull();
             assertThat(player2.getTeam()).isNull();
             assertThat(player3.getTeam()).isNull();
             assertThat(player4.getTeam()).isNull();
 
-            Team team1 = teamManager.createTeam(player1, "Team A");
-            Team team2 = teamManager.createTeam(player3, "Team B");
+            UHCTeam team1 = teamManager.createTeam(player1, "UHCTeam A");
+            UHCTeam team2 = teamManager.createTeam(player3, "UHCTeam B");
 
             teamManager.addPlayer(team1, player1);
             teamManager.addPlayer(team1, player2);
@@ -148,9 +147,9 @@ class TeamManagerComplexTest {
         }
 
         @Test
-        @DisplayName("Scenario: Team elimination and cleanup")
-        void scenarioTeamEliminationAndCleanup() {
-            Team team = teamManager.createTeam(player1, "DoomedTeam");
+        @DisplayName("Scenario: UHCTeam elimination and cleanup")
+        void scenarioUHCTeamEliminationAndCleanup() {
+            UHCTeam team = teamManager.createTeam(player1, "DoomedUHCTeam");
             teamManager.addPlayer(team, player1);
             teamManager.addPlayer(team, player2);
 
@@ -166,7 +165,7 @@ class TeamManagerComplexTest {
         @Test
         @DisplayName("Scenario: Leader promotion chain")
         void scenarioLeaderPromotionChain() {
-            Team team = teamManager.createTeam(player1, "Dynasty");
+            UHCTeam team = teamManager.createTeam(player1, "Dynasty");
             teamManager.addPlayer(team, player1);
             teamManager.addPlayer(team, player2);
             teamManager.addPlayer(team, player3);
@@ -182,10 +181,10 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Scenario: Multiple teams competing")
-        void scenarioMultipleTeamsCompeting() {
-            Team teamA = teamManager.createTeam(player1, "Alpha");
-            Team teamB = teamManager.createTeam(player2, "Beta");
-            Team teamC = teamManager.createTeam(player3, "Gamma");
+        void scenarioMultipleUHCTeamsCompeting() {
+            UHCTeam teamA = teamManager.createTeam(player1, "Alpha");
+            UHCTeam teamB = teamManager.createTeam(player2, "Beta");
+            UHCTeam teamC = teamManager.createTeam(player3, "Gamma");
 
             teamManager.addPlayer(teamA, player1);
             teamManager.addPlayer(teamB, player2);
@@ -205,9 +204,9 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should handle rapid team changes")
-        void shouldHandleRapidTeamChanges() {
-            Team team1 = teamManager.createTeam(player1, "Team1");
-            Team team2 = teamManager.createTeam(player2, "Team2");
+        void shouldHandleRapidUHCTeamChanges() {
+            UHCTeam team1 = teamManager.createTeam(player1, "UHCTeam1");
+            UHCTeam team2 = teamManager.createTeam(player2, "UHCTeam2");
 
             teamManager.addPlayer(team1, player3);
             assertThat(player3.getTeam()).isEqualTo(team1);
@@ -222,19 +221,19 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should handle team with single member")
-        void shouldHandleTeamWithSingleMember() {
-            Team soloTeam = teamManager.createTeam(player1, "Solo");
-            teamManager.addPlayer(soloTeam, player1);
+        void shouldHandleUHCTeamWithSingleMember() {
+            UHCTeam soloUHCTeam = teamManager.createTeam(player1, "Solo");
+            teamManager.addPlayer(soloUHCTeam, player1);
 
-            assertThat(soloTeam.getMembers()).hasSize(1);
-            assertThat(soloTeam.getLeader()).isEqualTo(player1);
+            assertThat(soloUHCTeam.getMembers()).hasSize(1);
+            assertThat(soloUHCTeam.getLeader()).isEqualTo(player1);
         }
 
         @Test
         @DisplayName("Should prevent duplicate team names")
-        void shouldAllowDuplicateTeamNames() {
-            Team team1 = teamManager.createTeam(player1, "Duplicate");
-            Team team2 = teamManager.createTeam(player2, "Duplicate");
+        void shouldAllowDuplicateUHCTeamNames() {
+            UHCTeam team1 = teamManager.createTeam(player1, "Duplicate");
+            UHCTeam team2 = teamManager.createTeam(player2, "Duplicate");
 
             assertThat(team1.getName()).isEqualTo(team2.getName());
             assertThat(team1).isNotEqualTo(team2);
@@ -243,7 +242,7 @@ class TeamManagerComplexTest {
         @Test
         @DisplayName("Should handle renaming during game")
         void shouldHandleRenamingDuringGame() {
-            Team team = teamManager.createTeam(player1, "Original");
+            UHCTeam team = teamManager.createTeam(player1, "Original");
             teamManager.addPlayer(team, player1);
             teamManager.addPlayer(team, player2);
 
@@ -262,14 +261,14 @@ class TeamManagerComplexTest {
         @DisplayName("Should maintain consistent state across operations")
         void shouldMaintainConsistentStateAcrossOperations() {
             int operationCount = 10;
-            Team team = teamManager.createTeam(player1, "Consistent");
+            UHCTeam team = teamManager.createTeam(player1, "Consistent");
 
             for (int i = 0; i < operationCount; i++) {
-                Player tempPlayer = new Player(UUID.randomUUID(), "Temp" + i);
-                teamManager.addPlayer(team, tempPlayer);
+                UHCPlayer tempUHCPlayer = new UHCPlayer(UUID.randomUUID(), "Temp" + i);
+                teamManager.addPlayer(team, tempUHCPlayer);
                 
                 if (i % 2 == 0) {
-                    teamManager.removePlayer(team, tempPlayer);
+                    teamManager.removePlayer(team, tempUHCPlayer);
                 }
             }
 
@@ -278,8 +277,8 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should handle team operations in sequence")
-        void shouldHandleTeamOperationsInSequence() {
-            Team team = teamManager.createTeam(player1, "Sequential");
+        void shouldHandleUHCTeamOperationsInSequence() {
+            UHCTeam team = teamManager.createTeam(player1, "Sequential");
             
             teamManager.addPlayer(team, player1);
             assertThat(team.getMembers()).hasSize(1);
@@ -303,7 +302,7 @@ class TeamManagerComplexTest {
         @Test
         @DisplayName("Should maintain bidirectional player-team relationship")
         void shouldMaintainBidirectionalRelationship() {
-            Team team = teamManager.createTeam(player1, "BiDir");
+            UHCTeam team = teamManager.createTeam(player1, "BiDir");
             teamManager.addPlayer(team, player1);
 
             assertThat(player1.getTeam()).isEqualTo(team);
@@ -316,8 +315,8 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should not allow orphaned team references")
-        void shouldNotAllowOrphanedTeamReferences() {
-            Team team = teamManager.createTeam(player1, "Orphan");
+        void shouldNotAllowOrphanedUHCTeamReferences() {
+            UHCTeam team = teamManager.createTeam(player1, "Orphan");
             teamManager.addPlayer(team, player1);
 
             teamManager.removePlayer(team, player1);
@@ -328,10 +327,10 @@ class TeamManagerComplexTest {
 
         @Test
         @DisplayName("Should preserve team list integrity")
-        void shouldPreserveTeamListIntegrity() {
-            Team team1 = teamManager.createTeam(player1, "T1");
-            Team team2 = teamManager.createTeam(player2, "T2");
-            Team team3 = teamManager.createTeam(player3, "T3");
+        void shouldPreserveUHCTeamListIntegrity() {
+            UHCTeam team1 = teamManager.createTeam(player1, "T1");
+            UHCTeam team2 = teamManager.createTeam(player2, "T2");
+            UHCTeam team3 = teamManager.createTeam(player3, "T3");
 
             teamManager.addPlayer(team1, player1);
             teamManager.addPlayer(team2, player2);

@@ -8,13 +8,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import vch.uhc.UHC;
 import vch.uhc.managers.SkinManager;
 import vch.uhc.misc.BaseListener;
-import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
 
 public class SkinRevealListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerHitPlayer(EntityDamageByEntityEvent event) {
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) {
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
             return;
         }
 

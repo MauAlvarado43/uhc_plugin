@@ -2,46 +2,26 @@ package vch.uhc.misc;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 import com.google.gson.Gson;
-
 import vch.uhc.UHC;
-import vch.uhc.items.DragonBreath;
-import vch.uhc.items.GlisteringMelonSlice;
-import vch.uhc.items.HyperGoldenApple;
-import vch.uhc.items.PlayerGoldenApple;
-import vch.uhc.items.SuperGoldenApple;
+import vch.uhc.misc.constants.GameConstants;
+import vch.uhc.misc.enums.GameMode;
+import vch.uhc.misc.enums.GameState;
+import vch.uhc.misc.enums.TeamMode;
 
+/**
+ * Game configuration settings manager.
+ * Handles persistence and access to game parameters.
+ */
 public class Settings {
 
-  public enum TeamMode {
-    IN_GAME,
-    AUTO,
-    MANUAL,
-  }
-
-  public enum GameStatus {
-    NONE,
-    IN_PROGRESS,
-    PAUSED,
-    ENDED
-  }
-
-  public enum GameMode {
-    PVD,
-    PVP,
-    RESOURCE_RUSH
-  }
-
-  
   private transient final Gson gson = new Gson();
-  private transient final File settingsFile = new File(UHC.getPlugin().getDataFolder(), "settings.json");
+  private transient final File settingsFile = new File(UHC.getPlugin().getDataFolder(), GameConstants.SETTINGS_FILE_NAME);
 
-  private int maxWorldSize = 1000;
-  private int minWorldSize = 100;
+  private int maxWorldSize = GameConstants.DEFAULT_MAX_WORLD_SIZE;
+  private int minWorldSize = GameConstants.DEFAULT_MIN_WORLD_SIZE;
 
   private int gameHours = 0;
   private int gameMinutes = 0;
@@ -60,45 +40,45 @@ public class Settings {
   private int maxTeamInGameSeconds = 0;
 
   private int endPortalHours = 0;
-  private int endPortalMinutes = 10;
+  private int endPortalMinutes = GameConstants.DEFAULT_END_PORTAL_TIME_MINUTES;
   private int endPortalSeconds = 0;
 
   private boolean shulkerEnabled = false;
   private int shulkerHours = 0;
-  private int shulkerMinutes = 15;
+  private int shulkerMinutes = GameConstants.DEFAULT_SHULKER_TIME_MINUTES;
   private int shulkerSeconds = 0;
 
   private boolean locatorBarEnabled = false;
   private int locatorBarHours = 0;
-  private int locatorBarMinutes = 20;
+  private int locatorBarMinutes = GameConstants.DEFAULT_LOCATOR_BAR_TIME_MINUTES;
   private int locatorBarSeconds = 0;
 
   private boolean buffsEnabled = false;
   private int buffsHours = 0;
-  private int buffsMinutes = 30;
+  private int buffsMinutes = GameConstants.DEFAULT_BUFFS_TIME_MINUTES;
   private int buffsSeconds = 0;
-  private double extraHearts = 10.0;
+  private double extraHearts = GameConstants.DEFAULT_EXTRA_HEARTS;
 
   private boolean skinShuffleEnabled = true;
-  private int skinShuffleMinutes = 5;
+  private int skinShuffleMinutes = GameConstants.DEFAULT_SKIN_SHUFFLE_TIME_MINUTES;
   private int skinShuffleSeconds = 0;
 
   private boolean gradualBorderEnabled = true;
 
-  private GameStatus gameStatus = GameStatus.NONE;
+  private GameState gameStatus = GameState.NONE;
   private GameMode gameMode = GameMode.PVP;
 
   private TeamMode teamMode = TeamMode.MANUAL;
-  private int teamSize = 2;
+  private int teamSize = GameConstants.DEFAULT_TEAM_SIZE;
 
-  private int playerLives = 1;
+  private int playerLives = GameConstants.DEFAULT_PLAYER_LIVES;
 
-  private transient ArrayList<BaseItem> items = new ArrayList<>(Arrays.asList(
-    new DragonBreath(),
-    new GlisteringMelonSlice(),
-    new SuperGoldenApple(),
-    new HyperGoldenApple(),
-    new PlayerGoldenApple()
+  private final transient java.util.ArrayList<BaseItem> items = new java.util.ArrayList<>(java.util.Arrays.asList(
+    new vch.uhc.items.DragonBreath(),
+    new vch.uhc.items.GlisteringMelonSlice(),
+    new vch.uhc.items.SuperGoldenApple(),
+    new vch.uhc.items.HyperGoldenApple(),
+    new vch.uhc.items.PlayerGoldenApple()
   ));
 
   public void setMaxWorldSize(int maxWorldSize) {
@@ -213,11 +193,11 @@ public class Settings {
     return maxTeamInGameSeconds;
   }
 
-  public void setGameStatus(GameStatus gameStatus) {
+  public void setGameState(GameState gameStatus) {
     this.gameStatus = gameStatus;
   }
 
-  public GameStatus getGameStatus() {
+  public GameState getGameState() {
     return gameStatus;
   }
 
@@ -253,7 +233,7 @@ public class Settings {
     return playerLives;
   }
 
-  public ArrayList<BaseItem> getItems() {
+  public java.util.ArrayList<BaseItem> getItems() {
     return items;
   }
 
@@ -466,8 +446,8 @@ public class Settings {
       this.teamSize = loadedSettings.teamSize;
       this.playerLives = loadedSettings.playerLives;
       
-      UHC.getPlugin().getLogger().info("Settings loaded successfully from " + settingsFile.getAbsolutePath());
-    } catch (Exception e) {
+      UHC.getPlugin().getLogger().info(() -> "Settings loaded successfully from " + settingsFile.getAbsolutePath());
+    } catch (java.io.IOException e) {
       UHC.getPlugin().getLogger().log(Level.SEVERE, "Failed to load settings", e);
     }
   }
@@ -485,8 +465,8 @@ public class Settings {
         writer.flush();
       }
       
-      UHC.getPlugin().getLogger().info("Settings saved successfully to " + settingsFile.getAbsolutePath());
-    } catch (Exception e) {
+      UHC.getPlugin().getLogger().info(() -> "Settings saved successfully to " + settingsFile.getAbsolutePath());
+    } catch (java.io.IOException e) {
       UHC.getPlugin().getLogger().log(Level.SEVERE, "Failed to save settings", e);
     }
   }

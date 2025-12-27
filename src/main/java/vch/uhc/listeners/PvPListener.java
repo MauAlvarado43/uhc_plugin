@@ -7,14 +7,14 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseListener;
 import vch.uhc.misc.Messages;
-import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
 
 public class PvPListener extends BaseListener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 
-        if (UHC.getPlugin().getSettings().getGameStatus() != Settings.GameStatus.IN_PROGRESS) {
+        if (UHC.getPlugin().getSettings().getGameState() != GameState.IN_PROGRESS) {
             return;
         }
 

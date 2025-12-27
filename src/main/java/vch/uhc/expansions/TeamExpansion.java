@@ -4,11 +4,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.md_5.bungee.api.ChatColor;
 import vch.uhc.UHC;
 import vch.uhc.managers.PlayerManager;
-import vch.uhc.misc.Settings;
-import vch.uhc.models.Team;
+import vch.uhc.misc.enums.GameState;
+import vch.uhc.models.UHCTeam;
 
 public class TeamExpansion extends PlaceholderExpansion {
 
@@ -40,13 +39,13 @@ public class TeamExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        
+
         String name = "";
 
-        if(UHC.getPlugin().getSettings().getGameStatus() == Settings.GameStatus.IN_PROGRESS) {
-            Team playerTeam = playerManager.getPlayerByUUID(player.getUniqueId()).getTeam();
-            if(playerTeam != null) {
-                name = ChatColor.WHITE + "[" + playerTeam.getName() + ChatColor.WHITE + "]";
+        if (UHC.getPlugin().getSettings().getGameState() == GameState.IN_PROGRESS) {
+            UHCTeam playerTeam = playerManager.getPlayerByUUID(player.getUniqueId()).getTeam();
+            if (playerTeam != null) {
+                name = "\u00a7f[" + playerTeam.getName() + "\u00a7f]";
             }
         }
 
@@ -59,10 +58,10 @@ public class TeamExpansion extends PlaceholderExpansion {
 
         String name = player.getName();
 
-        if(UHC.getPlugin().getSettings().getGameStatus() == Settings.GameStatus.IN_PROGRESS) {
-            Team playerTeam = playerManager.getPlayerByUUID(player.getUniqueId()).getTeam();
-            if(playerTeam != null) {
-                name = ChatColor.WHITE + "[" + playerTeam.getName() + ChatColor.WHITE + "]";
+        if (UHC.getPlugin().getSettings().getGameState() == GameState.IN_PROGRESS) {
+            UHCTeam playerTeam = playerManager.getPlayerByUUID(player.getUniqueId()).getTeam();
+            if (playerTeam != null) {
+                name = "\u00a7f[" + playerTeam.getName() + "\u00a7f]";
             }
         }
 

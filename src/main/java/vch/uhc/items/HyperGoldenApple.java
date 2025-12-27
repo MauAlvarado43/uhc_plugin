@@ -56,10 +56,12 @@ public class HyperGoldenApple extends BaseItem {
             return false;
 
         AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
-        double currentMaxHealth = attribute.getBaseValue();
+        if (attribute != null) {
+            double currentMaxHealth = attribute.getBaseValue();
 
-        if (!(currentMaxHealth + 4.0D > 60.0D))
-            attribute.setBaseValue(currentMaxHealth + 4.0D);
+            if (!(currentMaxHealth + 4.0D > 60.0D))
+                attribute.setBaseValue(currentMaxHealth + 4.0D);
+        }
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 130, 1));
         player.getInventory().getItemInMainHand().setAmount(item.getAmount() - 1);

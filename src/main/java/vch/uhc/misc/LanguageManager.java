@@ -21,7 +21,14 @@ public class LanguageManager {
     public LanguageManager() {
         this.dataFolder = UHC.getPlugin().getDataFolder();
         this.currentLanguage = "es";
-        loadLanguage(currentLanguage);
+        initializeLanguage(currentLanguage);
+    }
+
+    private void initializeLanguage(String languageCode) {
+        messages = new Properties();
+        this.currentLanguage = languageCode;
+
+        loadLanguage(languageCode);
     }
 
     public void loadLanguage(String languageCode) {
@@ -34,7 +41,7 @@ public class LanguageManager {
             try (FileInputStream fis = new FileInputStream(langFile);
                  InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
                 messages.load(reader);
-                UHC.getPlugin().getLogger().info("Loaded language file: " + langFile.getName());
+                UHC.getPlugin().getLogger().info(() -> "Loaded language file: " + langFile.getName());
                 return;
             } catch (IOException e) {
                 UHC.getPlugin().getLogger().log(Level.WARNING, "Error loading language file from data folder", e);
@@ -45,10 +52,10 @@ public class LanguageManager {
             if (is != null) {
                 try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     messages.load(reader);
-                    UHC.getPlugin().getLogger().info("Loaded language from resources: messages_" + languageCode + ".properties");
+                    UHC.getPlugin().getLogger().info(() -> "Loaded language from resources: messages_" + languageCode + ".properties");
                 }
             } else {
-                UHC.getPlugin().getLogger().warning("Language file not found: messages_" + languageCode + ".properties");
+                UHC.getPlugin().getLogger().warning(() -> "Language file not found: messages_" + languageCode + ".properties");
                 if (!languageCode.equals("en")) {
                     loadLanguage("en");
                 }
@@ -62,7 +69,7 @@ public class LanguageManager {
         String message = messages.getProperty(key);
         
         if (message == null) {
-            UHC.getPlugin().getLogger().warning("Missing translation for key: " + key);
+            UHC.getPlugin().getLogger().warning(() -> "Missing translation for key: " + key);
             return "§c[Missing: " + key + "]";
         }
 

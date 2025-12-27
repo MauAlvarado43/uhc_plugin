@@ -8,7 +8,9 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import vch.uhc.UHC;
 import vch.uhc.misc.Messages;
 import vch.uhc.misc.Settings;
-import vch.uhc.models.Team;
+import vch.uhc.misc.enums.GameState;
+import vch.uhc.misc.enums.TeamMode;
+import vch.uhc.models.UHCTeam;
 
 public class PlayerInteractListener implements Listener {
 
@@ -21,12 +23,12 @@ public class PlayerInteractListener implements Listener {
 
 
         Settings settings = UHC.getPlugin().getSettings();
-        if (settings.getTeamMode() != Settings.TeamMode.IN_GAME) {
+        if (settings.getTeamMode() != TeamMode.IN_GAME) {
             return;
         }
 
 
-        if (settings.getGameStatus() != Settings.GameStatus.IN_PROGRESS || 
+        if (settings.getGameState() != GameState.IN_PROGRESS || 
             UHC.getPlugin().getUHCManager().areTeamsFormed()) {
             return;
         }
@@ -34,8 +36,8 @@ public class PlayerInteractListener implements Listener {
         Player clicker = event.getPlayer();
         Player target = (Player) event.getRightClicked();
 
-        vch.uhc.models.Player p1 = UHC.getPlugin().getPlayerManager().getPlayerByUUID(clicker.getUniqueId());
-        vch.uhc.models.Player p2 = UHC.getPlugin().getPlayerManager().getPlayerByUUID(target.getUniqueId());
+        vch.uhc.models.UHCPlayer p1 = UHC.getPlugin().getPlayerManager().getPlayerByUUID(clicker.getUniqueId());
+        vch.uhc.models.UHCPlayer p2 = UHC.getPlugin().getPlayerManager().getPlayerByUUID(target.getUniqueId());
 
         if (p1 == null || p2 == null) {
             return;
@@ -47,8 +49,8 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        Team teamP1 = p1.getTeam();
-        Team teamP2 = p2.getTeam();
+        UHCTeam teamP1 = p1.getTeam();
+        UHCTeam teamP2 = p2.getTeam();
 
         if (teamP1 != null && teamP2 != null) {
 
@@ -57,7 +59,7 @@ public class PlayerInteractListener implements Listener {
                 clicker.sendMessage(Messages.INTERACT_TEAMS_COMBINED_EXCEED(settings.getTeamSize()));
                 return;
             }
-            for (vch.uhc.models.Player member : teamP2.getMembers()) {
+            for (vch.uhc.models.UHCPlayer member : teamP2.getMembers()) {
                 UHC.getPlugin().getTeamManager().removePlayer(teamP2, member);
                 UHC.getPlugin().getTeamManager().addPlayer(teamP1, member);
                 Player bukkitMember = member.getBukkitPlayer();
@@ -87,7 +89,7 @@ public class PlayerInteractListener implements Listener {
             target.sendMessage(clicker.getName() + " se unió a tu equipo!");
         } else {
 
-            Team newTeam = UHC.getPlugin().getTeamManager().createTeam(p1, "Team " + (UHC.getPlugin().getTeamManager().getTeams().size() + 1));
+            UHCTeam newTeam = UHC.getPlugin().getTeamManager().createTeam(p1, "Team " + (UHC.getPlugin().getTeamManager().getTeams().size() + 1));
             UHC.getPlugin().getTeamManager().addPlayer(newTeam, p2);
             clicker.sendMessage(Messages.INTERACT_TEAM_FORMED_WITH(target.getName()));
             target.sendMessage(Messages.INTERACT_TEAM_FORMED_WITH(clicker.getName()));

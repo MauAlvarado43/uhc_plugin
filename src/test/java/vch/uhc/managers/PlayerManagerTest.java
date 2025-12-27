@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
-import vch.uhc.models.Player;
+import vch.uhc.models.UHCPlayer;
 
 import java.util.UUID;
 
@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.*;
 class PlayerManagerTest {
 
     private PlayerManager playerManager;
-    private Player player1;
-    private Player player2;
+    private UHCPlayer player1;
+    private UHCPlayer player2;
     private UUID uuid1;
     private UUID uuid2;
 
@@ -24,8 +24,8 @@ class PlayerManagerTest {
         playerManager = new PlayerManager();
         uuid1 = UUID.randomUUID();
         uuid2 = UUID.randomUUID();
-        player1 = new Player(uuid1, "Player1");
-        player2 = new Player(uuid2, "Player2");
+        player1 = new UHCPlayer(uuid1, "Player1");
+        player2 = new UHCPlayer(uuid2, "Player2");
     }
 
     @Nested
@@ -140,7 +140,7 @@ class PlayerManagerTest {
         @DisplayName("Should return existing player by UUID")
         void shouldReturnExistingPlayerByUUID() {
             playerManager.addPlayer(player1);
-            Player found = playerManager.getPlayerByUUID(uuid1);
+            UHCPlayer found = playerManager.getPlayerByUUID(uuid1);
             assertThat(found).isEqualTo(player1);
         }
 
@@ -149,7 +149,7 @@ class PlayerManagerTest {
         void shouldFindCorrectPlayerAmongMultiple() {
             playerManager.addPlayer(player1);
             playerManager.addPlayer(player2);
-            Player found = playerManager.getPlayerByUUID(uuid2);
+            UHCPlayer found = playerManager.getPlayerByUUID(uuid2);
             assertThat(found).isEqualTo(player2);
         }
 
@@ -158,7 +158,7 @@ class PlayerManagerTest {
         void shouldReturnPlayerEvenIfNotPlaying() {
             player1.setPlaying(false);
             playerManager.addPlayer(player1);
-            Player found = playerManager.getPlayerByUUID(uuid1);
+            UHCPlayer found = playerManager.getPlayerByUUID(uuid1);
             assertThat(found).isEqualTo(player1);
         }
 
@@ -193,7 +193,7 @@ class PlayerManagerTest {
             playerManager.removePlayer(player1);
             assertThat(playerManager.getPlayers()).hasSize(1);
             
-            Player player3 = new Player(UUID.randomUUID(), "Player3");
+            UHCPlayer player3 = new UHCPlayer(UUID.randomUUID(), "Player3");
             playerManager.addPlayer(player3);
             assertThat(playerManager.getPlayers()).hasSize(2);
         }

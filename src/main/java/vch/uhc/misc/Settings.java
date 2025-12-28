@@ -5,8 +5,11 @@ import java.io.FileWriter;
 import java.util.logging.Level;
 
 import com.google.gson.Gson;
+
 import vch.uhc.UHC;
 import vch.uhc.misc.constants.GameConstants;
+import vch.uhc.misc.enums.BorderType;
+import vch.uhc.misc.enums.EliminationMode;
 import vch.uhc.misc.enums.GameMode;
 import vch.uhc.misc.enums.GameState;
 import vch.uhc.misc.enums.TeamMode;
@@ -62,10 +65,20 @@ public class Settings {
   private double maxHealth = GameConstants.DEFAULT_CONFIGURABLE_MAX_HEALTH;
 
   private boolean skinShuffleEnabled = true;
+  private int skinShuffleHours = 0;
   private int skinShuffleMinutes = GameConstants.DEFAULT_SKIN_SHUFFLE_TIME_MINUTES;
   private int skinShuffleSeconds = 0;
 
   private boolean gradualBorderEnabled = true;
+  private BorderType borderType = BorderType.GRADUAL;
+  
+  // Threshold border settings (only used when borderType == THRESHOLD)
+  private int thresholdStartHours = 0;
+  private int thresholdStartMinutes = 0;
+  private int thresholdStartSeconds = 0;
+  private int thresholdEndHours = 0;
+  private int thresholdEndMinutes = 0;
+  private int thresholdEndSeconds = 0;
 
   private GameState gameStatus = GameState.NONE;
   private GameMode gameMode = GameMode.PVP;
@@ -74,6 +87,8 @@ public class Settings {
   private int teamSize = GameConstants.DEFAULT_TEAM_SIZE;
 
   private int playerLives = GameConstants.DEFAULT_PLAYER_LIVES;
+
+  private EliminationMode eliminationMode = EliminationMode.SPECTATOR;
 
   private final transient java.util.ArrayList<BaseItem> items = new java.util.ArrayList<>(java.util.Arrays.asList(
     new vch.uhc.items.DragonBreath(),
@@ -235,6 +250,14 @@ public class Settings {
     return playerLives;
   }
 
+  public void setEliminationMode(EliminationMode eliminationMode) {
+    this.eliminationMode = eliminationMode;
+  }
+
+  public EliminationMode getEliminationMode() {
+    return eliminationMode;
+  }
+
   public java.util.ArrayList<BaseItem> getItems() {
     return items;
   }
@@ -335,6 +358,14 @@ public class Settings {
     return skinShuffleEnabled;
   }
 
+  public void setSkinShuffleHours(int skinShuffleHours) {
+    this.skinShuffleHours = skinShuffleHours;
+  }
+
+  public int getSkinShuffleHours() {
+    return skinShuffleHours;
+  }
+
   public void setSkinShuffleMinutes(int skinShuffleMinutes) {
     this.skinShuffleMinutes = skinShuffleMinutes;
   }
@@ -357,6 +388,62 @@ public class Settings {
 
   public boolean isGradualBorderEnabled() {
     return gradualBorderEnabled;
+  }
+
+  public void setBorderType(BorderType borderType) {
+    this.borderType = borderType;
+  }
+
+  public BorderType getBorderType() {
+    return borderType;
+  }
+
+  public void setThresholdStartHours(int thresholdStartHours) {
+    this.thresholdStartHours = thresholdStartHours;
+  }
+
+  public int getThresholdStartHours() {
+    return thresholdStartHours;
+  }
+
+  public void setThresholdStartMinutes(int thresholdStartMinutes) {
+    this.thresholdStartMinutes = thresholdStartMinutes;
+  }
+
+  public int getThresholdStartMinutes() {
+    return thresholdStartMinutes;
+  }
+
+  public void setThresholdStartSeconds(int thresholdStartSeconds) {
+    this.thresholdStartSeconds = thresholdStartSeconds;
+  }
+
+  public int getThresholdStartSeconds() {
+    return thresholdStartSeconds;
+  }
+
+  public void setThresholdEndHours(int thresholdEndHours) {
+    this.thresholdEndHours = thresholdEndHours;
+  }
+
+  public int getThresholdEndHours() {
+    return thresholdEndHours;
+  }
+
+  public void setThresholdEndMinutes(int thresholdEndMinutes) {
+    this.thresholdEndMinutes = thresholdEndMinutes;
+  }
+
+  public int getThresholdEndMinutes() {
+    return thresholdEndMinutes;
+  }
+
+  public void setThresholdEndSeconds(int thresholdEndSeconds) {
+    this.thresholdEndSeconds = thresholdEndSeconds;
+  }
+
+  public int getThresholdEndSeconds() {
+    return thresholdEndSeconds;
   }
 
   public void setBuffsEnabled(boolean buffsEnabled) {
@@ -447,14 +534,24 @@ public class Settings {
       this.buffsMinutes = loadedSettings.buffsMinutes;
       this.buffsSeconds = loadedSettings.buffsSeconds;
       this.extraHearts = loadedSettings.extraHearts;
+      this.maxHealth = loadedSettings.maxHealth;
       this.skinShuffleEnabled = loadedSettings.skinShuffleEnabled;
+      this.skinShuffleHours = loadedSettings.skinShuffleHours;
       this.skinShuffleMinutes = loadedSettings.skinShuffleMinutes;
       this.skinShuffleSeconds = loadedSettings.skinShuffleSeconds;
       this.gradualBorderEnabled = loadedSettings.gradualBorderEnabled;
+      this.borderType = loadedSettings.borderType;
+      this.thresholdStartHours = loadedSettings.thresholdStartHours;
+      this.thresholdStartMinutes = loadedSettings.thresholdStartMinutes;
+      this.thresholdStartSeconds = loadedSettings.thresholdStartSeconds;
+      this.thresholdEndHours = loadedSettings.thresholdEndHours;
+      this.thresholdEndMinutes = loadedSettings.thresholdEndMinutes;
+      this.thresholdEndSeconds = loadedSettings.thresholdEndSeconds;
       this.gameMode = loadedSettings.gameMode;
       this.teamMode = loadedSettings.teamMode;
       this.teamSize = loadedSettings.teamSize;
       this.playerLives = loadedSettings.playerLives;
+      this.eliminationMode = loadedSettings.eliminationMode;
       
       UHC.getPlugin().getLogger().info(() -> "Settings loaded successfully from " + settingsFile.getAbsolutePath());
     } catch (java.io.IOException e) {

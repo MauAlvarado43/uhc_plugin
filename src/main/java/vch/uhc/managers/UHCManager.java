@@ -853,7 +853,6 @@ public class UHCManager {
                 if (maxHealthAttr != null) {
                     double currentMaxHealth = maxHealthAttr.getValue();
                     double newMaxHealth = currentMaxHealth + (settings.getExtraHearts() * 2.0);
-                    newMaxHealth = Math.min(newMaxHealth, UHC.getPlugin().getSettings().getMaxHealth());
                     maxHealthAttr.setBaseValue(newMaxHealth);
                     p.setHealth(newMaxHealth);
                 }
@@ -891,6 +890,7 @@ public class UHCManager {
         int currentElapsedSeconds = elapsedHours * 3600 + elapsedMinutes * 60 + elapsedSeconds;
 
         if (settings.isGradualBorderEnabled()) {
+            // Legacy mode - keep for backwards compatibility
             double totalBorderChange = (maxWorldSize - minWorldSize) * 2.0;
             double borderStep = totalBorderChange / totalGameSeconds;
 
@@ -901,12 +901,66 @@ public class UHCManager {
                 border.setSize(newSize);
             }
         } else {
-            if (currentElapsedSeconds >= totalGameSeconds) {
-                for (World world : Bukkit.getWorlds()) {
-                    WorldBorder border = world.getWorldBorder();
-                    double newSize = minWorldSize * 2.0;
-                    newSize = Math.max(1.0, Math.min(newSize, 5.9999968E7));
-                    border.setSize(newSize);
+            // New BorderType system
+            switch (settings.getBorderType()) {
+                case NONE -> {
+                    // Border never shrinks - do nothing
+                }
+                case GRADUAL -> {
+                    double totalBorderChange = (maxWorldSize - minWorldSize) * 2.0;
+                    double borderStep = totalBorderChange / totalGameSeconds;
+
+                    for (World world : Bukkit.getWorlds()) {
+                        WorldBorder border = world.getWorldBorder();
+                        double newSize = border.getSize() - borderStep;
+                        newSize = Math.max(1.0, Math.min(newSize, 5.9999968E7));
+                        border.setSize(newSize);
+                    }
+                }
+                case INSTANT -> {
+                    if (currentElapsedSeconds >= totalGameSeconds) {
+                        for (World world : Bukkit.getWorlds()) {
+                            WorldBorder border = world.getWorldBorder();
+                            double newSize = minWorldSize * 2.0;
+                            newSize = Math.max(1.0, Math.min(newSize, 5.9999968E7));
+                            border.setSize(newSize);
+                        }
+                    }
+                }
+                case THRESHOLD -> {
+                    int thresholdStartSeconds = settings.getThresholdStartHours() * 3600
+                            + settings.getThresholdStartMinutes() * 60
+                            + settings.getThresholdStartSeconds();
+                    int thresholdEndSeconds = settings.getThresholdEndHours() * 3600
+                            + settings.getThresholdEndMinutes() * 60
+                            + settings.getThresholdEndSeconds();
+
+                    // Only shrink border if we've passed the start threshold
+                    if (currentElapsedSeconds >= thresholdStartSeconds) {
+                        if (currentElapsedSeconds >= thresholdEndSeconds) {
+                            // Border should be at minimum size
+                            for (World world : Bukkit.getWorlds()) {
+                                WorldBorder border = world.getWorldBorder();
+                                double newSize = minWorldSize * 2.0;
+                                newSize = Math.max(1.0, Math.min(newSize, 5.9999968E7));
+                                border.setSize(newSize);
+                            }
+                        } else {
+                            // Gradually shrink from start to end time
+                            int shrinkDuration = thresholdEndSeconds - thresholdStartSeconds;
+                            if (shrinkDuration > 0) {
+                                double totalBorderChange = (maxWorldSize - minWorldSize) * 2.0;
+                                double borderStep = totalBorderChange / shrinkDuration;
+
+                                for (World world : Bukkit.getWorlds()) {
+                                    WorldBorder border = world.getWorldBorder();
+                                    double newSize = border.getSize() - borderStep;
+                                    newSize = Math.max(1.0, Math.min(newSize, 5.9999968E7));
+                                    border.setSize(newSize);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

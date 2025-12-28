@@ -18,11 +18,12 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseItem;
 import vch.uhc.misc.Settings;
-import vch.uhc.models.UHCTeam;
-import vch.uhc.models.UHCPlayer;
+import vch.uhc.misc.enums.EliminationMode;
 import vch.uhc.misc.enums.GameMode;
 import vch.uhc.misc.enums.GameState;
 import vch.uhc.misc.enums.TeamMode;
+import vch.uhc.models.UHCPlayer;
+import vch.uhc.models.UHCTeam;
 
 public class MenuManager {
 
@@ -40,13 +41,18 @@ public class MenuManager {
 
     private static final int MENU_SIZE = 54;
     private final Map<UUID, String> playerMenuContext = new HashMap<>();
+    private final Map<UUID, Map<Integer, String>> slotMapping = new HashMap<>(); // Maps visual slot to config key
 
     public void openMainMenu(Player player) {
         Inventory menu = Bukkit.createInventory(null, MENU_SIZE, Component.text(getMainMenuTitle()));
 
         Settings settings = UHC.getPlugin().getSettings();
+        Map<Integer, String> mapping = new HashMap<>();
+        int slot = 0;
 
-        menu.setItem(0, createMenuItem(
+        // === FIRST ROW: Basic Settings ===
+        mapping.put(slot, "gameMode");
+        menu.setItem(slot++, createMenuItem(
                 Material.NETHERITE_SWORD,
                 vch.uhc.misc.Messages.MENU_GAME_MODE(),
                 Arrays.asList(
@@ -59,7 +65,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(1, createMenuItem(
+        mapping.put(slot, "teamMode");
+        menu.setItem(slot++, createMenuItem(
                 Material.WHITE_BANNER,
                 vch.uhc.misc.Messages.MENU_TEAM_MODE(),
                 Arrays.asList(
@@ -72,7 +79,9 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(2, createMenuItem(
+        // Team Size (always visible)
+        mapping.put(slot, "teamSize");
+        menu.setItem(slot++, createMenuItem(
                 Material.IRON_HELMET,
                 vch.uhc.misc.Messages.MENU_TEAM_SIZE(),
                 Arrays.asList(
@@ -83,7 +92,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(3, createMenuItem(
+        mapping.put(slot, "playerLives");
+        menu.setItem(slot++, createMenuItem(
                 Material.TOTEM_OF_UNDYING,
                 vch.uhc.misc.Messages.MENU_PLAYER_LIVES(),
                 Arrays.asList(
@@ -94,30 +104,55 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(4, createMenuItem(
+        mapping.put(slot, "eliminationMode");
+        menu.setItem(slot++, createMenuItem(
+                Material.SKELETON_SKULL,
+                vch.uhc.misc.Messages.MENU_ELIMINATION_MODE(),
+                Arrays.asList(
+                        vch.uhc.misc.Messages.MENU_ELIMINATION_MODE_DESC(),
+                        settings.getEliminationMode() == EliminationMode.SPECTATOR
+                                ? vch.uhc.misc.Messages.MENU_ELIMINATION_MODE_SPECTATOR()
+                                : vch.uhc.misc.Messages.MENU_ELIMINATION_MODE_KICK(),
+                        "",
+                        vch.uhc.misc.Messages.MENU_ELIMINATION_MODE_CLICK()
+                )
+        ));
+
+        mapping.put(slot, "skinShuffle");
+        menu.setItem(slot++, createMenuItem(
                 Material.ARMOR_STAND,
                 vch.uhc.misc.Messages.MENU_SKIN_SHUFFLE(),
                 Arrays.asList(
                         vch.uhc.misc.Messages.MENU_STATUS(settings.isSkinShuffleEnabled()
                                 ? vch.uhc.misc.Messages.MENU_ENABLED() : vch.uhc.misc.Messages.MENU_DISABLED()),
-                        vch.uhc.misc.Messages.MENU_SKIN_SHUFFLE_INTERVAL(settings.getSkinShuffleMinutes(), settings.getSkinShuffleSeconds()),
+                        vch.uhc.misc.Messages.MENU_SKIN_SHUFFLE_INTERVAL(
+                                settings.getSkinShuffleHours(),
+                                settings.getSkinShuffleMinutes(),
+                                settings.getSkinShuffleSeconds()),
                         "",
                         vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
                 )
         ));
 
-        menu.setItem(5, createMenuItem(
-                Material.WHITE_BANNER,
-                vch.uhc.misc.Messages.MENU_TEAMS(),
-                Arrays.asList(
-                        vch.uhc.misc.Messages.MENU_TEAMS_DESC(),
-                        vch.uhc.misc.Messages.MENU_TEAMS_MODE(settings.getTeamMode().name()),
-                        "",
-                        vch.uhc.misc.Messages.MENU_TEAMS_CLICK_TO_MANAGE()
-                )
-        ));
+        // Teams Manager (only for MANUAL mode)
+        if (settings.getTeamMode() == vch.uhc.misc.enums.TeamMode.MANUAL) {
+            mapping.put(slot, "teams");
+            menu.setItem(slot++, createMenuItem(
+                    Material.WHITE_BANNER,
+                    vch.uhc.misc.Messages.MENU_TEAMS(),
+                    Arrays.asList(
+                            vch.uhc.misc.Messages.MENU_TEAMS_DESC(),
+                            vch.uhc.misc.Messages.MENU_TEAMS_MODE(settings.getTeamMode().name()),
+                            "",
+                            vch.uhc.misc.Messages.MENU_TEAMS_CLICK_TO_MANAGE()
+                    )
+            ));
+        }
 
-        menu.setItem(9, createMenuItem(
+        // === SECOND ROW: World Settings ===
+        slot = 9;
+        mapping.put(slot, "maxWorldSize");
+        menu.setItem(slot++, createMenuItem(
                 Material.GRASS_BLOCK,
                 vch.uhc.misc.Messages.MENU_MAX_WORLD_SIZE(),
                 Arrays.asList(
@@ -128,7 +163,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(10, createMenuItem(
+        mapping.put(slot, "minWorldSize");
+        menu.setItem(slot++, createMenuItem(
                 Material.BEDROCK,
                 vch.uhc.misc.Messages.MENU_MIN_WORLD_SIZE(),
                 Arrays.asList(
@@ -139,23 +175,27 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(11, createMenuItem(
+        mapping.put(slot, "borderType");
+        menu.setItem(slot++, createMenuItem(
                 Material.RED_STAINED_GLASS,
                 vch.uhc.misc.Messages.MENU_GRADUAL_BORDER(),
                 Arrays.asList(
-                        vch.uhc.misc.Messages.MENU_STATUS(settings.isGradualBorderEnabled()
-                                ? vch.uhc.misc.Messages.MENU_ENABLED() : vch.uhc.misc.Messages.MENU_DISABLED()),
-                        "",
                         vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_DESC(),
-                        settings.isGradualBorderEnabled()
-                        ? vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_GRADUAL() : vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_INSTANT(),
+                        switch (settings.getBorderType()) {
+                            case NONE -> vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_NONE();
+                            case GRADUAL -> vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_GRADUAL();
+                            case INSTANT -> vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_INSTANT();
+                            case THRESHOLD -> vch.uhc.misc.Messages.MENU_GRADUAL_BORDER_THRESHOLD();
+                        },
                         "",
-                        vch.uhc.misc.Messages.MENU_CLICK_TO_TOGGLE(settings.isGradualBorderEnabled()
-                                ? vch.uhc.misc.Messages.MENU_DISABLE() : vch.uhc.misc.Messages.MENU_ENABLE())
+                        vch.uhc.misc.Messages.MENU_CLICK_TO_CHANGE()
                 )
         ));
 
-        menu.setItem(18, createMenuItem(
+        // === THIRD ROW: Time Settings ===
+        slot = 18;
+        mapping.put(slot, "gameTime");
+        menu.setItem(slot++, createMenuItem(
                 Material.CLOCK,
                 vch.uhc.misc.Messages.MENU_GAME_TIME(),
                 Arrays.asList(
@@ -168,7 +208,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(19, createMenuItem(
+        mapping.put(slot, "agreementTime");
+        menu.setItem(slot++, createMenuItem(
                 Material.PAPER,
                 vch.uhc.misc.Messages.MENU_AGREEMENT_TIME(),
                 Arrays.asList(
@@ -181,46 +222,89 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(20, createMenuItem(
-                Material.LAVA_BUCKET,
-                vch.uhc.misc.Messages.MENU_MIN_BORDER_TIME(),
-                Arrays.asList(
-                        vch.uhc.misc.Messages.MENU_MIN_BORDER_TIME_CURRENT(
-                                settings.getMinWorldBorderHours(),
-                                settings.getMinWorldBorderMinutes(),
-                                settings.getMinWorldBorderSeconds()),
-                        "",
-                        vch.uhc.misc.Messages.MENU_MIN_BORDER_TIME_CLICK()
-                )
-        ));
+        // Border Time - Conditional on BorderType
+        if (settings.getBorderType() == vch.uhc.misc.enums.BorderType.THRESHOLD) {
+            mapping.put(slot, "thresholdStart");
+            menu.setItem(slot++, createMenuItem(
+                    Material.LIME_DYE,
+                    vch.uhc.misc.Messages.MENU_THRESHOLD_START_TIME(),
+                    Arrays.asList(
+                            vch.uhc.misc.Messages.MENU_THRESHOLD_START_TIME_CURRENT(
+                                    settings.getThresholdStartHours(),
+                                    settings.getThresholdStartMinutes(),
+                                    settings.getThresholdStartSeconds()),
+                            "",
+                            vch.uhc.misc.Messages.MENU_THRESHOLD_START_TIME_CLICK()
+                    )
+            ));
 
-        menu.setItem(21, createMenuItem(
-                Material.NAME_TAG,
-                vch.uhc.misc.Messages.MENU_MAX_TEAM_TIME(),
-                Arrays.asList(
-                        vch.uhc.misc.Messages.MENU_MAX_TEAM_TIME_CURRENT(
-                                settings.getMaxTeamInGameHours(),
-                                settings.getMaxTeamInGameMinutes(),
-                                settings.getMaxTeamInGameSeconds()),
-                        "",
-                        vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
-                )
-        ));
+            mapping.put(slot, "thresholdEnd");
+            menu.setItem(slot++, createMenuItem(
+                    Material.RED_DYE,
+                    vch.uhc.misc.Messages.MENU_THRESHOLD_END_TIME(),
+                    Arrays.asList(
+                            vch.uhc.misc.Messages.MENU_THRESHOLD_END_TIME_CURRENT(
+                                    settings.getThresholdEndHours(),
+                                    settings.getThresholdEndMinutes(),
+                                    settings.getThresholdEndSeconds()),
+                            "",
+                            vch.uhc.misc.Messages.MENU_THRESHOLD_END_TIME_CLICK()
+                    )
+            ));
+        } else if (settings.getBorderType() != vch.uhc.misc.enums.BorderType.NONE) {
+            mapping.put(slot, "minBorderTime");
+            menu.setItem(slot++, createMenuItem(
+                    Material.LAVA_BUCKET,
+                    vch.uhc.misc.Messages.MENU_MIN_BORDER_TIME(),
+                    Arrays.asList(
+                            vch.uhc.misc.Messages.MENU_MIN_BORDER_TIME_CURRENT(
+                                    settings.getMinWorldBorderHours(),
+                                    settings.getMinWorldBorderMinutes(),
+                                    settings.getMinWorldBorderSeconds()),
+                            "",
+                            vch.uhc.misc.Messages.MENU_MIN_BORDER_TIME_CLICK()
+                    )
+            ));
+        }
 
-        menu.setItem(22, createMenuItem(
-                Material.END_PORTAL_FRAME,
-                vch.uhc.misc.Messages.MENU_END_PORTAL_TIME(),
-                Arrays.asList(
-                        vch.uhc.misc.Messages.MENU_CURRENT_SIMPLE()
-                        + settings.getEndPortalHours() + "h "
-                        + settings.getEndPortalMinutes() + "m "
-                        + settings.getEndPortalSeconds() + "s",
-                        "",
-                        vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
-                )
-        ));
+        // Max Team Time (only for IN_GAME mode)
+        if (settings.getTeamMode() == vch.uhc.misc.enums.TeamMode.IN_GAME) {
+            mapping.put(slot, "maxTeamTime");
+            menu.setItem(slot++, createMenuItem(
+                    Material.NAME_TAG,
+                    vch.uhc.misc.Messages.MENU_MAX_TEAM_TIME(),
+                    Arrays.asList(
+                            vch.uhc.misc.Messages.MENU_MAX_TEAM_TIME_CURRENT(
+                                    settings.getMaxTeamInGameHours(),
+                                    settings.getMaxTeamInGameMinutes(),
+                                    settings.getMaxTeamInGameSeconds()),
+                            "",
+                            vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
+                    )
+            ));
+        }
 
-        menu.setItem(23, createMenuItem(
+        // End Portal Time (only for PVD mode)
+        if (settings.getGameMode() == GameMode.PVD) {
+            mapping.put(slot, "endPortalTime");
+            menu.setItem(slot++, createMenuItem(
+                    Material.END_PORTAL_FRAME,
+                    vch.uhc.misc.Messages.MENU_END_PORTAL_TIME(),
+                    Arrays.asList(
+                            vch.uhc.misc.Messages.MENU_CURRENT_SIMPLE()
+                            + settings.getEndPortalHours() + "h "
+                            + settings.getEndPortalMinutes() + "m "
+                            + settings.getEndPortalSeconds() + "s",
+                            "",
+                            vch.uhc.misc.Messages.MENU_CLICK_TO_CONFIGURE()
+                    )
+            ));
+        }
+
+        // === FOURTH ROW: Special Features ===
+        slot = 27;
+        mapping.put(slot, "shulker");
+        menu.setItem(slot++, createMenuItem(
                 Material.SHULKER_BOX,
                 vch.uhc.misc.Messages.MENU_SHULKER_SPAWN(),
                 Arrays.asList(
@@ -235,7 +319,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(24, createMenuItem(
+        mapping.put(slot, "locatorBar");
+        menu.setItem(slot++, createMenuItem(
                 Material.RECOVERY_COMPASS,
                 vch.uhc.misc.Messages.MENU_LOCATOR_BAR_TIME(),
                 Arrays.asList(
@@ -251,7 +336,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(27, createMenuItem(
+        mapping.put(slot, "playerBuffs");
+        menu.setItem(slot++, createMenuItem(
                 Material.ENCHANTED_GOLDEN_APPLE,
                 vch.uhc.misc.Messages.MENU_PLAYER_BUFFS(),
                 Arrays.asList(
@@ -269,7 +355,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(28, createMenuItem(
+        mapping.put(slot, "recipes");
+        menu.setItem(slot++, createMenuItem(
                 Material.CRAFTING_TABLE,
                 vch.uhc.misc.Messages.MENU_CUSTOM_RECIPES(),
                 Arrays.asList(
@@ -278,7 +365,8 @@ public class MenuManager {
                 )
         ));
 
-        menu.setItem(29, createMenuItem(
+        mapping.put(slot, "stats");
+        menu.setItem(slot++, createMenuItem(
                 Material.WRITABLE_BOOK,
                 vch.uhc.misc.Messages.MENU_VIEW_STATS(),
                 Arrays.asList(
@@ -287,24 +375,29 @@ public class MenuManager {
                 )
         ));
 
+        // === BOTTOM ROW: Game Controls ===
+        mapping.put(36, "startGame");
         menu.setItem(36, createMenuItem(
                 Material.LIME_WOOL,
                 vch.uhc.misc.Messages.MENU_START_GAME(),
                 Arrays.asList(vch.uhc.misc.Messages.MENU_START_GAME_DESC().split("\n"))
         ));
 
+        mapping.put(37, "pauseGame");
         menu.setItem(37, createMenuItem(
                 Material.YELLOW_WOOL,
                 vch.uhc.misc.Messages.MENU_PAUSE_GAME(),
                 Arrays.asList(vch.uhc.misc.Messages.MENU_PAUSE_GAME_DESC().split("\n"))
         ));
 
+        mapping.put(38, "cancelGame");
         menu.setItem(38, createMenuItem(
                 Material.RED_WOOL,
                 vch.uhc.misc.Messages.MENU_CANCEL_GAME(),
                 Arrays.asList(vch.uhc.misc.Messages.MENU_CANCEL_GAME_DESC().split("\n"))
         ));
 
+        mapping.put(45, "saveConfig");
         menu.setItem(45, createMenuItem(
                 Material.EMERALD,
                 vch.uhc.misc.Messages.MENU_SAVE_CONFIG(),
@@ -313,12 +406,14 @@ public class MenuManager {
                 )
         ));
 
+        mapping.put(46, "loadConfig");
         menu.setItem(46, createMenuItem(
                 Material.KNOWLEDGE_BOOK,
                 vch.uhc.misc.Messages.MENU_LOAD_CONFIG(),
                 Arrays.asList(vch.uhc.misc.Messages.MENU_LOAD_CONFIG_DESC().split("\n"))
         ));
 
+        mapping.put(47, "closeMenu");
         menu.setItem(47, createMenuItem(
                 Material.BARRIER,
                 vch.uhc.misc.Messages.MENU_CLOSE(),
@@ -327,6 +422,8 @@ public class MenuManager {
                 )
         ));
 
+        // Store mapping for this player
+        slotMapping.put(player.getUniqueId(), mapping);
         playerMenuContext.remove(player.getUniqueId());
         player.openInventory(menu);
     }
@@ -354,6 +451,16 @@ public class MenuManager {
                 hours = settings.getMinWorldBorderHours();
                 minutes = settings.getMinWorldBorderMinutes();
                 seconds = settings.getMinWorldBorderSeconds();
+            }
+            case "Threshold Start" -> {
+                hours = settings.getThresholdStartHours();
+                minutes = settings.getThresholdStartMinutes();
+                seconds = settings.getThresholdStartSeconds();
+            }
+            case "Threshold End" -> {
+                hours = settings.getThresholdEndHours();
+                minutes = settings.getThresholdEndMinutes();
+                seconds = settings.getThresholdEndSeconds();
             }
             case "Max Equipos" -> {
                 hours = settings.getMaxTeamInGameHours();
@@ -387,7 +494,7 @@ public class MenuManager {
                 enabled = settings.isShulkerEnabled();
             }
             case "Skin Shuffle" -> {
-                hours = 0;
+                hours = settings.getSkinShuffleHours();
                 minutes = settings.getSkinShuffleMinutes();
                 seconds = settings.getSkinShuffleSeconds();
                 hasEnabled = true;
@@ -703,129 +810,159 @@ public class MenuManager {
     }
 
     private void handleMainMenuClick(Player player, int slot, boolean leftClick, Settings settings) {
-        switch (slot) {
-            case 0 ->
+        // Get the mapping for this player
+        Map<Integer, String> mapping = slotMapping.get(player.getUniqueId());
+        if (mapping == null || !mapping.containsKey(slot)) {
+            return; // No mapping for this slot
+        }
+
+        String action = mapping.get(slot);
+
+        switch (action) {
+            case "gameMode" ->
                 cycleGameMode(settings);
-            case 1 ->
+            case "teamMode" ->
                 cycleTeamMode(settings);
-            case 2 -> {
+            case "teamSize" -> {
                 if (leftClick) {
                     settings.setTeamSize(settings.getTeamSize() + 1);
                 } else {
                     settings.setTeamSize(Math.max(1, settings.getTeamSize() - 1));
                 }
             }
-            case 3 -> {
+            case "playerLives" -> {
                 if (leftClick) {
                     settings.setPlayerLives(settings.getPlayerLives() + 1);
                 } else {
                     settings.setPlayerLives(Math.max(1, settings.getPlayerLives() - 1));
                 }
             }
-            case 4 -> {
+            case "eliminationMode" -> {
+                // Toggle between SPECTATOR and KICK
+                if (settings.getEliminationMode() == EliminationMode.SPECTATOR) {
+                    settings.setEliminationMode(EliminationMode.KICK);
+                } else {
+                    settings.setEliminationMode(EliminationMode.SPECTATOR);
+                }
+            }
+            case "skinShuffle" -> {
                 openTimeMenu(player, "Skin Shuffle");
                 return;
             }
-            case 5 -> {
+            case "teams" -> {
                 openTeamsMenu(player);
                 return;
             }
-            case 9 -> {
+            case "maxWorldSize" -> {
                 if (leftClick) {
                     settings.setMaxWorldSize(settings.getMaxWorldSize() + 100);
                 } else {
                     settings.setMaxWorldSize(Math.max(100, settings.getMaxWorldSize() - 100));
                 }
             }
-            case 10 -> {
+            case "minWorldSize" -> {
                 if (leftClick) {
                     settings.setMinWorldSize(settings.getMinWorldSize() + 100);
                 } else {
                     settings.setMinWorldSize(Math.max(100, settings.getMinWorldSize() - 100));
                 }
             }
-            case 11 ->
-                settings.setGradualBorderEnabled(!settings.isGradualBorderEnabled());
-            case 18 -> {
+            case "borderType" -> {
+                // Cycle through border types
+                vch.uhc.misc.enums.BorderType[] types = vch.uhc.misc.enums.BorderType.values();
+                vch.uhc.misc.enums.BorderType current = settings.getBorderType();
+                int nextIndex = (current.ordinal() + 1) % types.length;
+                settings.setBorderType(types[nextIndex]);
+                
+                // Update legacy flag for compatibility
+                settings.setGradualBorderEnabled(types[nextIndex] == vch.uhc.misc.enums.BorderType.GRADUAL);
+            }
+            case "gameTime" -> {
                 openTimeMenu(player, "Game");
                 return;
             }
-            case 19 -> {
+            case "agreementTime" -> {
                 openTimeMenu(player, "Agreement");
                 return;
             }
-            case 20 -> {
+            case "minBorderTime" -> {
                 openTimeMenu(player, "Min Border");
                 return;
             }
-            case 21 -> {
+            case "thresholdStart" -> {
+                openTimeMenu(player, "Threshold Start");
+                return;
+            }
+            case "thresholdEnd" -> {
+                openTimeMenu(player, "Threshold End");
+                return;
+            }
+            case "maxTeamTime" -> {
                 openTimeMenu(player, "Max Equipos");
                 return;
             }
-            case 22 -> {
+            case "endPortalTime" -> {
                 openTimeMenu(player, "Portal End");
                 return;
             }
-            case 23 -> {
+            case "shulker" -> {
                 openTimeMenu(player, "Shulker");
                 return;
             }
-            case 24 -> {
+            case "locatorBar" -> {
                 openTimeMenu(player, "Locator Bar");
                 return;
             }
-            case 27 -> {
+            case "playerBuffs" -> {
                 openBuffsMenu(player);
                 return;
             }
-            case 28 -> {
+            case "recipes" -> {
                 openRecipesMenu(player);
                 return;
             }
-            case 29 -> {
+            case "stats" -> {
                 player.closeInventory();
                 player.sendMessage(UHC.getPlugin().getStatsManager().getStatsReport());
                 return;
             }
-            case 36 -> {
+            case "startGame" -> {
                 UHC.getPlugin().getUHCManager().start();
                 player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_STARTED_MSG());
                 player.closeInventory();
                 return;
             }
-            case 37 -> {
+            case "pauseGame" -> {
                 if (settings.getGameState() == GameState.IN_PROGRESS) {
                     UHC.getPlugin().getUHCManager().pause();
                     player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_PAUSED());
+                    player.closeInventory();
                 } else {
                     player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_NOT_RUNNING());
                 }
-                player.closeInventory();
                 return;
             }
-            case 38 -> {
+            case "cancelGame" -> {
                 UHC.getPlugin().getUHCManager().cancel();
-                player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_CANCELLED_MSG());
                 player.closeInventory();
+                player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_CANCELLED_MSG());
                 return;
             }
-            case 45 -> {
+            case "saveConfig" -> {
                 settings.save();
                 player.sendMessage(vch.uhc.misc.Messages.MENU_CONFIG_SAVED());
                 player.closeInventory();
+                return;
             }
-            case 46 -> {
+            case "loadConfig" -> {
                 settings.load();
                 player.sendMessage(vch.uhc.misc.Messages.MENU_LOAD_CONFIG_SUCCESS());
                 player.closeInventory();
-                openMainMenu(player);
                 return;
             }
-            case 47 -> {
+            case "closeMenu" -> {
                 player.closeInventory();
                 return;
-            }
-            default -> {
             }
         }
 
@@ -880,6 +1017,20 @@ public class MenuManager {
                     default -> settings.setMinWorldBorderSeconds(Math.max(0, settings.getMinWorldBorderSeconds() + delta));
                 }
             }
+            case "Threshold Start" -> {
+                switch (unit) {
+                    case "hours" -> settings.setThresholdStartHours(Math.max(0, settings.getThresholdStartHours() + delta));
+                    case "minutes" -> settings.setThresholdStartMinutes(Math.max(0, settings.getThresholdStartMinutes() + delta));
+                    default -> settings.setThresholdStartSeconds(Math.max(0, settings.getThresholdStartSeconds() + delta));
+                }
+            }
+            case "Threshold End" -> {
+                switch (unit) {
+                    case "hours" -> settings.setThresholdEndHours(Math.max(0, settings.getThresholdEndHours() + delta));
+                    case "minutes" -> settings.setThresholdEndMinutes(Math.max(0, settings.getThresholdEndMinutes() + delta));
+                    default -> settings.setThresholdEndSeconds(Math.max(0, settings.getThresholdEndSeconds() + delta));
+                }
+            }
             case "Max Equipos" -> {
                 switch (unit) {
                     case "hours" -> settings.setMaxTeamInGameHours(Math.max(0, settings.getMaxTeamInGameHours() + delta));
@@ -917,6 +1068,7 @@ public class MenuManager {
             }
             case "Skin Shuffle" -> {
                 switch (unit) {
+                    case "hours" -> settings.setSkinShuffleHours(Math.max(0, settings.getSkinShuffleHours() + delta));
                     case "minutes" -> settings.setSkinShuffleMinutes(Math.max(0, settings.getSkinShuffleMinutes() + delta));
                     case "seconds" -> settings.setSkinShuffleSeconds(Math.max(0, settings.getSkinShuffleSeconds() + delta));
                 }
@@ -1101,7 +1253,7 @@ public class MenuManager {
     }
 
     public void openPlayerSelectionMenu(Player player, UHCTeam team) {
-        Inventory menu = Bukkit.createInventory(null, 54, Component.text("§6Seleccionar Jugador"));
+        Inventory menu = Bukkit.createInventory(null, 54, Component.text("§6UHC - Seleccionar Jugador"));
         
         List<UHCPlayer> availablePlayers = UHC.getPlugin().getPlayerManager().getPlayers().stream()
                 .filter(p -> p.getTeam() == null)

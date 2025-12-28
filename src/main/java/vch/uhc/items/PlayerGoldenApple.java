@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -20,6 +21,12 @@ public class PlayerGoldenApple extends BaseItem {
                 'D', Material.DIAMOND,
                 'H', Material.PLAYER_HEAD
         ), vch.uhc.misc.Messages.ITEM_HEAD_APPLE());
+        
+        // Modify recipe to accept both PLAYER_HEAD and WITHER_SKELETON_SKULL
+        getRecipe().setIngredient('H', new RecipeChoice.MaterialChoice(
+            Material.PLAYER_HEAD, 
+            Material.WITHER_SKELETON_SKULL
+        ));
     }
 
     @Override

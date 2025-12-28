@@ -146,8 +146,13 @@ public class SkinManager {
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
+                // Apply skin
                 String command = "skin set " + player.getName() + " " + assignment.getAssignedSkin();
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                
+                // Apply nametag
+                player.displayName(Component.text(assignment.getAssignedSkin()));
+                player.playerListName(Component.text(assignment.getAssignedSkin()));
             } catch (Exception e) {
                 plugin.getLogger().warning(e.getMessage());
             }
@@ -204,8 +209,13 @@ public class SkinManager {
         
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
+                // Restore skin
                 String command = "skin clear " + player.getName();
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                
+                // Restore original nametag
+                player.displayName(Component.text(player.getName()));
+                player.playerListName(Component.text(player.getName()));
             } catch (Exception e) {
                 plugin.getLogger().warning(e.getMessage());
             }

@@ -1,6 +1,6 @@
 name: uhc
 main: vch.uhc.UHC
-version: 0.1.0.46
+version: 0.1.0.66
 api-version: 1.21
 depend: [TAB, PlaceholderAPI]
 commands:

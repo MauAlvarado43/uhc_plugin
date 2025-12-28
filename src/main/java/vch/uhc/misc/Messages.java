@@ -474,6 +474,10 @@ public class Messages {
         return lang().getMessage("menu.clickToConfigure");
     }
 
+    public static String MENU_CLICK_TO_CHANGE() {
+        return lang().getMessage("menu.clickToChange");
+    }
+
     public static String MENU_END_PORTAL_TIME() {
         return lang().getMessage("menu.endPortalTime");
     }
@@ -612,6 +616,10 @@ public class Messages {
 
     public static String ITEM_GLISTERING_MELON_SLICE() {
         return lang().getMessage("item.glisteringMelonSlice");
+    }
+
+    public static String ITEM_GOLDEN_CARROT() {
+        return lang().getMessage("item.goldenCarrot");
     }
 
     public static String ITEM_DRAGON_BREATH() {
@@ -1262,6 +1270,26 @@ public class Messages {
         return lang().getMessage("menu.playerLives.rightClick");
     }
 
+    public static String MENU_ELIMINATION_MODE() {
+        return lang().getMessage("menu.eliminationMode");
+    }
+
+    public static String MENU_ELIMINATION_MODE_DESC() {
+        return lang().getMessage("menu.eliminationMode.desc");
+    }
+
+    public static String MENU_ELIMINATION_MODE_SPECTATOR() {
+        return lang().getMessage("menu.eliminationMode.spectator");
+    }
+
+    public static String MENU_ELIMINATION_MODE_KICK() {
+        return lang().getMessage("menu.eliminationMode.kick");
+    }
+
+    public static String MENU_ELIMINATION_MODE_CLICK() {
+        return lang().getMessage("menu.eliminationMode.click");
+    }
+
     public static String MENU_MAX_WORLD_SIZE() {
         return lang().getMessage("menu.maxWorldSize");
     }
@@ -1487,8 +1515,8 @@ public class Messages {
         return lang().getMessage("menu.skinShuffle");
     }
 
-    public static String MENU_SKIN_SHUFFLE_INTERVAL(int m, int s) {
-        return lang().getMessage("menu.skinShuffle.interval", m, m);
+    public static String MENU_SKIN_SHUFFLE_INTERVAL(int h, int m, int s) {
+        return lang().getMessage("menu.skinShuffle.interval", h, m, s);
     }
 
     public static String MENU_GRADUAL_BORDER() {
@@ -1499,12 +1527,44 @@ public class Messages {
         return lang().getMessage("menu.gradualBorder.desc");
     }
 
+    public static String MENU_GRADUAL_BORDER_NONE() {
+        return lang().getMessage("menu.gradualBorder.none");
+    }
+
     public static String MENU_GRADUAL_BORDER_GRADUAL() {
         return lang().getMessage("menu.gradualBorder.gradual");
     }
 
     public static String MENU_GRADUAL_BORDER_INSTANT() {
         return lang().getMessage("menu.gradualBorder.instant");
+    }
+
+    public static String MENU_GRADUAL_BORDER_THRESHOLD() {
+        return lang().getMessage("menu.gradualBorder.threshold");
+    }
+
+    public static String MENU_THRESHOLD_START_TIME() {
+        return lang().getMessage("menu.thresholdStartTime");
+    }
+
+    public static String MENU_THRESHOLD_START_TIME_CURRENT(int h, int m, int s) {
+        return lang().getMessage("menu.thresholdStartTime.current", h, m, s);
+    }
+
+    public static String MENU_THRESHOLD_START_TIME_CLICK() {
+        return lang().getMessage("menu.thresholdStartTime.clickToConfigure");
+    }
+
+    public static String MENU_THRESHOLD_END_TIME() {
+        return lang().getMessage("menu.thresholdEndTime");
+    }
+
+    public static String MENU_THRESHOLD_END_TIME_CURRENT(int h, int m, int s) {
+        return lang().getMessage("menu.thresholdEndTime.current", h, m, s);
+    }
+
+    public static String MENU_THRESHOLD_END_TIME_CLICK() {
+        return lang().getMessage("menu.thresholdEndTime.clickToConfigure");
     }
 
     public static String MENU_PLAYER_BUFFS() {

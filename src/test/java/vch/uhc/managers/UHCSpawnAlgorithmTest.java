@@ -79,28 +79,35 @@ class UHCSpawnAlgorithmTest {
         }
 
         int remainingSpawns = spawnCount - 4;
-        int pointsPerSide = (int) Math.ceil(remainingSpawns / 4.0);
+        int[] pointsPerSide = new int[4];
+        for (int i = 0; i < remainingSpawns; i++) {
+            pointsPerSide[i % 4]++;
+        }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double)(pointsPerSide + 1);
+        // Lado Norte
+        for (int i = 1; i <= pointsPerSide[0]; i++) {
+            double fraction = i / (double)(pointsPerSide[0] + 1);
             int x = (int)(-size + 2 * size * fraction);
             spawns.add(new SpawnPoint(x, -size));
         }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double)(pointsPerSide + 1);
+        // Lado Este
+        for (int i = 1; i <= pointsPerSide[1]; i++) {
+            double fraction = i / (double)(pointsPerSide[1] + 1);
             int z = (int)(-size + 2 * size * fraction);
             spawns.add(new SpawnPoint(size, z));
         }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double)(pointsPerSide + 1);
+        // Lado Sur
+        for (int i = 1; i <= pointsPerSide[2]; i++) {
+            double fraction = i / (double)(pointsPerSide[2] + 1);
             int x = (int)(size - 2 * size * fraction);
             spawns.add(new SpawnPoint(x, size));
         }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double)(pointsPerSide + 1);
+        // Lado Oeste
+        for (int i = 1; i <= pointsPerSide[3]; i++) {
+            double fraction = i / (double)(pointsPerSide[3] + 1);
             int z = (int)(size - 2 * size * fraction);
             spawns.add(new SpawnPoint(-size, z));
         }
@@ -571,6 +578,78 @@ class UHCSpawnAlgorithmTest {
                         new SpawnPoint(-size, size)
                     );
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("Escenarios Solicitados por el Usuario")
+    class UserRequestedScenariosTests {
+
+        @Test
+        @DisplayName("Escenario: 10 equipos preformados - Verificación de Uniformidad")
+        void tenPreformedTeamsUniformity() {
+            int size = 1000;
+            int teamCount = 10;
+            List<SpawnPoint> spawns = calculateSpawns(teamCount, size);
+
+            assertThat(spawns).hasSize(10);
+
+            // Con el nuevo algoritmo, los 6 spawns extra se distribuyen [2, 2, 1, 1]
+            // Lado Oeste (Side 4) ahora tiene 1 spawn extra.
+            // La distancia entre esquinas en el lado Oeste ya no es 2000.
+            
+            SpawnPoint sw = new SpawnPoint(-size, size); // Esquina 4
+            SpawnPoint nw = new SpawnPoint(-size, -size); // Esquina 1
+            
+            // El spawn extra en el lado Oeste está a la mitad (fraction = 1/2)
+            SpawnPoint westExtra = new SpawnPoint(-size, 0);
+            assertThat(spawns).contains(westExtra);
+
+            double gap1 = sw.distanceTo(westExtra);
+            double gap2 = westExtra.distanceTo(nw);
+            
+            assertThat(gap1).isEqualTo(1000.0);
+            assertThat(gap2).isEqualTo(1000.0);
+        }
+
+        @Test
+        @DisplayName("Escenario: 14 jugadores con equipos in-game (asumiendo 7 equipos de 2)")
+        void fourteenPlayersSevenTeams() {
+            int size = 1000;
+            int teamCount = 7; // 14 players / 2 per team
+            List<SpawnPoint> spawns = calculateSpawns(teamCount, size);
+
+            assertThat(spawns).hasSize(7);
+
+            double minDistance = Double.MAX_VALUE;
+            for (int i = 0; i < spawns.size(); i++) {
+                for (int j = i + 1; j < spawns.size(); j++) {
+                    minDistance = Math.min(minDistance, spawns.get(i).distanceTo(spawns.get(j)));
+                }
+            }
+
+            // 8000 / 7 = ~1142 de separación ideal.
+            assertThat(minDistance).isGreaterThan(600);
+        }
+
+        @Test
+        @DisplayName("Escenario: 14 jugadores con equipos in-game (asumiendo 14 equipos de 1)")
+        void fourteenPlayersFourteenTeams() {
+            int size = 1000;
+            int teamCount = 14;
+            List<SpawnPoint> spawns = calculateSpawns(teamCount, size);
+
+            assertThat(spawns).hasSize(14);
+
+            double minDistance = Double.MAX_VALUE;
+            for (int i = 0; i < spawns.size(); i++) {
+                for (int j = i + 1; j < spawns.size(); j++) {
+                    minDistance = Math.min(minDistance, spawns.get(i).distanceTo(spawns.get(j)));
+                }
+            }
+
+            // 8000 / 14 = ~571 de separación ideal.
+            assertThat(minDistance).isGreaterThan(400);
         }
     }
 }

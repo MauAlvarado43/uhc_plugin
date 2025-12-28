@@ -411,28 +411,35 @@ public class UHCManager {
         }
 
         int remainingSpawns = spawnCount - 4;
-        int pointsPerSide = (int) Math.ceil(remainingSpawns / 4.0);
+        int[] pointsPerSide = new int[4];
+        for (int i = 0; i < remainingSpawns; i++) {
+            pointsPerSide[i % 4]++;
+        }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double) (pointsPerSide + 1);
+        // North
+        for (int i = 1; i <= pointsPerSide[0]; i++) {
+            double fraction = i / (double) (pointsPerSide[0] + 1);
             int x = (int) (-size + 2 * size * fraction);
             spawns.add(createSpawn(world, x, -size));
         }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double) (pointsPerSide + 1);
+        // East
+        for (int i = 1; i <= pointsPerSide[1]; i++) {
+            double fraction = i / (double) (pointsPerSide[1] + 1);
             int z = (int) (-size + 2 * size * fraction);
             spawns.add(createSpawn(world, size, z));
         }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double) (pointsPerSide + 1);
+        // South
+        for (int i = 1; i <= pointsPerSide[2]; i++) {
+            double fraction = i / (double) (pointsPerSide[2] + 1);
             int x = (int) (size - 2 * size * fraction);
             spawns.add(createSpawn(world, x, size));
         }
 
-        for (int i = 1; i <= pointsPerSide && spawns.size() < spawnCount; i++) {
-            double fraction = i / (double) (pointsPerSide + 1);
+        // West
+        for (int i = 1; i <= pointsPerSide[3]; i++) {
+            double fraction = i / (double) (pointsPerSide[3] + 1);
             int z = (int) (size - 2 * size * fraction);
             spawns.add(createSpawn(world, -size, z));
         }

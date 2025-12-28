@@ -35,6 +35,11 @@ public class SettingsCommandHandler {
             return false;
         }
 
+        if (!sender.hasPermission(vch.uhc.misc.enums.Permission.SETTINGS_SET.getNode())) {
+            sender.sendMessage(Messages.NO_PERMISSION());
+            return false;
+        }
+
         if (args.length < 4) {
             sender.sendMessage(Messages.SETTINGS_SPECIFY_VALUE());
             return false;

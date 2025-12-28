@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 
 import vch.uhc.UHC;
 import vch.uhc.misc.Messages;
-import vch.uhc.models.UHCTeam;
-import vch.uhc.misc.enums.TeamMode;
 import vch.uhc.misc.enums.GameState;
+import vch.uhc.misc.enums.TeamMode;
+import vch.uhc.models.UHCTeam;
 
 /**
  * Handler for team management subcommands under /uhc team. Includes
@@ -36,6 +36,10 @@ public class TeamCommandHandler {
         switch (subcommand) {
             case "list" -> {
                 // List all teams and their members
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_LIST.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (UHC.getPlugin().getTeamManager().getTeams().isEmpty()) {
                     sender.sendMessage(Messages.TEAM_NONE_CREATED());
                     return true;
@@ -52,7 +56,7 @@ public class TeamCommandHandler {
             }
             case "create" -> {
                 // Create a new team (Admins only, manual mode)
-                if (!sender.hasPermission("uhc.admin")) {
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_CREATE.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
@@ -74,7 +78,7 @@ public class TeamCommandHandler {
             }
             case "add" -> {
                 // Add a player to a team (Admins only, manual mode)
-                if (!sender.hasPermission("uhc.admin")) {
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_ADD.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
@@ -113,7 +117,7 @@ public class TeamCommandHandler {
             }
             case "remove" -> {
                 // Remove a player from a team (Admins only, manual mode)
-                if (!sender.hasPermission("uhc.admin")) {
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_REMOVE.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
@@ -148,6 +152,10 @@ public class TeamCommandHandler {
             }
             case "rename" -> {
                 // Rename your own team (Leader only)
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_RENAME.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (!(sender instanceof Player renamePlayer)) {
                     if (sender != null) {
                         sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
@@ -190,6 +198,10 @@ public class TeamCommandHandler {
             }
             case "leave" -> {
                 // Leave your current team (Manual mode before game start)
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_LEAVE.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
                     sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;

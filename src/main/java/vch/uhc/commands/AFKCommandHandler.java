@@ -16,6 +16,11 @@ public class AFKCommandHandler implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
+        if (!sender.hasPermission(vch.uhc.misc.enums.Permission.AFK.getNode())) {
+            sender.sendMessage(Messages.NO_PERMISSION());
+            return true;
+        }
+
         // Only players can be AFK
         if (!(sender instanceof Player player)) {
             if (sender != null) {

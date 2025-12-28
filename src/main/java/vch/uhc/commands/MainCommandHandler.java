@@ -48,7 +48,7 @@ public class MainCommandHandler implements CommandExecutor {
         // Handle subcommands using modern switch rule syntax
         switch (args[0].toLowerCase()) {
             case "start" -> {
-                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                if (!sender.hasPermission(Permission.START.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
@@ -56,7 +56,7 @@ public class MainCommandHandler implements CommandExecutor {
                 sender.sendMessage(Messages.GAME_STARTED());
             }
             case "cancel" -> {
-                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                if (!sender.hasPermission(Permission.CANCEL.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
@@ -64,14 +64,26 @@ public class MainCommandHandler implements CommandExecutor {
                 sender.sendMessage(Messages.GAME_CANCELLED());
             }
             case "reload" -> {
-                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                if (!sender.hasPermission(Permission.RELOAD.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
                 sender.sendMessage(Messages.SETTINGS_LOADED());
                 plugin.getUHCManager().reload();
             }
+            case "pause" -> {
+                if (!sender.hasPermission(Permission.PAUSE.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
+                plugin.getUHCManager().pause();
+                sender.sendMessage(Messages.GAME_PAUSED());
+            }
             case "info" -> {
+                if (!sender.hasPermission(Permission.INFO.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 sender.sendMessage(Messages.INFO_HEADER());
                 sender.sendMessage(Messages.INFO_GAME_STATE(plugin.getSettings().getGameState()));
                 sender.sendMessage(Messages.INFO_TEAM_MODE(plugin.getSettings().getTeamMode()));
@@ -109,6 +121,10 @@ public class MainCommandHandler implements CommandExecutor {
                 });
             }
             case "join" -> {
+                if (!sender.hasPermission(Permission.JOIN.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (sender instanceof Player player) {
                     vch.uhc.models.UHCPlayer uhcPlayer = plugin.getPlayerManager().getPlayerByUUID(player.getUniqueId());
                     if (uhcPlayer != null) {
@@ -122,6 +138,10 @@ public class MainCommandHandler implements CommandExecutor {
                 }
             }
             case "leave" -> {
+                if (!sender.hasPermission(Permission.LEAVE.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (sender instanceof Player player) {
                     vch.uhc.models.UHCPlayer uhcPlayer = plugin.getPlayerManager().getPlayerByUUID(player.getUniqueId());
                     if (uhcPlayer != null) {
@@ -135,13 +155,17 @@ public class MainCommandHandler implements CommandExecutor {
                 }
             }
             case "settings" -> {
-                if (!sender.hasPermission("uhc.admin")) {
+                if (!sender.hasPermission(Permission.SETTINGS.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
                 SettingsCommandHandler.onSettingsCommand(sender, args);
             }
             case "menu" -> {
+                if (!sender.hasPermission(Permission.MENU.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (sender instanceof Player player) {
                     plugin.getMenuManager().openMainMenu(player);
                 } else {
@@ -150,17 +174,43 @@ public class MainCommandHandler implements CommandExecutor {
                     }
                 }
             }
-            case "stats" ->
+            case "stats" -> {
+                if (!sender.hasPermission(Permission.STATS.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 sender.sendMessage(plugin.getStatsManager().getStatsReport());
+            }
+            case "afk" -> {
+                if (!sender.hasPermission(Permission.AFK.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
+                if (sender instanceof Player player) {
+                    if (plugin.getAFKManager() != null) {
+                        plugin.getAFKManager().toggleAFK(player);
+                        if (plugin.getAFKManager().isAFK(player.getUniqueId())) {
+                            player.sendMessage(Messages.AFK_NOW_AFK());
+                        } else {
+                            player.sendMessage(Messages.AFK_NO_LONGER_AFK());
+                        }
+                    }
+                } else {
+                    if (sender != null) {
+                        sender.sendMessage(Messages.AFK_ONLY_PLAYERS());
+                    }
+                }
+            }
             case "players" -> {
-                if (!sender.hasPermission("uhc.admin")) {
+                if (!sender.hasPermission(Permission.PLAYERS.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
                 PlayerCommandHandler.onPlayerCommand(sender, args);
             }
-            case "team" ->
+            case "team" -> {
                 TeamCommandHandler.onTeamCommand(sender, args);
+            }
             default -> {
                 sender.sendMessage(Messages.COMMAND_UNKNOWN_SUBCOMMAND());
                 return false;

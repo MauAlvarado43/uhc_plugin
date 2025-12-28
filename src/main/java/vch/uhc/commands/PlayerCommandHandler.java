@@ -33,6 +33,10 @@ public class PlayerCommandHandler {
         switch (args[1].toLowerCase()) {
             case "list" -> {
                 // List all UHC players and their current lives
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.PLAYERS_LIST.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 sender.sendMessage(Messages.PLAYER_LIST_HEADER());
                 if (UHC.getPlugin().getPlayerManager().getPlayers().isEmpty()) {
                     sender.sendMessage(Messages.PLAYER_LIST_NONE());
@@ -44,6 +48,10 @@ public class PlayerCommandHandler {
             }
             case "setlives" -> {
                 // Set the number of lives for a specific player
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.PLAYERS_SETLIVES.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (args.length < 4) {
                     sender.sendMessage(Messages.PLAYER_SETLIVES_USAGE());
                     return false;
@@ -71,6 +79,10 @@ public class PlayerCommandHandler {
             }
             case "sethealth" -> {
                 // Set the maximum health for a specific player
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.PLAYERS_SETHEALTH.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (args.length < 4) {
                     sender.sendMessage(Messages.PLAYER_SETHEALTH_USAGE());
                     return false;
@@ -95,6 +107,10 @@ public class PlayerCommandHandler {
             }
             case "revive" -> {
                 // Revive a player and teleport them to their spawn
+                if (!sender.hasPermission(vch.uhc.misc.enums.Permission.PLAYERS_REVIVE.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
                 if (args.length < 3) {
                     sender.sendMessage(Messages.PLAYER_REVIVE_USAGE());
                     return false;

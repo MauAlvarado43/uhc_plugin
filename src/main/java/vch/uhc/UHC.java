@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import vch.uhc.commands.AFKCommandHandler;
 import vch.uhc.commands.MainCommandHandler;
 import vch.uhc.expansions.PlayerExpansion;
 import vch.uhc.expansions.PlayerHealthExpansion;
@@ -74,7 +73,6 @@ public class UHC extends JavaPlugin {
 
         Objects.requireNonNull(getCommand("uhc")).setTabCompleter(new CommandCompleter());
         Objects.requireNonNull(getCommand("uhc")).setExecutor(new MainCommandHandler());
-        Objects.requireNonNull(getCommand("afk")).setExecutor(new AFKCommandHandler());
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new TeamExpansion().register();

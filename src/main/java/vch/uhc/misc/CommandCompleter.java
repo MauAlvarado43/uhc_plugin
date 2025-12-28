@@ -22,17 +22,17 @@ public class CommandCompleter implements TabCompleter {
 
         rootCommands = new ArrayList<>();
 
-        AvailableCommands start = new AvailableCommands("start");
-        AvailableCommands stop = new AvailableCommands("cancel");
-        AvailableCommands reload = new AvailableCommands("reload");
-        AvailableCommands pause = new AvailableCommands("pause");
-        AvailableCommands info = new AvailableCommands("info");
-        AvailableCommands play = new AvailableCommands("play");
-        AvailableCommands leave = new AvailableCommands("leave");
+        AvailableCommands start = new AvailableCommands("start", vch.uhc.misc.enums.Permission.START.getNode());
+        AvailableCommands stop = new AvailableCommands("cancel", vch.uhc.misc.enums.Permission.CANCEL.getNode());
+        AvailableCommands reload = new AvailableCommands("reload", vch.uhc.misc.enums.Permission.RELOAD.getNode());
+        AvailableCommands pause = new AvailableCommands("pause", vch.uhc.misc.enums.Permission.PAUSE.getNode());
+        AvailableCommands info = new AvailableCommands("info", vch.uhc.misc.enums.Permission.INFO.getNode());
+        AvailableCommands join = new AvailableCommands("join", vch.uhc.misc.enums.Permission.JOIN.getNode());
+        AvailableCommands leave = new AvailableCommands("leave", vch.uhc.misc.enums.Permission.LEAVE.getNode());
 
-        AvailableCommands settings = new AvailableCommands("settings");
+        AvailableCommands settings = new AvailableCommands("settings", vch.uhc.misc.enums.Permission.SETTINGS.getNode());
 
-        AvailableCommands set = new AvailableCommands("set");
+        AvailableCommands set = new AvailableCommands("set", vch.uhc.misc.enums.Permission.SETTINGS_SET.getNode());
 
         AvailableCommands gameMode = new AvailableCommands("gameMode");
         gameMode.addNextArg(new AvailableCommands("pvd"));
@@ -172,26 +172,25 @@ public class CommandCompleter implements TabCompleter {
 
         settings.addNextArg(set);
 
-        AvailableCommands player = new AvailableCommands("players");
+        AvailableCommands player = new AvailableCommands("players", vch.uhc.misc.enums.Permission.PLAYERS.getNode());
 
-        AvailableCommands playerList = new AvailableCommands("list");
+        AvailableCommands playerList = new AvailableCommands("list", vch.uhc.misc.enums.Permission.PLAYERS_LIST.getNode());
 
-        AvailableCommands setLives = new AvailableCommands("setLives");
+        AvailableCommands setLives = new AvailableCommands("setLives", vch.uhc.misc.enums.Permission.PLAYERS_SETLIVES.getNode());
         UHC.getPlugin().getPlayerManager().getPlayers().stream().forEach(p -> {
-            UHC.getPlugin().getLogger().info(p.getName());
             AvailableCommands playerCommand = new AvailableCommands(p.getName());
             playerCommand.addNextArg(new AvailableCommands("<lives>"));
             setLives.addNextArg(playerCommand);
         });
 
-        AvailableCommands setHealth = new AvailableCommands("setHealth");
+        AvailableCommands setHealth = new AvailableCommands("setHealth", vch.uhc.misc.enums.Permission.PLAYERS_SETHEALTH.getNode());
         Bukkit.getOnlinePlayers().stream().forEach(p -> {
             AvailableCommands playerCommand = new AvailableCommands(p.getName());
             playerCommand.addNextArg(new AvailableCommands("<health>"));
             setHealth.addNextArg(playerCommand);
         });
 
-        AvailableCommands revive = new AvailableCommands("revive");
+        AvailableCommands revive = new AvailableCommands("revive", vch.uhc.misc.enums.Permission.PLAYERS_REVIVE.getNode());
         UHC.getPlugin().getPlayerManager().getPlayers().stream().forEach(p -> {
             revive.addNextArg(new AvailableCommands(p.getName()));
         });
@@ -203,10 +202,10 @@ public class CommandCompleter implements TabCompleter {
 
         AvailableCommands team = new AvailableCommands("team");
         
-        AvailableCommands teamCreate = new AvailableCommands("create");
+        AvailableCommands teamCreate = new AvailableCommands("create", vch.uhc.misc.enums.Permission.TEAM_CREATE.getNode());
         teamCreate.addNextArg(new AvailableCommands("<nombre>"));
         
-        AvailableCommands teamAdd = new AvailableCommands("add");
+        AvailableCommands teamAdd = new AvailableCommands("add", vch.uhc.misc.enums.Permission.TEAM_ADD.getNode());
         Bukkit.getOnlinePlayers().stream().forEach(p -> {
             AvailableCommands playerCommand = new AvailableCommands(p.getName());
             UHC.getPlugin().getTeamManager().getTeams().stream().forEach(t -> {
@@ -215,7 +214,7 @@ public class CommandCompleter implements TabCompleter {
             teamAdd.addNextArg(playerCommand);
         });
         
-        AvailableCommands teamRemove = new AvailableCommands("remove");
+        AvailableCommands teamRemove = new AvailableCommands("remove", vch.uhc.misc.enums.Permission.TEAM_REMOVE.getNode());
         Bukkit.getOnlinePlayers().stream().forEach(p -> {
             AvailableCommands playerCommand = new AvailableCommands(p.getName());
             UHC.getPlugin().getTeamManager().getTeams().stream().forEach(t -> {
@@ -224,16 +223,16 @@ public class CommandCompleter implements TabCompleter {
             teamRemove.addNextArg(playerCommand);
         });
         
-        AvailableCommands teamRename = new AvailableCommands("rename");
+        AvailableCommands teamRename = new AvailableCommands("rename", vch.uhc.misc.enums.Permission.TEAM_RENAME.getNode());
         UHC.getPlugin().getTeamManager().getTeams().stream().forEach(t -> {
             AvailableCommands teamCommand = new AvailableCommands(t.getName());
             teamCommand.addNextArg(new AvailableCommands("<nuevoNombre>"));
             teamRename.addNextArg(teamCommand);
         });
         
-        AvailableCommands teamLeave = new AvailableCommands("leave");
+        AvailableCommands teamLeave = new AvailableCommands("leave", vch.uhc.misc.enums.Permission.TEAM_LEAVE.getNode());
         
-        AvailableCommands teamList = new AvailableCommands("list");
+        AvailableCommands teamList = new AvailableCommands("list", vch.uhc.misc.enums.Permission.TEAM_LIST.getNode());
         
         team.addNextArg(teamCreate);
         team.addNextArg(teamAdd);
@@ -242,8 +241,9 @@ public class CommandCompleter implements TabCompleter {
         team.addNextArg(teamLeave);
         team.addNextArg(teamList);
 
-        AvailableCommands menu = new AvailableCommands("menu");
-        AvailableCommands stats = new AvailableCommands("stats");
+        AvailableCommands menu = new AvailableCommands("menu", vch.uhc.misc.enums.Permission.MENU.getNode());
+        AvailableCommands stats = new AvailableCommands("stats", vch.uhc.misc.enums.Permission.STATS.getNode());
+        AvailableCommands afk = new AvailableCommands("afk", vch.uhc.misc.enums.Permission.AFK.getNode());
 
         rootCommands.add(start);
         rootCommands.add(stop);
@@ -253,35 +253,41 @@ public class CommandCompleter implements TabCompleter {
         rootCommands.add(settings);
         rootCommands.add(player);
         rootCommands.add(team);
-        rootCommands.add(play);
+        rootCommands.add(join);
         rootCommands.add(leave);
         rootCommands.add(menu);
         rootCommands.add(stats);
+        rootCommands.add(afk);
 
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         buildRootCommands();
-        return getSuggestionsRecursive(rootCommands, args, 0);
+        return getSuggestionsRecursive(sender, rootCommands, args, 0);
     }
 
-    private List<String> getSuggestionsRecursive(List<AvailableCommands> commands, String[] args, int index) {
+    private List<String> getSuggestionsRecursive(CommandSender sender, List<AvailableCommands> commands, String[] args, int index) {
 
         List<String> suggestions = new ArrayList<>();
 
         if (index >= args.length) {
             for (AvailableCommands cmd : commands) {
-                suggestions.add(cmd.getArg());
+                if (cmd.getPermission() == null || sender.hasPermission(cmd.getPermission())) {
+                    suggestions.add(cmd.getArg());
+                }
             }
         } else {
             String currentArg = args[index].toLowerCase();
             for (AvailableCommands cmd : commands) {
                 if (cmd.getArg().toLowerCase().startsWith(currentArg)) {
+                    if (cmd.getPermission() != null && !sender.hasPermission(cmd.getPermission())) {
+                        continue;
+                    }
                     if (index == args.length - 1) {
                         suggestions.add(cmd.getArg());
                     } else {
-                        return getSuggestionsRecursive(cmd.getNextArgs(), args, index + 1);
+                        return getSuggestionsRecursive(sender, cmd.getNextArgs(), args, index + 1);
                     }
                 }
             }
@@ -297,10 +303,17 @@ class AvailableCommands {
 
     private final String arg;
     private final List<AvailableCommands> nextArgs;
+    private String permission;
 
     public AvailableCommands(String arg) {
         this.arg = arg;
         this.nextArgs = new ArrayList<>();
+    }
+
+    public AvailableCommands(String arg, String permission) {
+        this.arg = arg;
+        this.nextArgs = new ArrayList<>();
+        this.permission = permission;
     }
 
     public String getArg() {
@@ -309,6 +322,14 @@ class AvailableCommands {
 
     public List<AvailableCommands> getNextArgs() {
         return nextArgs;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 
     public void addNextArg(AvailableCommands nextArg) {

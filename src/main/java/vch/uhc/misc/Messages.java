@@ -663,6 +663,10 @@ public class Messages {
         return lang().getMessage("game.started");
     }
 
+    public static String GAME_PAUSED() {
+        return lang().getMessage("game.paused");
+    }
+
     public static String GAME_CANCELLED() {
         return lang().getMessage("game.cancelled");
     }

@@ -50,6 +50,11 @@ public class Messages {
         return lang().getMessage("elimination.message");
     }
 
+    public static String BAN_ELIMINATED() {
+        return lang().getMessage("elimination.ban_message");
+    }
+    
+
     public static String ELIMINATED_TITLE() {
         return lang().getMessage("elimination.title");
     }

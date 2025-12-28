@@ -1077,7 +1077,7 @@ public class UHCManager {
         broadcast(Messages.VICTORY_HEADER());
         broadcast(Messages.VICTORY_TITLE_LINE());
         broadcast("");
-        broadcast(Messages.VICTORY_WINNER_SOLO(winner.getName()));
+        broadcast(Messages.VICTORY_WINNER_SOLO(/*winner.getName()*/"Clair Obscure: Expedition 33"));
         broadcast("");
         broadcast(Messages.VICTORY_GAME_DURATION(gameStats.getFormattedDuration()));
         broadcast(Messages.VICTORY_FOOTER());
@@ -1085,7 +1085,7 @@ public class UHCManager {
 
         Bukkit.getOnlinePlayers().forEach(p -> {
             sendTitle(p,
-                    Messages.VICTORY_PLAYER_TITLE(winner.getName()),
+                    Messages.VICTORY_PLAYER_TITLE(/*winner.getName()*/ "Clair Obscure: Expedition 33"),
                     Messages.VICTORY_TITLE_WON());
         });
 
@@ -1123,7 +1123,7 @@ public class UHCManager {
         broadcast(Messages.VICTORY_HEADER());
         broadcast(Messages.VICTORY_TITLE_LINE());
         broadcast("");
-        broadcast(Messages.VICTORY_WINNING_TEAM(winningTeam.getName()));
+        broadcast(Messages.VICTORY_WINNING_TEAM(/*winningTeam.getName()*/"Clair Obscure: Expedition 33"));
         broadcast("");
         broadcast(Messages.VICTORY_TEAM_MEMBERS());
 
@@ -1139,7 +1139,7 @@ public class UHCManager {
 
         Bukkit.getOnlinePlayers().forEach(p -> {
             sendTitle(p,
-                    Messages.VICTORY_TEAM_TITLE(winningTeam.getName()),
+                    Messages.VICTORY_TEAM_TITLE(/*winningTeam.getName()*/ "Clair Obscure: Expedition 33"),
                     Messages.VICTORY_TITLE_WON());
         });
 

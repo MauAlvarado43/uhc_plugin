@@ -110,7 +110,7 @@ public class PlayerDeathListener extends BaseListener {
                 if (UHC.getPlugin().getSettings().getEliminationMode() == EliminationMode.KICK) {
                     Bukkit.getScheduler().runTaskLater(UHC.getPlugin(), () -> {
                         victim.sendMessage(Messages.ELIMINATED());
-                        victim.kick(net.kyori.adventure.text.Component.text(Messages.ELIMINATED()));
+                        victim.kick(net.kyori.adventure.text.Component.text(Messages.BAN_ELIMINATED()));
                     }, 20L);
                 } else {
                     // Default: SPECTATOR mode

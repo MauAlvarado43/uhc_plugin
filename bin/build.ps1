@@ -22,30 +22,23 @@ function Update-Version {
     $major = [int]$versionParts[0]
     $minor = [int]$versionParts[1]
     $patch = [int]$versionParts[2]
-    $hotfix = [int]$versionParts[3]
     
     switch ($type) {
         "major" {
             $major++
             $minor = 0
             $patch = 0
-            $hotfix = 0
         }
         "minor" {
             $minor++
             $patch = 0
-            $hotfix = 0
         }
         "patch" {
             $patch++
-            $hotfix = 0
-        }
-        "hotfix" {
-            $hotfix++
         }
     }
     
-    $newVersion = "$major.$minor.$patch.$hotfix"
+    $newVersion = "$major.$minor.$patch"
     $pom.project.version = $newVersion
     $pom.Save((Resolve-Path $pomPath))
     

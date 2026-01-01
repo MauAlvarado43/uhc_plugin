@@ -611,6 +611,62 @@ public class Messages {
         return lang().getMessage("menu.configSaved");
     }
 
+    public static String MENU_BACKUP_SAVE() {
+        return lang().getMessage("menu.backup.save");
+    }
+
+    public static String MENU_BACKUP_SAVE_DESC() {
+        return lang().getMessage("menu.backup.save.desc");
+    }
+
+    public static String MENU_BACKUP_LOAD() {
+        return lang().getMessage("menu.backup.load");
+    }
+
+    public static String MENU_BACKUP_LOAD_DESC() {
+        return lang().getMessage("menu.backup.load.desc");
+    }
+
+    public static String MENU_BACKUP_CLEAR() {
+        return lang().getMessage("menu.backup.clear");
+    }
+
+    public static String MENU_BACKUP_CLEAR_DESC() {
+        return lang().getMessage("menu.backup.clear.desc");
+    }
+
+    public static String BACKUP_SAVED() {
+        return lang().getMessage("backup.saved");
+    }
+
+    public static String BACKUP_LOADED() {
+        return lang().getMessage("backup.loaded");
+    }
+
+    public static String BACKUP_NOT_FOUND() {
+        return lang().getMessage("backup.notFound");
+    }
+
+    public static String BACKUP_CLEARED() {
+        return lang().getMessage("backup.cleared");
+    }
+
+    public static String MENU_RESUME_GAME() {
+        return lang().getMessage("menu.resumeGame");
+    }
+
+    public static String MENU_RESUME_GAME_DESC() {
+        return lang().getMessage("menu.resumeGame.desc");
+    }
+
+    public static String MENU_GAME_RESUMED() {
+        return lang().getMessage("menu.gameResumed");
+    }
+
+    public static String MENU_GAME_NOT_PAUSED() {
+        return lang().getMessage("menu.gameNotPaused");
+    }
+
     public static String GAMEMODE_ENDER_DRAGON() {
         return lang().getMessage("gamemode.enderDragon");
     }
@@ -1466,6 +1522,18 @@ public class Messages {
 
     public static String STATS_TOP_KILLERS_ENTRY(int position, String name, int kills) {
         return lang().getMessage("stats.topKillers.entry", position, name, kills);
+    }
+
+    public static String BRAND_SCOREBOARD_TITLE(String brandName) {
+        return lang().getMessage("brand.scoreboard.title", brandName);
+    }
+
+    public static String BRAND_GAME_STARTING(String brandName) {
+        return lang().getMessage("brand.game.starting", brandName);
+    }
+
+    public static String BRAND_SETTINGS_UPDATED(String brandName) {
+        return lang().getMessage("brand.settings.updated", brandName);
     }
 
     public static String UHC_SCOREBOARD_TITLE() {

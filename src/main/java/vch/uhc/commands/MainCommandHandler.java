@@ -211,6 +211,38 @@ public class MainCommandHandler implements CommandExecutor {
             case "team" -> {
                 TeamCommandHandler.onTeamCommand(sender, args);
             }
+            case "backup" -> {
+                if (!sender.hasPermission(Permission.ADMIN.getNode())) {
+                    sender.sendMessage(Messages.NO_PERMISSION());
+                    return false;
+                }
+                
+                if (args.length < 2) {
+                    sender.sendMessage("§cUso: /uhc backup <save|load|clear>");
+                    return false;
+                }
+                
+                switch (args[1].toLowerCase()) {
+                    case "save" -> {
+                        plugin.getBackupManager().saveGameState();
+                        sender.sendMessage(vch.uhc.misc.Messages.BACKUP_SAVED());
+                    }
+                    case "load" -> {
+                        if (plugin.getBackupManager().loadGameState()) {
+                            sender.sendMessage(vch.uhc.misc.Messages.BACKUP_LOADED());
+                        } else {
+                            sender.sendMessage(vch.uhc.misc.Messages.BACKUP_NOT_FOUND());
+                        }
+                    }
+                    case "clear" -> {
+                        plugin.getBackupManager().clearBackup();
+                        sender.sendMessage(vch.uhc.misc.Messages.BACKUP_CLEARED());
+                    }
+                    default -> {
+                        sender.sendMessage("§cSubcomando desconocido. Usa: save, load, o clear");
+                    }
+                }
+            }
             default -> {
                 sender.sendMessage(Messages.COMMAND_UNKNOWN_SUBCOMMAND());
                 return false;

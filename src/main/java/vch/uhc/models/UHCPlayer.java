@@ -107,6 +107,10 @@ public class UHCPlayer {
     public void addKill() {
         this.kills++;
     }
+    
+    public void setKills(int kills) {
+        this.kills = kills;
+    }
 
     public int getDeaths() {
         return deaths;
@@ -114,6 +118,10 @@ public class UHCPlayer {
 
     public void addDeath() {
         this.deaths++;
+    }
+    
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
     }
 
     public boolean isIronman() {

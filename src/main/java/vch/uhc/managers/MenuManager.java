@@ -390,11 +390,40 @@ public class MenuManager {
                 Arrays.asList(vch.uhc.misc.Messages.MENU_PAUSE_GAME_DESC().split("\n"))
         ));
 
-        mapping.put(38, "cancelGame");
+        mapping.put(38, "resumeGame");
         menu.setItem(38, createMenuItem(
+                Material.ORANGE_WOOL,
+                vch.uhc.misc.Messages.MENU_RESUME_GAME(),
+                Arrays.asList(vch.uhc.misc.Messages.MENU_RESUME_GAME_DESC().split("\n"))
+        ));
+
+        mapping.put(39, "cancelGame");
+        menu.setItem(39, createMenuItem(
                 Material.RED_WOOL,
                 vch.uhc.misc.Messages.MENU_CANCEL_GAME(),
                 Arrays.asList(vch.uhc.misc.Messages.MENU_CANCEL_GAME_DESC().split("\n"))
+        ));
+
+        // Backup controls
+        mapping.put(40, "saveBackup");
+        menu.setItem(40, createMenuItem(
+                Material.WRITABLE_BOOK,
+                vch.uhc.misc.Messages.MENU_BACKUP_SAVE(),
+                Arrays.asList(vch.uhc.misc.Messages.MENU_BACKUP_SAVE_DESC().split("\\n"))
+        ));
+
+        mapping.put(41, "loadBackup");
+        menu.setItem(41, createMenuItem(
+                Material.ENCHANTED_BOOK,
+                vch.uhc.misc.Messages.MENU_BACKUP_LOAD(),
+                Arrays.asList(vch.uhc.misc.Messages.MENU_BACKUP_LOAD_DESC().split("\\n"))
+        ));
+
+        mapping.put(42, "clearBackup");
+        menu.setItem(42, createMenuItem(
+                Material.LAVA_BUCKET,
+                vch.uhc.misc.Messages.MENU_BACKUP_CLEAR(),
+                Arrays.asList(vch.uhc.misc.Messages.MENU_BACKUP_CLEAR_DESC().split("\\n"))
         ));
 
         mapping.put(45, "saveConfig");
@@ -942,6 +971,16 @@ public class MenuManager {
                 }
                 return;
             }
+            case "resumeGame" -> {
+                if (settings.getGameState() == GameState.PAUSED) {
+                    UHC.getPlugin().getUHCManager().resume();
+                    player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_RESUMED());
+                    player.closeInventory();
+                } else {
+                    player.sendMessage(vch.uhc.misc.Messages.MENU_GAME_NOT_PAUSED());
+                }
+                return;
+            }
             case "cancelGame" -> {
                 UHC.getPlugin().getUHCManager().cancel();
                 player.closeInventory();
@@ -957,6 +996,27 @@ public class MenuManager {
             case "loadConfig" -> {
                 settings.load();
                 player.sendMessage(vch.uhc.misc.Messages.MENU_LOAD_CONFIG_SUCCESS());
+                player.closeInventory();
+                return;
+            }
+            case "saveBackup" -> {
+                UHC.getPlugin().getBackupManager().saveGameState();
+                player.sendMessage(vch.uhc.misc.Messages.BACKUP_SAVED());
+                player.closeInventory();
+                return;
+            }
+            case "loadBackup" -> {
+                if (UHC.getPlugin().getBackupManager().loadGameState()) {
+                    player.sendMessage(vch.uhc.misc.Messages.BACKUP_LOADED());
+                } else {
+                    player.sendMessage(vch.uhc.misc.Messages.BACKUP_NOT_FOUND());
+                }
+                player.closeInventory();
+                return;
+            }
+            case "clearBackup" -> {
+                UHC.getPlugin().getBackupManager().clearBackup();
+                player.sendMessage(vch.uhc.misc.Messages.BACKUP_CLEARED());
                 player.closeInventory();
                 return;
             }

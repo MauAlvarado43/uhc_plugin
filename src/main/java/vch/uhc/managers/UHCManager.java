@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -131,11 +132,13 @@ public class UHCManager {
             gameTimeTask.cancel();
         }
         settings.save();
+        plugin.getBackupManager().saveGameState();
     }
 
     public void resume() {
         settings.setGameState(GameState.IN_PROGRESS);
         settings.load();
+        plugin.getBackupManager().loadGameState();
         startTimedTasks();
     }
 
@@ -147,6 +150,7 @@ public class UHCManager {
 
         plugin.getSkinManager().restoreAllSkins();
         plugin.getSkinManager().clearAssignments();
+        plugin.getBackupManager().clearBackup();
     }
 
     public void reload() {
@@ -244,10 +248,11 @@ public class UHCManager {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = manager.getNewScoreboard();
 
+        String brandTitle = Messages.BRAND_SCOREBOARD_TITLE(settings.getBrandName());
         Objective objective = scoreboard.registerNewObjective(
                 "uhc",
                 Criteria.DUMMY,
-                Component.text(Messages.UHC_SCOREBOARD_TITLE()));
+                Component.text(brandTitle));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         player.setScoreboard(scoreboard);
@@ -448,8 +453,37 @@ public class UHCManager {
     }
 
     private Location createSpawn(World world, int x, int z) {
-        int worldY = world.getHighestBlockYAt(x, z) + 1;
-        return new Location(world, x + 0.5, worldY, z + 0.5);
+        return findSafeSpawnLocation(world, x, z);
+    }
+    
+    /**
+     * Finds a safe spawn location at the surface and creates a small bedrock platform.
+     * Ensures players spawn on top with a safe platform, not in caves.
+     */
+    private Location findSafeSpawnLocation(World world, int x, int z) {
+        int highestY = world.getHighestBlockYAt(x, z);
+        
+        // Create a small 3x3 bedrock platform at the surface
+        for (int xOffset = -1; xOffset <= 1; xOffset++) {
+            for (int zOffset = -1; zOffset <= 1; zOffset++) {
+                Block platformBlock = world.getBlockAt(x + xOffset, highestY, z + zOffset);
+                platformBlock.setType(Material.BEDROCK);
+                
+                // Clear blocks above platform
+                world.getBlockAt(x + xOffset, highestY + 1, z + zOffset).setType(Material.AIR);
+                world.getBlockAt(x + xOffset, highestY + 2, z + zOffset).setType(Material.AIR);
+            }
+        }
+        
+        // Add invisible light block in the center for illumination
+        Block lightBlock = world.getBlockAt(x, highestY + 2, z);
+        lightBlock.setType(Material.LIGHT);
+        org.bukkit.block.data.type.Light lightData = (org.bukkit.block.data.type.Light) lightBlock.getBlockData();
+        lightData.setLevel(15); // Maximum light level
+        lightBlock.setBlockData(lightData);
+        
+        // Spawn on center of bedrock platform
+        return new Location(world, x + 0.5, highestY + 1, z + 0.5);
     }
 
     public Location getSafeRespawnLocation(Location originalSpawn) {
@@ -819,7 +853,7 @@ public class UHCManager {
                 Bukkit.getOnlinePlayers().forEach(p -> {
                     Location loc = p.getLocation();
                     if (loc != null) {
-                        p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f);
+                        p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.5f);
                     }
                 });
             }
@@ -829,9 +863,9 @@ public class UHCManager {
             agreementActive = false;
 
             broadcast("");
-            broadcast(Messages.PVP_ACTIVATED());
             broadcast(Messages.PVP_ACTIVATED_LINE());
             broadcast(Messages.PVP_ACTIVATED());
+            broadcast(Messages.PVP_ACTIVATED_LINE());
             broadcast("");
 
             Bukkit.getOnlinePlayers().forEach(p -> {
@@ -840,7 +874,7 @@ public class UHCManager {
                         Messages.PVP_ACTIVATED_SUBTITLE());
                 Location loc = p.getLocation();
                 if (loc != null) {
-                    p.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.0f);
+                    p.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BELL, 0.6f, 1.2f);
                 }
             });
 
@@ -873,12 +907,9 @@ public class UHCManager {
 
             broadcast("");
             broadcast(Messages.BUFFS_ACTIVATED_BORDER());
-            broadcast("");
             broadcast(Messages.BUFFS_ACTIVATED_TITLE());
-            broadcast("");
             broadcast(Messages.BUFFS_ACTIVATED_HEARTS((int) settings.getExtraHearts()));
             broadcast(Messages.BUFFS_ACTIVATED_RESISTANCE());
-            broadcast("");
             broadcast(Messages.BUFFS_ACTIVATED_BORDER());
             broadcast("");
 
@@ -905,7 +936,7 @@ public class UHCManager {
 
                 Location loc = p.getLocation();
                 if (loc != null) {
-                    p.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                    p.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.0f);
                 }
             });
 
@@ -1257,6 +1288,84 @@ public class UHCManager {
             return;
         }
         Bukkit.getServer().broadcast(LegacyComponentSerializer.legacySection().deserialize(message));
+    }
+
+    // Getters and setters for backup/restore system
+    
+    public int getAgreementElapsedSeconds() {
+        return agreementElapsedSeconds;
+    }
+    
+    public void setAgreementElapsedSeconds(int seconds) {
+        this.agreementElapsedSeconds = seconds;
+    }
+    
+    public void setAgreementActive(boolean active) {
+        this.agreementActive = active;
+    }
+    
+    public int getBuffsElapsedSeconds() {
+        return buffsElapsedSeconds;
+    }
+    
+    public void setBuffsElapsedSeconds(int seconds) {
+        this.buffsElapsedSeconds = seconds;
+    }
+    
+    public boolean isBuffsApplied() {
+        return buffsApplied;
+    }
+    
+    public void setBuffsApplied(boolean applied) {
+        this.buffsApplied = applied;
+    }
+    
+    public int getSkinShuffleElapsedSeconds() {
+        return skinShuffleElapsedSeconds;
+    }
+    
+    public void setSkinShuffleElapsedSeconds(int seconds) {
+        this.skinShuffleElapsedSeconds = seconds;
+    }
+    
+    public int getCurrentWorldSize() {
+        return currentWorldSize;
+    }
+    
+    public void setCurrentWorldSize(int size) {
+        this.currentWorldSize = size;
+    }
+    
+    public boolean isCheckingProximity() {
+        return isCheckingProximity;
+    }
+    
+    public void setCheckingProximity(boolean checking) {
+        this.isCheckingProximity = checking;
+    }
+    
+    public boolean isTeamsFormed() {
+        return teamsFormed;
+    }
+    
+    public GameStats getGameStats() {
+        return gameStats;
+    }
+    
+    public void setGameStats(GameStats stats) {
+        this.gameStats = stats;
+    }
+    
+    public void setElapsedHours(int hours) {
+        this.elapsedHours = hours;
+    }
+    
+    public void setElapsedMinutes(int minutes) {
+        this.elapsedMinutes = minutes;
+    }
+    
+    public void setElapsedSeconds(int seconds) {
+        this.elapsedSeconds = seconds;
     }
 
 }

@@ -21,6 +21,7 @@ import vch.uhc.listeners.PlayerDamageListener;
 import vch.uhc.listeners.PlayerDeathListener;
 import vch.uhc.listeners.PlayerJoinListener;
 import vch.uhc.managers.AFKManager;
+import vch.uhc.managers.BackupManager;
 import vch.uhc.managers.CombatTracker;
 import vch.uhc.managers.GameModeManager;
 import vch.uhc.managers.MenuManager;
@@ -32,6 +33,7 @@ import vch.uhc.managers.UHCManager;
 import vch.uhc.misc.CommandCompleter;
 import vch.uhc.misc.LanguageManager;
 import vch.uhc.misc.Settings;
+import vch.uhc.misc.enums.GameState;
 
 public class UHC extends JavaPlugin {
 
@@ -47,6 +49,7 @@ public class UHC extends JavaPlugin {
     private GameModeManager gameModeManager;
     private MenuManager menuManager;
     private CombatTracker combatTracker;
+    private BackupManager backupManager;
 
     @Override
     public void onEnable() {
@@ -63,6 +66,7 @@ public class UHC extends JavaPlugin {
         gameModeManager = new GameModeManager();
         menuManager = new MenuManager();
         combatTracker = new CombatTracker();
+        backupManager = new BackupManager();
 
         new ChatListener().register();
         new EntityDeathListener().register();
@@ -104,11 +108,29 @@ public class UHC extends JavaPlugin {
                 """.formatted(version)
                 + "\u00a76==========================" + "\u00a7r" + "\n"
         );
+        
+        // Auto-load game state if backup exists
+        if (backupManager.hasBackup()) {
+            getLogger().info("Found existing game state backup. Loading...");
+            if (backupManager.loadGameState()) {
+                getLogger().info("Game state restored successfully");
+            } else {
+                getLogger().warning("Failed to restore game state from backup");
+            }
+        }
 
     }
 
     @Override
     public void onDisable() {
+        // Save game state on shutdown if game is in progress or paused
+        if (settings != null && uhcManager != null && backupManager != null) {
+            GameState state = settings.getGameState();
+            if (state == GameState.IN_PROGRESS || state == GameState.PAUSED) {
+                backupManager.saveGameState();
+                getLogger().info("Game state saved due to server shutdown");
+            }
+        }
     }
 
     public static UHC getPlugin() {
@@ -157,6 +179,10 @@ public class UHC extends JavaPlugin {
 
     public CombatTracker getCombatTracker() {
         return combatTracker;
+    }
+
+    public BackupManager getBackupManager() {
+        return backupManager;
     }
 
 }

@@ -139,12 +139,16 @@ public class CommandCompleter implements TabCompleter {
             recipe.addNextArg(recipeCommands);
         });
 
+        AvailableCommands brand = new AvailableCommands("brand");
+        brand.addNextArg(new AvailableCommands("<name>"));
+
         set.addNextArg(gameMode);
         set.addNextArg(teamMode);
         set.addNextArg(teamSize);
         set.addNextArg(playerLives);
         set.addNextArg(maxWorldSize);
         set.addNextArg(minWorldSize);
+        set.addNextArg(brand);
         set.addNextArg(gameHours);
         set.addNextArg(gameMinutes);
         set.addNextArg(gameSeconds);
@@ -244,6 +248,11 @@ public class CommandCompleter implements TabCompleter {
         AvailableCommands menu = new AvailableCommands("menu", vch.uhc.misc.enums.Permission.MENU.getNode());
         AvailableCommands stats = new AvailableCommands("stats", vch.uhc.misc.enums.Permission.STATS.getNode());
         AvailableCommands afk = new AvailableCommands("afk", vch.uhc.misc.enums.Permission.AFK.getNode());
+        
+        AvailableCommands backup = new AvailableCommands("backup", vch.uhc.misc.enums.Permission.ADMIN.getNode());
+        backup.addNextArg(new AvailableCommands("save"));
+        backup.addNextArg(new AvailableCommands("load"));
+        backup.addNextArg(new AvailableCommands("clear"));
 
         rootCommands.add(start);
         rootCommands.add(stop);
@@ -258,6 +267,7 @@ public class CommandCompleter implements TabCompleter {
         rootCommands.add(menu);
         rootCommands.add(stats);
         rootCommands.add(afk);
+        rootCommands.add(backup);
 
     }
 

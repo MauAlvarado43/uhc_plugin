@@ -17,6 +17,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import vch.uhc.UHC;
 import vch.uhc.misc.BaseListener;
@@ -135,6 +137,12 @@ public class PlayerDeathListener extends BaseListener {
                 
             } else {
 
+                // Send death coordinates to player
+                int deathX = deathLoc.getBlockX();
+                int deathY = deathLoc.getBlockY();
+                int deathZ = deathLoc.getBlockZ();
+                victim.sendMessage(Messages.DEATH_CHEST_COORDS(deathX, deathY, deathZ));
+
                 Bukkit.getScheduler().runTaskLater(UHC.getPlugin(), () -> {
                     if (uhcVictim.getSpawn() != null) {
                         Location safeSpawn = UHC.getPlugin().getUHCManager().getSafeRespawnLocation(uhcVictim.getSpawn());
@@ -146,10 +154,20 @@ public class PlayerDeathListener extends BaseListener {
 
                             victim.spigot().respawn();
                             victim.teleport(safeSpawn);
+                            
+                            // Reset max health to base value (20.0) to balance PvE deaths
                             AttributeInstance maxHealthAttr = victim.getAttribute(Attribute.MAX_HEALTH);
                             if (maxHealthAttr != null) {
-                                victim.setHealth(maxHealthAttr.getValue());
+                                maxHealthAttr.setBaseValue(20.0);
+                                victim.setHealth(20.0);
                             }
+                            
+                            // Apply respawn protection effects
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 20 * 30, 0, false, false)); // 30 seconds
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 20 * 30, 0, false, false)); // 30 seconds
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 60, 0, false, false)); // 60 seconds
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 15, 0, false, false)); // 15 seconds
+                            
                             victim.sendMessage(Messages.RESPAWN_MESSAGE(uhcVictim.getLives()));
                         }
                     }

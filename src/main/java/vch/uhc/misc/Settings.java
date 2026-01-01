@@ -90,6 +90,8 @@ public class Settings {
 
   private EliminationMode eliminationMode = EliminationMode.SPECTATOR;
 
+  private String brandName = "UHC";
+
   private final transient java.util.ArrayList<BaseItem> items = new java.util.ArrayList<>(java.util.Arrays.asList(
     new vch.uhc.items.DragonBreath(),
     new vch.uhc.items.GlisteringMelonSlice(),
@@ -256,6 +258,14 @@ public class Settings {
 
   public EliminationMode getEliminationMode() {
     return eliminationMode;
+  }
+
+  public String getBrandName() {
+    return brandName != null && !brandName.isEmpty() ? brandName : "UHC";
+  }
+
+  public void setBrandName(String brandName) {
+    this.brandName = brandName;
   }
 
   public java.util.ArrayList<BaseItem> getItems() {

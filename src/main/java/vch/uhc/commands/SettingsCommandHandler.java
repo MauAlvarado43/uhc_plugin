@@ -50,6 +50,19 @@ public class SettingsCommandHandler {
 
         switch (setting.toLowerCase()) {
 
+            case "brand", "brandname", "name" -> {
+                // Set the brand/event name
+                // Allow multiple words by joining remaining args
+                StringBuilder brandName = new StringBuilder(value);
+                for (int i = 4; i < args.length; i++) {
+                    brandName.append(" ").append(args[i]);
+                }
+                String finalBrandName = brandName.toString();
+                UHC.getPlugin().getSettings().setBrandName(finalBrandName);
+                UHC.getPlugin().getSettings().save();
+                sender.sendMessage(Messages.BRAND_SETTINGS_UPDATED(finalBrandName));
+            }
+
             case "gamemode" -> {
                 // Set the game mode (PVD, PVP, ResourceRush)
                 Map<String, GameMode> gameModes = Map.of(

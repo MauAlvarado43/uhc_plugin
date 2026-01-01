@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
@@ -69,17 +70,25 @@ public class SkinManager {
 
             List<SkinAssignment> assignments = createShuffledAssignments(onlinePlayers);
 
-            for (SkinAssignment assignment : assignments) {
+            for (int i = 0; i < assignments.size(); i++) {
+                SkinAssignment assignment = assignments.get(i);
                 skinAssignments.put(assignment.getPlayerUUID(), assignment);
-                applySkinToPlayer(assignment);
+                
+                long delay = i * 2L;
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    applySkinToPlayer(assignment);
+                }, delay);
             }
 
-            Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_BORDER()));
-            Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_TITLE()));
-            Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_DESCRIPTION()));
-            Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_HINT()));
-            Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_BORDER()));
-        } catch (Exception e) {
+            long totalDelay = assignments.size() * 2L + 10L;
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_BORDER()));
+                Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_TITLE()));
+                Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_DESCRIPTION()));
+                Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_HINT()));
+                Bukkit.getServer().broadcast(Component.text(Messages.SKIN_SHUFFLE_BORDER()));
+            }, totalDelay);
+        } catch (IllegalArgumentException e) {
             plugin.getLogger().warning(e.getMessage());
         }
     }
@@ -144,19 +153,17 @@ public class SkinManager {
             return;
         }
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                // Apply skin
-                String command = "skin set " + player.getName() + " " + assignment.getAssignedSkin();
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-                
-                // Apply nametag
-                player.displayName(Component.text(assignment.getAssignedSkin()));
-                player.playerListName(Component.text(assignment.getAssignedSkin()));
-            } catch (Exception e) {
-                plugin.getLogger().warning(e.getMessage());
-            }
-        });
+        try {
+            // Apply skin
+            String command = "skin set " + player.getName() + " " + assignment.getAssignedSkin();
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            
+            // Apply nametag
+            player.displayName(Component.text(assignment.getAssignedSkin()));
+            player.playerListName(Component.text(assignment.getAssignedSkin()));
+        } catch (CommandException e) {
+            plugin.getLogger().warning(e.getMessage());
+        }
     }
 
     public boolean revealSkin(UUID attackedUUID, UUID attackerUUID) {
@@ -207,19 +214,17 @@ public class SkinManager {
 
     private void restoreOriginalSkin(Player player) {
         
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                // Restore skin
-                String command = "skin clear " + player.getName();
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-                
-                // Restore original nametag
-                player.displayName(Component.text(player.getName()));
-                player.playerListName(Component.text(player.getName()));
-            } catch (Exception e) {
-                plugin.getLogger().warning(e.getMessage());
-            }
-        });
+        try {
+            // Restore skin
+            String command = "skin clear " + player.getName();
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            
+            // Restore original nametag
+            player.displayName(Component.text(player.getName()));
+            player.playerListName(Component.text(player.getName()));
+        } catch (CommandException e) {
+            plugin.getLogger().warning(e.getMessage());
+        }
     }
 
     public void restoreAllSkins() {
@@ -227,19 +232,27 @@ public class SkinManager {
             if (skinsAPI == null)
                 return;
 
+            int i = 0;
             for (UUID playerUUID : skinAssignments.keySet()) {
                 try {
                     Player player = Bukkit.getPlayer(playerUUID);
                     if (player != null) {
-                        restoreOriginalSkin(player);
+                        long delay = i * 2L;
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            restoreOriginalSkin(player);
+                        }, delay);
+                        i++;
                     }
-                } catch (Exception e) {
+                } catch (IllegalArgumentException e) {
                     plugin.getLogger().warning(e.getMessage());
                 }
             }
 
-            Bukkit.getServer().broadcast(Component.text(Messages.SKIN_RESTORE_SUCCESS()));
-        } catch (Exception e) {
+            long totalDelay = i * 2L + 10L;
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Bukkit.getServer().broadcast(Component.text(Messages.SKIN_RESTORE_SUCCESS()));
+            }, totalDelay);
+        } catch (IllegalArgumentException e) {
             plugin.getLogger().warning(e.getMessage());
         }
     }

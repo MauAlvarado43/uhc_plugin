@@ -411,6 +411,14 @@ public class Messages {
         return lang().getMessage("uhc.teamsMerged", teamName);
     }
 
+    public static String UHC_TEAM_FORMED_SOLO() {
+        return lang().getMessage("uhc.teamFormedSolo");
+    }
+
+    public static String TEAM_FORMATION_ENDED() {
+        return lang().getMessage("uhc.teamFormationEnded");
+    }
+
     public static String PVP_WARNING_SECONDS(int seconds) {
         return lang().getMessage("pvp.warningSeconds", seconds);
     }
@@ -629,6 +637,10 @@ public class Messages {
 
     public static String ITEM_DRAGON_BREATH() {
         return lang().getMessage("item.dragonBreath");
+    }
+
+    public static String ITEM_MAX_HEALTH_REACHED() {
+        return lang().getMessage("item.maxHealthReached");
     }
 
     public static String PROXIMITY_NEARBY_PLAYER(String playerName) {

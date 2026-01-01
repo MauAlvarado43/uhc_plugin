@@ -21,6 +21,7 @@ import vch.uhc.listeners.PlayerDamageListener;
 import vch.uhc.listeners.PlayerDeathListener;
 import vch.uhc.listeners.PlayerJoinListener;
 import vch.uhc.managers.AFKManager;
+import vch.uhc.managers.CombatTracker;
 import vch.uhc.managers.GameModeManager;
 import vch.uhc.managers.MenuManager;
 import vch.uhc.managers.PlayerManager;
@@ -45,6 +46,7 @@ public class UHC extends JavaPlugin {
     private AFKManager afkManager;
     private GameModeManager gameModeManager;
     private MenuManager menuManager;
+    private CombatTracker combatTracker;
 
     @Override
     public void onEnable() {
@@ -60,6 +62,7 @@ public class UHC extends JavaPlugin {
         afkManager = new AFKManager();
         gameModeManager = new GameModeManager();
         menuManager = new MenuManager();
+        combatTracker = new CombatTracker();
 
         new ChatListener().register();
         new EntityDeathListener().register();
@@ -150,6 +153,10 @@ public class UHC extends JavaPlugin {
 
     public LanguageManager getLanguageManager() {
         return languageManager;
+    }
+
+    public CombatTracker getCombatTracker() {
+        return combatTracker;
     }
 
 }

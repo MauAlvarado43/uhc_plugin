@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import vch.uhc.UHC;
 import vch.uhc.misc.Messages;
 import vch.uhc.misc.enums.GameState;
-import vch.uhc.misc.enums.TeamMode;
 import vch.uhc.models.UHCTeam;
 
 /**
@@ -55,13 +54,9 @@ public class TeamCommandHandler {
                 sender.sendMessage(Messages.TEAM_LIST_FOOTER());
             }
             case "create" -> {
-                // Create a new team (Admins only, manual mode)
+                // Create a new team (Admins only)
                 if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_CREATE.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
-                    return false;
-                }
-                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
-                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (args.length < 3) {
@@ -77,13 +72,9 @@ public class TeamCommandHandler {
                 sender.sendMessage(Messages.TEAM_CREATED(teamName));
             }
             case "add" -> {
-                // Add a player to a team (Admins only, manual mode)
+                // Add a player to a team (Admins only)
                 if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_ADD.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
-                    return false;
-                }
-                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
-                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (args.length < 4) {
@@ -116,13 +107,9 @@ public class TeamCommandHandler {
                 addBukkitPlayer.sendMessage(Messages.TEAM_YOU_WERE_ADDED(targetTeamName));
             }
             case "remove" -> {
-                // Remove a player from a team (Admins only, manual mode)
+                // Remove a player from a team (Admins only)
                 if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_REMOVE.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
-                    return false;
-                }
-                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
-                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (args.length < 4) {
@@ -157,9 +144,7 @@ public class TeamCommandHandler {
                     return false;
                 }
                 if (!(sender instanceof Player renamePlayer)) {
-                    if (sender != null) {
-                        sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
-                    }
+                    sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
                     return false;
                 }
                 vch.uhc.models.UHCPlayer renameUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(renamePlayer.getUniqueId());
@@ -197,13 +182,9 @@ public class TeamCommandHandler {
                 });
             }
             case "leave" -> {
-                // Leave your current team (Manual mode before game start)
+                // Leave your current team (before game start)
                 if (!sender.hasPermission(vch.uhc.misc.enums.Permission.TEAM_LEAVE.getNode())) {
                     sender.sendMessage(Messages.NO_PERMISSION());
-                    return false;
-                }
-                if (UHC.getPlugin().getSettings().getTeamMode() != TeamMode.MANUAL) {
-                    sender.sendMessage(Messages.TEAM_MANUAL_ONLY());
                     return false;
                 }
                 if (UHC.getPlugin().getSettings().getGameState() == GameState.IN_PROGRESS) {
@@ -211,9 +192,7 @@ public class TeamCommandHandler {
                     return false;
                 }
                 if (!(sender instanceof Player leavePlayer)) {
-                    if (sender != null) {
-                        sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
-                    }
+                    sender.sendMessage(Messages.TEAM_PLAYERS_ONLY());
                     return false;
                 }
                 vch.uhc.models.UHCPlayer leaveUhcPlayer = UHC.getPlugin().getPlayerManager().getPlayerByUUID(leavePlayer.getUniqueId());

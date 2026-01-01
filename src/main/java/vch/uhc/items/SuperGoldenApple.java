@@ -33,8 +33,14 @@ public class SuperGoldenApple extends BaseItem {
         if (!isEnabled())
             return false;
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 240, 2));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,100, 4));
+        // 5 Hearts
+        double currentHealth = player.getHealth();
+        double maxHealth = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
+        double newHealth = Math.min(currentHealth + 10.0, maxHealth);
+        player.setHealth(newHealth);
+        
+        // Absorption II
+        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 240, 1));
         player.getInventory().getItemInMainHand().setAmount(item.getAmount() - 1);
         
         return true;

@@ -1,6 +1,7 @@
 package vch.uhc.listeners;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,6 +36,17 @@ public class PlayerDeathListener extends BaseListener {
 
         Player victim = e.getEntity();
         Player killer = victim.getKiller();
+        
+        // Check combat tracker if no direct killer
+        if (killer == null) {
+            UUID lastAttackerUUID = UHC.getPlugin().getCombatTracker().getLastAttacker(victim.getUniqueId());
+            if (lastAttackerUUID != null) {
+                killer = Bukkit.getPlayer(lastAttackerUUID);
+            }
+        }
+        
+        // Clear combat tag after death
+        UHC.getPlugin().getCombatTracker().clearTag(victim.getUniqueId());
 
         UHCPlayer uhcVictim = UHC.getPlugin().getPlayerManager().getPlayerByUUID(victim.getUniqueId());
 
@@ -42,7 +54,6 @@ public class PlayerDeathListener extends BaseListener {
 
             // Create double chest with player's items
             Location deathLoc = victim.getLocation();
-            List<ItemStack> drops = e.getDrops();
             
             // Add player head if killed by another player
             if (killer != null && killer instanceof Player) {
@@ -51,11 +62,15 @@ public class PlayerDeathListener extends BaseListener {
                 if (skullMeta != null) {
                     skullMeta.setOwningPlayer(victim);
                     playerHead.setItemMeta(skullMeta);
-                    drops.add(playerHead);
+                    e.getDrops().add(playerHead);
                 }
             }
             
-            if (!drops.isEmpty() && deathLoc.getWorld() != null) {
+            if (!e.getDrops().isEmpty() && deathLoc.getWorld() != null) {
+                // Copy drops to avoid clearing them before adding to chest
+                List<ItemStack> dropsCopy = new java.util.ArrayList<>(e.getDrops());
+                e.getDrops().clear();
+                
                 Block block = deathLoc.getBlock();
                 block.setType(Material.CHEST);
                 
@@ -63,8 +78,8 @@ public class PlayerDeathListener extends BaseListener {
                 Block adjacentBlock = null;
                 Location[] adjacentLocations = {
                     deathLoc.clone().add(1, 0, 0),  // East
-                    deathLoc.clone().add(-1, 0, 0), // West
                     deathLoc.clone().add(0, 0, 1),  // South
+                    deathLoc.clone().add(-1, 0, 0), // West
                     deathLoc.clone().add(0, 0, -1)  // North
                 };
                 
@@ -84,7 +99,7 @@ public class PlayerDeathListener extends BaseListener {
                 Bukkit.getScheduler().runTaskLater(UHC.getPlugin(), () -> {
                     if (block.getState() instanceof Chest chest) {
                         Inventory chestInv = chest.getInventory();
-                        for (ItemStack item : drops) {
+                        for (ItemStack item : dropsCopy) {
                             if (item != null && item.getType() != Material.AIR) {
                                 chestInv.addItem(item);
                             }
@@ -92,8 +107,6 @@ public class PlayerDeathListener extends BaseListener {
                         chest.update();
                     }
                 }, 1L);
-                
-                e.getDrops().clear();
             }
 
             uhcVictim.removeLife();

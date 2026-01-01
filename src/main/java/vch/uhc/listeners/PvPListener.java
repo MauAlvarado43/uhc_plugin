@@ -23,18 +23,21 @@ public class PvPListener extends BaseListener {
             return;
         }
 
+        Player victim = (Player) e.getEntity();
+        Player attacker = (Player) e.getDamager();
 
         if (UHC.getPlugin().getUHCManager().isAgreementActive()) {
             e.setCancelled(true);
             
-            Player damager = (Player) e.getDamager();
-            damager.sendMessage(Messages.PVP_DISABLED_AGREEMENT());
+            attacker.sendMessage(Messages.PVP_DISABLED_AGREEMENT());
             
             int remainingSeconds = UHC.getPlugin().getUHCManager().getAgreementRemainingSeconds();
             int minutes = remainingSeconds / 60;
             int seconds = remainingSeconds % 60;
             
-            damager.sendMessage(Messages.PVP_TIME_REMAINING(minutes, seconds));
+            attacker.sendMessage(Messages.PVP_TIME_REMAINING(minutes, seconds));
+        } else {
+            UHC.getPlugin().getCombatTracker().tagPlayer(victim.getUniqueId(), attacker.getUniqueId());
         }
     }
 

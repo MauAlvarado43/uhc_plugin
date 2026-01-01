@@ -59,9 +59,19 @@ public class HyperGoldenApple extends BaseItem {
         if (attribute != null) {
             double currentMaxHealth = attribute.getBaseValue();
             double maxHealthLimit = UHC.getPlugin().getSettings().getMaxHealth();
-
-            if (!(currentMaxHealth + 4.0D > maxHealthLimit))
-                attribute.setBaseValue(currentMaxHealth + 4.0D);
+            
+            double extraBuffHealth = 0;
+            if (UHC.getPlugin().getSettings().isBuffsEnabled()) {
+                extraBuffHealth = UHC.getPlugin().getSettings().getExtraHearts() * 2.0;
+            }
+            double totalLimit = maxHealthLimit + extraBuffHealth;
+            
+            if (currentMaxHealth + 4.0 > totalLimit) {
+                player.sendMessage(vch.uhc.misc.Messages.ITEM_MAX_HEALTH_REACHED());
+                return true;
+            }
+            
+            attribute.setBaseValue(currentMaxHealth + 4.0);
         }
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 130, 1));

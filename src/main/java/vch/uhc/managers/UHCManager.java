@@ -666,8 +666,8 @@ public class UHCManager {
                     continue;
                 }
 
-                if (bukkitP1.getGameMode() == org.bukkit.GameMode.SPECTATOR ||
-                        bukkitP2.getGameMode() == org.bukkit.GameMode.SPECTATOR) {
+                if (bukkitP1.getGameMode() != org.bukkit.GameMode.SURVIVAL ||
+                        bukkitP2.getGameMode() != org.bukkit.GameMode.SURVIVAL) {
                     continue;
                 }
 
@@ -763,8 +763,35 @@ public class UHCManager {
         int currentElapsedSeconds = elapsedHours * 3600 + elapsedMinutes * 60 + elapsedSeconds;
 
         if (maxTeamFormationSeconds > 0 && currentElapsedSeconds >= maxTeamFormationSeconds) {
+            for (UHCPlayer player : activePlayers) {
+                if (player.getTeam() == null) {
+                    boolean added = false;
+                    for (UHCTeam existingTeam : teamManager.getTeams()) {
+                        if (existingTeam.getMembers().size() < settings.getTeamSize()) {
+                            teamManager.addPlayer(existingTeam, player);
+                            Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
+                            if (bukkitPlayer != null) {
+                                bukkitPlayer.sendMessage(Messages.UHC_YOU_JOINED(existingTeam.getName()));
+                            }
+                            added = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!added) {
+                        teamManager.createTeam(player, "Team " + (teamManager.getTeams().size() + 1));
+                        Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
+                        if (bukkitPlayer != null) {
+                            bukkitPlayer.sendMessage(Messages.UHC_TEAM_FORMED_SOLO());
+                        }
+                    }
+                }
+            }
+            
             isCheckingProximity = false;
             teamsFormed = true;
+            
+            Bukkit.getServer().broadcast(Component.text(Messages.TEAM_FORMATION_ENDED()));
         }
 
     }

@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import vch.uhc.UHC;
-import vch.uhc.managers.PlayerManager;
+import vch.uhc.managers.player.PlayerManager;
 import vch.uhc.misc.enums.GameState;
 import vch.uhc.models.UHCTeam;
 

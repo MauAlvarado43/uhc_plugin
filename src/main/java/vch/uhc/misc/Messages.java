@@ -53,7 +53,6 @@ public class Messages {
     public static String BAN_ELIMINATED() {
         return lang().getMessage("elimination.ban_message");
     }
-    
 
     public static String ELIMINATED_TITLE() {
         return lang().getMessage("elimination.title");
@@ -1347,6 +1346,18 @@ public class Messages {
         return lang().getMessage("menu.playerLives.rightClick");
     }
 
+    public static String MENU_LANGUAGE() {
+        return lang().getMessage("menu.language");
+    }
+
+    public static String MENU_LANGUAGE_CURRENT(String lang) {
+        return lang().getMessage("menu.language.current", lang);
+    }
+
+    public static String MENU_LANGUAGE_CLICK() {
+        return lang().getMessage("menu.language.click");
+    }
+
     public static String MENU_ELIMINATION_MODE() {
         return lang().getMessage("menu.eliminationMode");
     }
@@ -1954,5 +1965,25 @@ public class Messages {
 
     public static String DRAW_WINNER_LABEL() {
         return lang().getMessage("draw.winner.label");
+    }
+
+    public static String MAIN_GAME_PAUSED() {
+        return lang().getMessage("main.game_paused");
+    }
+
+    public static String MAIN_GAME_RESUMED() {
+        return lang().getMessage("main.game_resumed");
+    }
+
+    public static String MAIN_GAME_CANCELLED() {
+        return lang().getMessage("main.game_cancelled");
+    }
+
+    public static String TEAM_JOINED(String teamName) {
+        return lang().getMessage("team.joined", teamName);
+    }
+
+    public static String TEAM_FORMED(String teamName) {
+        return lang().getMessage("team.formed", teamName);
     }
 }

@@ -11,25 +11,31 @@ import vch.uhc.expansions.PlayerExpansion;
 import vch.uhc.expansions.PlayerHealthExpansion;
 import vch.uhc.expansions.PlayerLivesExpansion;
 import vch.uhc.expansions.TeamExpansion;
-import vch.uhc.listeners.AFKListener;
-import vch.uhc.listeners.AdvancementListener;
-import vch.uhc.listeners.ChatListener;
-import vch.uhc.listeners.EntityDeathListener;
-import vch.uhc.listeners.FoodListener;
-import vch.uhc.listeners.MenuListener;
-import vch.uhc.listeners.PlayerDamageListener;
-import vch.uhc.listeners.PlayerDeathListener;
-import vch.uhc.listeners.PlayerJoinListener;
-import vch.uhc.managers.AFKManager;
-import vch.uhc.managers.BackupManager;
-import vch.uhc.managers.CombatTracker;
-import vch.uhc.managers.GameModeManager;
-import vch.uhc.managers.MenuManager;
-import vch.uhc.managers.PlayerManager;
-import vch.uhc.managers.SkinManager;
-import vch.uhc.managers.StatsManager;
-import vch.uhc.managers.TeamManager;
-import vch.uhc.managers.UHCManager;
+import vch.uhc.listeners.chat.ChatListener;
+import vch.uhc.listeners.game.EntityDeathListener;
+import vch.uhc.listeners.game.PvPListener;
+import vch.uhc.listeners.player.AFKListener;
+import vch.uhc.listeners.player.AdvancementListener;
+import vch.uhc.listeners.player.FoodListener;
+import vch.uhc.listeners.player.PlayerDamageListener;
+import vch.uhc.listeners.player.PlayerDeathListener;
+import vch.uhc.listeners.player.PlayerInteractListener;
+import vch.uhc.listeners.player.PlayerJoinListener;
+import vch.uhc.listeners.player.SkinRevealListener;
+import vch.uhc.listeners.ui.MenuListener;
+import vch.uhc.managers.game.BackupManager;
+import vch.uhc.managers.game.GameModeManager;
+import vch.uhc.managers.game.GameTimerManager;
+import vch.uhc.managers.game.UHCManager;
+import vch.uhc.managers.game.WorldManager;
+import vch.uhc.managers.player.AFKManager;
+import vch.uhc.managers.player.CombatTracker;
+import vch.uhc.managers.player.PlayerManager;
+import vch.uhc.managers.player.SkinManager;
+import vch.uhc.managers.player.StatsManager;
+import vch.uhc.managers.player.TeamManager;
+import vch.uhc.managers.ui.MenuManager;
+import vch.uhc.managers.ui.ScoreboardManager;
 import vch.uhc.misc.CommandCompleter;
 import vch.uhc.misc.LanguageManager;
 import vch.uhc.misc.Settings;
@@ -42,6 +48,9 @@ public class UHC extends JavaPlugin {
 
     private PlayerManager playerManager;
     private TeamManager teamManager;
+    private ScoreboardManager scoreboardManager;
+    private WorldManager worldManager;
+    private GameTimerManager gameTimerManager;
     private UHCManager uhcManager;
     private SkinManager skinManager;
     private StatsManager statsManager;
@@ -56,9 +65,14 @@ public class UHC extends JavaPlugin {
 
         languageManager = new LanguageManager();
         settings = new Settings();
+        settings.load();
+        languageManager.setLanguage(settings.getLanguage());
 
         playerManager = new PlayerManager();
         teamManager = new TeamManager();
+        scoreboardManager = new ScoreboardManager();
+        worldManager = new WorldManager();
+        gameTimerManager = new GameTimerManager();
         uhcManager = new UHCManager();
         skinManager = new SkinManager();
         statsManager = new StatsManager();
@@ -68,15 +82,25 @@ public class UHC extends JavaPlugin {
         combatTracker = new CombatTracker();
         backupManager = new BackupManager();
 
-        new ChatListener().register();
-        new EntityDeathListener().register();
-        new FoodListener().register();
-        new PlayerDeathListener().register();
+        // Register Player Listeners
         new PlayerJoinListener().register();
-        new AFKListener().register();
+        new PlayerDeathListener().register();
         new PlayerDamageListener().register();
-        new MenuListener().register();
+        new PlayerInteractListener().register();
+        new FoodListener().register();
         new AdvancementListener().register();
+        new AFKListener().register();
+        new SkinRevealListener().register();
+
+        // Register Game Listeners
+        new EntityDeathListener().register();
+        new PvPListener().register();
+
+        // Register UI Listeners
+        new MenuListener().register();
+
+        // Register Chat Listeners
+        new ChatListener().register();
 
         Objects.requireNonNull(getCommand("uhc")).setTabCompleter(new CommandCompleter());
         Objects.requireNonNull(getCommand("uhc")).setExecutor(new MainCommandHandler());
@@ -86,29 +110,30 @@ public class UHC extends JavaPlugin {
             new PlayerExpansion().register();
             new PlayerLivesExpansion().register();
             new PlayerHealthExpansion().register();
-            System.out.println("Expansions registered!");
+            getLogger().info("Expansions registered!");
         } else {
             getLogger().warning("PlaceholderAPI not found, team system may not work properly.");
         }
 
         ConsoleCommandSender console = Bukkit.getConsoleSender();
         String version = this.getPluginMeta().getVersion();
-        console.sendMessage("""
+        String brand = settings != null ? settings.getBrandName() : "UHC";
 
-                \u00a76==========================\u00a7r
-                \u00a7a    UHC %s\u00a7r
-                \u00a7b        /\\
-                       /  \\
-                      /\u00a7f /\\ \u00a7b\\
-                     /\u00a7f_/__\\_\u00a7b\\
-                     \\      /
-                      \\    /
-                       \\  /
-                        \\/\u00a7r
-                """.formatted(version)
-                + "\u00a76==========================" + "\u00a7r" + "\n"
+        console.sendMessage("\n"
+                + "§6  _    _ _    _  _____   §e _   _                   _ \n"
+                + "§6 | |  | | |  | |/ ____|  §e| \\ | |                 | |\n"
+                + "§6 | |  | | |__| | |       §e|  \\| | ___  _ __   __ _| |\n"
+                + "§6 | |  | |  __  | |       §e| . ` |/ _ \\| '_ \\ / _` | |\n"
+                + "§6 | |__| | |  | | |____   §e| |\\  | (_) | |_) | (_| | |\n"
+                + "§6  \\____/|_|  |_|\\_____|  §e|_| \\_|\\___/| .__/ \\__,_|_|\n"
+                + "§e                             | |              \n"
+                + "§e                             |_|              \n"
+                + "§f  » §bVersion: §f" + version + "\n"
+                + "§f  » §bEvent: §f" + brand + "\n"
+                + "§f  » §bStatus: §aREADY §f(Managers Initialized)\n"
+                + "§6  ------------------------------------------"
         );
-        
+
         // Auto-load game state if backup exists
         if (backupManager.hasBackup()) {
             getLogger().info("Found existing game state backup. Loading...");
@@ -185,4 +210,15 @@ public class UHC extends JavaPlugin {
         return backupManager;
     }
 
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
+
+    public WorldManager getWorldManager() {
+        return worldManager;
+    }
+
+    public GameTimerManager getGameTimerManager() {
+        return gameTimerManager;
+    }
 }

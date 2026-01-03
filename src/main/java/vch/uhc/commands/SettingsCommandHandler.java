@@ -78,6 +78,7 @@ public class SettingsCommandHandler {
                 }
 
                 UHC.getPlugin().getSettings().setGameMode(gameMode);
+                UHC.getPlugin().getSettings().save();
                 sender.sendMessage(Messages.SETTINGS_TEAM_MODE_SET(gameMode.toString()));
             }
 
@@ -96,6 +97,7 @@ public class SettingsCommandHandler {
                 }
 
                 UHC.getPlugin().getSettings().setTeamMode(teamMode);
+                UHC.getPlugin().getSettings().save();
                 sender.sendMessage(Messages.SETTINGS_TEAM_MODE_SET(teamMode.toString()));
             }
 
@@ -104,6 +106,7 @@ public class SettingsCommandHandler {
                 try {
                     int teamSize = Integer.parseInt(value);
                     UHC.getPlugin().getSettings().setTeamSize(teamSize);
+                    UHC.getPlugin().getSettings().save();
                     sender.sendMessage(Messages.SETTINGS_TEAM_SIZE_SET(teamSize));
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_TEAM_SIZE_INVALID());
@@ -115,6 +118,7 @@ public class SettingsCommandHandler {
                 try {
                     int playerLives = Integer.parseInt(value);
                     UHC.getPlugin().getSettings().setPlayerLives(playerLives);
+                    UHC.getPlugin().getSettings().save();
                     sender.sendMessage(Messages.SETTINGS_PLAYER_LIVES_SET(playerLives));
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_PLAYER_LIVES_INVALID());
@@ -126,6 +130,7 @@ public class SettingsCommandHandler {
                 try {
                     int maxWorldSize = Integer.parseInt(value);
                     UHC.getPlugin().getSettings().setMaxWorldSize(maxWorldSize);
+                    UHC.getPlugin().getSettings().save();
                     sender.sendMessage(Messages.SETTINGS_MAX_WORLD_SIZE_SET(maxWorldSize));
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_MAX_WORLD_SIZE_INVALID());
@@ -137,6 +142,7 @@ public class SettingsCommandHandler {
                 try {
                     int minWorldSize = Integer.parseInt(value);
                     UHC.getPlugin().getSettings().setMinWorldSize(minWorldSize);
+                    UHC.getPlugin().getSettings().save();
                     sender.sendMessage(Messages.SETTINGS_MIN_WORLD_SIZE_SET(minWorldSize));
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_MIN_WORLD_SIZE_INVALID());
@@ -157,6 +163,7 @@ public class SettingsCommandHandler {
                         UHC.getPlugin().getSettings().setGameSeconds(timeVal);
                         sender.sendMessage(Messages.SETTINGS_SECONDS_SET(timeVal));
                     }
+                    UHC.getPlugin().getSettings().save();
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_HOURS_INVALID());
                 }
@@ -176,6 +183,7 @@ public class SettingsCommandHandler {
                         UHC.getPlugin().getSettings().setAgreementSeconds(timeVal);
                         sender.sendMessage(Messages.SETTINGS_AGREEMENT_SECONDS_SET(timeVal));
                     }
+                    UHC.getPlugin().getSettings().save();
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_HOURS_INVALID());
                 }
@@ -195,6 +203,7 @@ public class SettingsCommandHandler {
                         UHC.getPlugin().getSettings().setMinWorldBorderSeconds(timeVal);
                         sender.sendMessage(Messages.SETTINGS_MIN_BORDER_SECONDS_SET(timeVal));
                     }
+                    UHC.getPlugin().getSettings().save();
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_HOURS_INVALID());
                 }
@@ -214,6 +223,7 @@ public class SettingsCommandHandler {
                         UHC.getPlugin().getSettings().setMaxTeamInGameSeconds(timeVal);
                         sender.sendMessage(Messages.SETTINGS_MAX_TEAM_SECONDS_SET(timeVal));
                     }
+                    UHC.getPlugin().getSettings().save();
                 } catch (NumberFormatException e) {
                     sender.sendMessage(Messages.SETTINGS_HOURS_INVALID());
                 }
@@ -223,6 +233,7 @@ public class SettingsCommandHandler {
                 // Enable or disable randomized Shulker box delivery
                 boolean shulkerEnabled = value.equalsIgnoreCase("true") || value.equalsIgnoreCase("enabled");
                 UHC.getPlugin().getSettings().setShulkerEnabled(shulkerEnabled);
+                UHC.getPlugin().getSettings().save();
                 String status = shulkerEnabled ? Messages.INFO_ENABLED() : Messages.INFO_DISABLED();
                 sender.sendMessage(Messages.SETTINGS_SHULKER_SET(status));
             }
@@ -231,6 +242,7 @@ public class SettingsCommandHandler {
                 // Enable or disable the nearby player locator HUD element
                 boolean locatorBarEnabled = value.equalsIgnoreCase("true") || value.equalsIgnoreCase("enabled");
                 UHC.getPlugin().getSettings().setLocatorBarEnabled(locatorBarEnabled);
+                UHC.getPlugin().getSettings().save();
                 String status = locatorBarEnabled ? Messages.INFO_ENABLED() : Messages.INFO_DISABLED();
                 sender.sendMessage(Messages.SETTINGS_LOCATOR_BAR_SET(status));
             }
@@ -270,6 +282,7 @@ public class SettingsCommandHandler {
                     itemEntry.disable();
                 }
 
+                UHC.getPlugin().getSettings().save();
                 sender.sendMessage(Messages.SETTINGS_RECIPE_SET(recipeName, enabled));
             }
 

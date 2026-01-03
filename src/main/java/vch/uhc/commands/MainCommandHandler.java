@@ -132,9 +132,7 @@ public class MainCommandHandler implements CommandExecutor {
                         sender.sendMessage(Messages.MAIN_JOINED_UHC());
                     }
                 } else {
-                    if (sender != null) {
-                        sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_JOIN());
-                    }
+                    sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_JOIN());
                 }
             }
             case "leave" -> {
@@ -149,9 +147,7 @@ public class MainCommandHandler implements CommandExecutor {
                         sender.sendMessage(Messages.MAIN_LEFT_UHC());
                     }
                 } else {
-                    if (sender != null) {
-                        sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_LEAVE());
-                    }
+                    sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_LEAVE());
                 }
             }
             case "settings" -> {
@@ -169,9 +165,7 @@ public class MainCommandHandler implements CommandExecutor {
                 if (sender instanceof Player player) {
                     plugin.getMenuManager().openMainMenu(player);
                 } else {
-                    if (sender != null) {
-                        sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_MENU());
-                    }
+                    sender.sendMessage(Messages.MAIN_PLAYERS_ONLY_MENU());
                 }
             }
             case "stats" -> {
@@ -196,9 +190,7 @@ public class MainCommandHandler implements CommandExecutor {
                         }
                     }
                 } else {
-                    if (sender != null) {
-                        sender.sendMessage(Messages.AFK_ONLY_PLAYERS());
-                    }
+                    sender.sendMessage(Messages.AFK_ONLY_PLAYERS());
                 }
             }
             case "players" -> {
@@ -216,12 +208,12 @@ public class MainCommandHandler implements CommandExecutor {
                     sender.sendMessage(Messages.NO_PERMISSION());
                     return false;
                 }
-                
+
                 if (args.length < 2) {
-                    sender.sendMessage("§cUso: /uhc backup <save|load|clear>");
+                    sender.sendMessage("§cUsage: /uhc backup <save|load|clear>");
                     return false;
                 }
-                
+
                 switch (args[1].toLowerCase()) {
                     case "save" -> {
                         plugin.getBackupManager().saveGameState();
@@ -239,7 +231,7 @@ public class MainCommandHandler implements CommandExecutor {
                         sender.sendMessage(vch.uhc.misc.Messages.BACKUP_CLEARED());
                     }
                     default -> {
-                        sender.sendMessage("§cSubcomando desconocido. Usa: save, load, o clear");
+                        sender.sendMessage("§cUnknown subcommand. Use: save, load, or clear");
                     }
                 }
             }
